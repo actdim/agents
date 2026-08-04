@@ -68,6 +68,37 @@ OpenCode uses flat `commands/*.md` with different front-matter, so those are **g
 same `SKILL.md` bodies** at install time; `init-agents`' helper files (`protocol.md`, `init-agents.sh`)
 are placed in `~/.config/opencode/actdim-agents/`. Either way the instruction text has a single source.
 
+### How each tool resolves the files
+
+**Inheritance is automatic — a nested folder does NOT need to reference the level above.** All three
+tools walk UP the directory tree from the working directory and concatenate what they find, so
+instructions written once at the root apply to every folder beneath it.
+
+| Tool | File it looks for | Resolution |
+|------|-------------------|------------|
+| Claude Code | **`CLAUDE.md` only** (never `AGENTS.md`) | Every `CLAUDE.md` from the filesystem root down to the cwd is concatenated; the nearest is read last. |
+| Codex | `AGENTS.md` | `~/.codex/AGENTS.md` → git root → down to the cwd, joined root-first; files closer to the cwd override earlier guidance. One file per directory; `AGENTS.override.md` is checked first. |
+| OpenCode | `AGENTS.md` | Walks up from the cwd, then `~/.config/opencode/AGENTS.md`, then falls back to `~/.claude/CLAUDE.md`. |
+
+Consequences worth knowing:
+
+- **A subfolder's `CLAUDE.md` is required for Claude Code** — not for inheritance, but because Claude
+  never reads `AGENTS.md`. Without it, that folder's own `AGENTS.md` specifics are invisible to Claude
+  (Codex and OpenCode find them by themselves). This is why `init-agents` writes the `@AGENTS.md`
+  pointer in every folder it scaffolds.
+- **The REF block in nested `AGENTS.md` files is optional.** Inheritance already works without it; it
+  exists only as a signpost for a reader — or an agent — handed that folder in isolation (a narrow
+  subagent, a partial checkout), and to note that the folder keeps its own `.agents/`.
+- **Claude loads nested files lazily** — a subfolder's `CLAUDE.md` enters context only when Claude
+  reads a file in that subfolder, and after `/compact` only the root one is re-injected. Keep
+  long-lived rules (code style, conventions) at the **root**, where they always load.
+- **Codex caps the merged docs** at `project_doc_max_bytes` (32 KiB default) and stops accumulating
+  past it — a reason to keep per-folder specifics lean.
+
+Sources: [Claude Code memory](https://code.claude.com/docs/en/memory) ·
+[Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md) ·
+[OpenCode rules](https://opencode.ai/docs/rules/)
+
 ## Layout
 
 ```
