@@ -1,10 +1,3 @@
-# Working guidance
-
-- Always brace `if`/`else`/`for`/`foreach`/`while`/`do`/`using` etc. — never single-line or same-line bodies. Every language.
-- No `#region`/`#endregion` (or equivalent folding directives).
-- English everywhere: code, comments, doc-comments, identifiers, log/exception messages.
-- Don't rush to implement. First check: is it warranted? technically sound? any ambiguities to clarify? does it fit the current architecture and the roadmap/vision? If any is in doubt, raise it before coding.
-
 # ACTDIM-AGENTS-PROTOCOL
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
@@ -27,7 +20,7 @@ Also, when relevant: `.agents/VISION.md`, `.agents/GLOSSARY.md`, and the `.agent
 - On completion, MOVE the file to `.agents/TASKS/done/<slug>.md` and update the board.
 
 ## While working
-- Follow the conventions above and in `AGENTS.md`.
+- Follow the conventions in `AGENTS.md`.
 - `DECISIONS.md` is APPEND-ONLY: add a new dated entry per non-trivial architectural decision; never edit past ones — mark a replaced one "Superseded by #N".
 - Add any new/clarified domain term to `.agents/GLOSSARY.md`.
 - Keep the task you touch current (its `status`/`updated` + board line); new work found = a new task.

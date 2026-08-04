@@ -1,6 +1,6 @@
 ---
 name: init-agents
-description: Scaffold or refresh the provider-agnostic agent-context structure in a repository — root AGENTS.md (with a managed protocol block that carries the global working guidance + the agent-context ritual), a CLAUDE.md that imports it, and the .agents/ directory (CONTEXT, TASKS + TASKS/, DECISIONS, VISION, GLOSSARY, HISTORY, SESSIONS). Use when the user wants to set up agent context/instructions for a project, initialize the agent structure, or invokes /init-agents. Idempotent — re-running refreshes only the managed protocol block and never overwrites existing dynamic state files.
+description: Scaffold or refresh the provider-agnostic agent-context structure in a repository — root AGENTS.md (with a managed block carrying the agent-context protocol), a CLAUDE.md that imports it, and the .agents/ directory (CONTEXT, TASKS + TASKS/, DECISIONS, VISION, GLOSSARY, HISTORY, SESSIONS). Use when the user wants to set up agent context/instructions for a project, initialize the agent structure, or invokes /init-agents. Idempotent — re-running refreshes only the managed protocol block and never overwrites existing dynamic state files.
 ---
 
 # init-agents
@@ -50,13 +50,6 @@ Behaviour (whichever variant you chose):
 The PROTOCOL TEXT to place between the markers is the canonical file **`protocol.md`** (same folder as this skill) — that is the single source of truth; stamp its contents verbatim. The copy reproduced below is for reference only and must be kept identical to `protocol.md`:
 
 ---
-# Working guidance
-
-- Always brace `if`/`else`/`for`/`foreach`/`while`/`do`/`using` etc. — never single-line or same-line bodies. Every language.
-- No `#region`/`#endregion` (or equivalent folding directives).
-- English everywhere: code, comments, doc-comments, identifiers, log/exception messages.
-- Don't rush to implement. First check: is it warranted? technically sound? any ambiguities to clarify? does it fit the current architecture and the roadmap/vision? If any is in doubt, raise it before coding.
-
 # ACTDIM-AGENTS-PROTOCOL
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
@@ -79,7 +72,7 @@ Also, when relevant: `.agents/VISION.md`, `.agents/GLOSSARY.md`, and the `.agent
 - On completion, MOVE the file to `.agents/TASKS/done/<slug>.md` and update the board.
 
 ## While working
-- Follow the conventions above and in `AGENTS.md`.
+- Follow the conventions in `AGENTS.md`.
 - `DECISIONS.md` is APPEND-ONLY: add a new dated entry per non-trivial architectural decision; never edit past ones — mark a replaced one "Superseded by #N".
 - Add any new/clarified domain term to `.agents/GLOSSARY.md`.
 - Keep the task you touch current (its `status`/`updated` + board line); new work found = a new task.

@@ -53,6 +53,7 @@ that every agent reads and keeps up to date.
 | `wrap-session` | End-of-session update: session log, context, tasks, decisions, history. |
 | `sync-context` | Refresh just the nearest `.agents/CONTEXT.md`. |
 | `sync-tasks`   | Reconcile the task board + per-task files with the actual work. |
+| `sync-decisions` | Append architectural decisions as ADR entries; mark superseded ones. |
 
 ## Provider support
 
@@ -78,6 +79,7 @@ actdim-agents/
     wrap-session/               # SKILL.md
     sync-context/               # SKILL.md
     sync-tasks/                 # SKILL.md
+    sync-decisions/             # SKILL.md
 ```
 
 The authoritative protocol text is `skills/init-agents/protocol.md`.
