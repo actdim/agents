@@ -7,7 +7,7 @@ plus the skills/commands that scaffold and maintain it. One convention, honored 
 ## Why
 
 AI agents start every session blind. They don't remember the decisions you made last time,
-the current state of the work, the open tasks, or the project's conventions — so they
+the current state of the work, the open issues, or the project's conventions — so they
 re-ask the same questions, contradict earlier choices, and drift. And each tool keeps its
 guidance in its own place (`~/.claude`, `~/.codex`, `~/.config/opencode`, `~/.gemini/config`), so nothing is shared.
 
@@ -17,10 +17,10 @@ that every agent reads and keeps up to date.
 ## What it gives
 
 - **Persistent project memory, versioned in the repo** (not locked inside one tool): current
-  state, task board, architectural decisions, vision/roadmap, glossary, and a per-session log.
+  state, issue board, architectural decisions, vision/roadmap, glossary, and a per-session log.
 - **One protocol for all four agents** — write conventions once, every tool follows them.
 - **Low-friction upkeep** — skills/commands scaffold the structure and update it at the end of
-  a session (session log, context, tasks, decisions, history) instead of you doing bookkeeping.
+  a stage or session (documentation check, session log, context, issues, decisions, history) instead of you doing bookkeeping.
 - **Travels with the code** — teammates who clone and CI agents get the same context; there is
   no global state to sync.
 
@@ -37,23 +37,29 @@ that every agent reads and keeps up to date.
   short **REF** block pointing up to it — no duplication.
 - `.agents/` holds:
   - `CONTEXT.md` — short "you are here" snapshot of the current state (read every session).
-  - `TASKS.md` + `TASKS/<slug>.md` (+ `TASKS/done/`) — a compact board and one file per task (YAML front-matter: status, dates).
+  - `ISSUES.md` + `ISSUES/<type>--<slug>.md` (+ `ISSUES/done/`) — a compact issue board (`## Active`, `## Backlog`, `## Done`) and one file per typed issue (YAML front-matter: `slug`, `type`, `status`, `priority`, `created`, `updated`). Supported types: `feat`, `bug`, `debt`, `task`, `docs`.
   - `DECISIONS.md` — append-only ADR log (never rewritten; superseded, not deleted).
   - `VISION.md` — scope, non-goals, roadmap.
   - `GLOSSARY.md` — domain terms.
   - `HISTORY.md` + `SESSIONS/<year>/<date>--<slug>.md` — an index and one log per session (YAML front-matter: date, agent, branch, commit, summary).
-- **Session lifecycle:** at the start, the agent reads `AGENTS.md` + `.agents/{CONTEXT,TASKS,DECISIONS}`;
-  it works; at the end it logs the session, refreshes `CONTEXT`, updates `TASKS`, appends `HISTORY`,
-  and records any decisions — all kept compact, and never containing secrets.
+- **Session & Stage lifecycle:** at the start, the agent reads `AGENTS.md` + `.agents/{CONTEXT,ISSUES,DECISIONS}`;
+  it works; at the end of a stage or session, it:
+  1. Checks if documentation/`README.md`/`AGENTS.md` needs updating.
+  2. Logs the session in `SESSIONS/`.
+  3. Refreshes `CONTEXT.md`.
+  4. Updates `ISSUES.md` (moves done issues to `ISSUES/done/`).
+  5. Appends `HISTORY.md` line and records any decisions — all kept compact and secret-free.
 
 ### Skills / commands
 
 | Skill | Purpose |
 |-------|---------|
-| `init-agents`  | Scaffold/refresh `AGENTS.md` + `CLAUDE.md` + `.agents/` in a folder (FULL vs REF auto-detected; a folder-own `VISION.md` is moved into `.agents/`). |
-| `wrap-session` | End-of-session update: session log, context, tasks, decisions, history. |
+| `init-agents`  | Scaffold/refresh `AGENTS.md` + `CLAUDE.md` + `.agents/` in a folder (auto-migrates legacy `TASKS` to `ISSUES`; FULL vs REF auto-detected). |
+| `wrap-session` | End-of-stage/session update: documentation check, session log, context, issues, decisions, history. |
+| `wrap-stage`   | Alias for `wrap-session` focused on completing a work stage / milestone phase. |
 | `sync-context` | Refresh just the nearest `.agents/CONTEXT.md`. |
-| `sync-tasks`   | Reconcile the task board + per-task files with the actual work. |
+| `sync-issues`  | Reconcile the issue board + per-issue `<type>--<slug>.md` files with the actual work. |
+| `sync-tasks`   | Backward-compatible alias for `sync-issues`. |
 | `sync-decisions` | Append architectural decisions as ADR entries; mark superseded ones. |
 
 ## Provider support
@@ -112,7 +118,8 @@ actdim-agents/
     init-agents/                # SKILL.md + protocol.md + init-agents.sh
     wrap-session/               # SKILL.md
     sync-context/               # SKILL.md
-    sync-tasks/                 # SKILL.md
+    sync-issues/                # SKILL.md
+    sync-tasks/                 # SKILL.md (alias)
     sync-decisions/             # SKILL.md
 ```
 
@@ -140,5 +147,6 @@ bash install.sh --symlink       # symlink skill folders (claude/codex/antigravit
 
 - In a repo (or subfolder) run `/init-agents` (or `bash skills/init-agents/init-agents.sh <dir>`)
   to scaffold `AGENTS.md` + `CLAUDE.md` + `.agents/`.
-- Work as usual; use `/wrap-session` at the end (or `/sync-context` / `/sync-tasks` for focused updates).
+- Work as usual; use `/wrap-session` at the end of a stage or session (or `/sync-context` / `/sync-issues` for focused updates).
+
 

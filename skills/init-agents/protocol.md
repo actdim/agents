@@ -27,12 +27,20 @@ Also, when relevant: `.agents/VISION.md`, `.agents/GLOSSARY.md`, and the `.agent
 - Add any new/clarified domain term to `.agents/GLOSSARY.md`.
 - Keep the issue you touch current (its `status`/`updated` + board line); new work found = a new issue file.
 
-## When you finish a stage/session — update, in order
-1. New session file `.agents/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` (slug 2–5 words; if it exists, suffix `-02`…). Begin with YAML front-matter (`date`, `slug`, `agent` = tool/model, `branch`, `commit`, `summary`), then a body: what changed & why, files touched, decisions (by slug/#N), issues advanced, gaps/follow-ups.
-2. Rewrite `.agents/CONTEXT.md` to the new state — a SHORT snapshot, not a log; history goes to the session file.
-3. Update `.agents/ISSUES.md` (+ move any done issue to `ISSUES/done/`).
-4. Append one line to `.agents/HISTORY.md`: `<YYYY-MM-DD> — <slug> — <agent> — <summary> — <link>`.
-Touch `.agents/VISION.md` only if scope/roadmap changed.
+## Stage Completion Triggers
+A **Stage** (or milestone phase) is a meaningful, verified unit of work. An agent MUST recognize that a Stage is complete when:
+1. **Issue Acceptance Met**: An active Issue (`.agents/ISSUES/<type>--<slug>.md`) has satisfied its acceptance criteria and passes verification.
+2. **Plan Milestone Reached**: A distinct phase of an implementation plan agreed with the user is complete.
+3. **Explicit Request**: The user asks to wrap up, checkpoint, or complete the current stage.
+
+## Stage & Session Wrap-up Protocol (Update in order)
+When a Stage or session completes, perform the following steps:
+1. **Documentation & Protocol Check** — Review if `README.md`, `AGENTS.md` (project conventions), or project guides need updates following the completed stage/task. Update them or report required doc updates.
+2. **Session log** — Write a new session file `.agents/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` (slug 2–5 words; if it exists, suffix `-02`…). Begin with YAML front-matter (`date`, `slug`, `agent` = tool/model, `branch`, `commit`, `summary`), then a body: what changed & why, files touched, decisions (by slug/#N), issues advanced, gaps/follow-ups.
+3. **CONTEXT** — Rewrite `.agents/CONTEXT.md` to the new state — a SHORT snapshot, not a log; history goes to the session file.
+4. **ISSUES** — Update `.agents/ISSUES.md` (+ move any completed issue to `ISSUES/done/`).
+5. **HISTORY** — Append one line to `.agents/HISTORY.md`: `<YYYY-MM-DD> — <slug> — <agent> — <summary> — <link>`.
+6. **VISION** — Touch `.agents/VISION.md` only if scope/roadmap changed.
 
 ## Rules
 - Windows-safe filenames: dates `YYYY-MM-DD` (no `:`), date first. Issue files keep a stable `<type>--<slug>.md` name; the only move is open → `ISSUES/done/`.
