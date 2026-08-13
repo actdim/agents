@@ -111,11 +111,43 @@ else
   echo "CLAUDE.md: already imports @AGENTS.md (unchanged)"
 fi
 
-# --- .agents/ skeletons (create only if missing) ---
+# --- .agents/ skeletons & migration (TASKS -> ISSUES) ---
 A="$ROOT/.agents"
 YEAR="$(date +%Y)"
-mkdir -p "$A/TASKS/done" "$A/SESSIONS/$YEAR"
-for k in "$A/TASKS/.gitkeep" "$A/TASKS/done/.gitkeep" "$A/SESSIONS/$YEAR/.gitkeep"; do
+
+if [ -d "$A" ]; then
+  if [ -f "$A/TASKS.md" ] && [ ! -f "$A/ISSUES.md" ]; then
+    mv "$A/TASKS.md" "$A/ISSUES.md"
+    sed -i 's/# Tasks/# Issues/g; s/TASKS/ISSUES/g' "$A/ISSUES.md" 2>/dev/null || true
+    echo "  migrated .agents/TASKS.md -> .agents/ISSUES.md"
+  fi
+  if [ -d "$A/TASKS" ] && [ ! -d "$A/ISSUES" ]; then
+    mv "$A/TASKS" "$A/ISSUES"
+    echo "  migrated .agents/TASKS/ -> .agents/ISSUES/"
+  fi
+  for folder in "$A/ISSUES" "$A/ISSUES/done"; do
+    if [ -d "$folder" ]; then
+      for f in "$folder"/*.md; do
+        [ -f "$f" ] || continue
+        fname="$(basename "$f")"
+        if [[ "$fname" != *"--"* ]]; then
+          tprefix="task"
+          case "$fname" in
+            *fix*|*bug*) tprefix="bug" ;;
+            *add*|*feat*|*new*) tprefix="feat" ;;
+            *refactor*|*clean*|*debt*) tprefix="debt" ;;
+            *doc*|*readme*) tprefix="docs" ;;
+          esac
+          mv "$f" "$folder/${tprefix}--${fname}"
+          echo "  renamed issue: $fname -> ${tprefix}--${fname}"
+        fi
+      done
+    fi
+  done
+fi
+
+mkdir -p "$A/ISSUES/done" "$A/SESSIONS/$YEAR"
+for k in "$A/ISSUES/.gitkeep" "$A/ISSUES/done/.gitkeep" "$A/SESSIONS/$YEAR/.gitkeep"; do
   if [ ! -f "$k" ]; then : > "$k"; fi
 done
 
@@ -132,10 +164,12 @@ _Current-state snapshot. Keep SHORT; history goes to SESSIONS/._
 - Status: initialized (no work recorded yet).
 EOF
 
-write_if_missing "$A/TASKS.md" <<'EOF'
-# Tasks   (glyphs: [ ] open  [~] in-progress  [!] blocked  [x] done)
+write_if_missing "$A/ISSUES.md" <<'EOF'
+# Issues   (glyphs: [ ] open  [~] in-progress  [!] blocked  [x] done)
 
 ## Active
+
+## Backlog
 
 ## Done (recent)
 EOF
@@ -169,6 +203,7 @@ write_if_missing "$A/HISTORY.md" <<'EOF'
 _Index of sessions (newest last). One line per session:_
 _`<YYYY-MM-DD> — <slug> — <agent> — <summary> — <relative link>`_
 EOF
+
 
 # --- VISION: move a folder-own VISION.md into .agents/, else skeleton ---
 if [ ! -f "$A/VISION.md" ]; then

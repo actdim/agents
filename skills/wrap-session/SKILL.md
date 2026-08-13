@@ -1,6 +1,6 @@
 ---
 name: wrap-session
-description: Wrap up the current coding session by updating the repo's .agents/ state — write a session log file, refresh CONTEXT, update the TASKS board (moving completed tasks to TASKS/done/), append a HISTORY line, and record any decisions/glossary terms. Use when the user ends a session, says to wrap up / save context / log the session, or invokes /wrap-session. Requires the .agents/ structure to exist (created by init-agents).
+description: Wrap up the current coding session by updating the repo's .agents/ state — write a session log file, refresh CONTEXT, update the ISSUES board (moving completed issues to ISSUES/done/), append a HISTORY line, and record any decisions/glossary terms. Use when the user ends a session, says to wrap up / save context / log the session, or invokes /wrap-session. Requires the .agents/ structure to exist (created by init-agents).
 ---
 
 # wrap-session
@@ -29,10 +29,10 @@ Perform the end-of-session update defined by the repo's agent context protocol. 
    # <Title>
 
    What changed this session and why; files touched; decisions made (by slug / #N);
-   tasks advanced (by slug); known gaps / follow-ups.
+   issues advanced (by slug); known gaps / follow-ups.
    ```
 2. **CONTEXT** — rewrite `.agents/CONTEXT.md` to the NEW current state. Keep it SHORT — a snapshot, not a log; push detail into the session file. If it has grown past ~1 screen, compress it.
-3. **TASKS** — update `.agents/TASKS.md` and the relevant `.agents/TASKS/<slug>.md`: mark progress; for any completed task MOVE its file to `.agents/TASKS/done/<slug>.md` and update the board line. Add newly discovered tasks (new file + board line). Keep the board lean.
+3. **ISSUES** — update `.agents/ISSUES.md` and the relevant `.agents/ISSUES/<type>--<slug>.md`: mark progress; for any completed issue MOVE its file to `.agents/ISSUES/done/<type>--<slug>.md` and update the board line. Add newly discovered issues (new file + board line). Keep the board lean.
 4. **DECISIONS** — if any non-trivial architectural/design decision was made this session, APPEND a dated entry to `.agents/DECISIONS.md` (never edit past entries; mark a replaced one "Superseded by #N").
 5. **GLOSSARY** — if any domain term was introduced/clarified, add it to `.agents/GLOSSARY.md`.
 6. **HISTORY** — APPEND one line to `.agents/HISTORY.md`:
@@ -40,8 +40,9 @@ Perform the end-of-session update defined by the repo's agent context protocol. 
 7. **VISION** — update `.agents/VISION.md` ONLY if scope/roadmap actually changed.
 
 ## Rules
-- Filenames Windows-safe: `YYYY-MM-DD`, no `:`, date first. Reference tasks by slug, not path.
-- Keep `CONTEXT.md` and `TASKS.md` compact.
+- Filenames Windows-safe: `YYYY-MM-DD`, no `:`, date first. Reference issues by slug, not path.
+- Keep `CONTEXT.md` and `ISSUES.md` compact.
+
 - NEVER write secrets/credentials/tokens into these files.
 - Do not `git add`/commit unless the user asks.
 

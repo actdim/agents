@@ -1,3 +1,4 @@
+<!-- BEGIN ACTDIM-AGENTS-PROTOCOL root (managed by init-agents — do not edit by hand) -->
 # ACTDIM-AGENTS-PROTOCOL
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
@@ -38,4 +39,15 @@ Touch `.agents/VISION.md` only if scope/roadmap changed.
 - Windows-safe filenames: dates `YYYY-MM-DD` (no `:`), date first. Issue files keep a stable `<type>--<slug>.md` name; the only move is open → `ISSUES/done/`.
 - Keep `CONTEXT.md` and `ISSUES.md` compact — they cost context every session.
 - Never write secrets/credentials/tokens/keys into these files; they are committed.
+
+<!-- END ACTDIM-AGENTS-PROTOCOL -->
+
+## Project specifics
+
+This repository is `actdim-agents` — the provider-agnostic agent-context protocol and skills suite for Claude Code, Codex, OpenCode, and Antigravity.
+
+- **Skills Source**: `skills/` (`init-agents`, `wrap-session`, `sync-context`, `sync-issues`, `sync-decisions`, `sync-tasks`).
+- **Install Commands**:
+  - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Target all` (or `install.bat`).
+  - Linux / macOS: `bash install.sh`.
 

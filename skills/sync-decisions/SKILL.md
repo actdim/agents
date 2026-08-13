@@ -20,7 +20,7 @@ Maintain `DECISIONS.md`. Operate on the NEAREST `.agents/` for the folder you're
    - Consequences: <trade-offs accepted, what this obliges callers/future work to do, follow-ups>
    ```
 4. If a new decision REPLACES an older one: leave the old entry's text intact and only change its `Status:` to `superseded by #NNN`; the new entry should reference the one it replaces. Never edit, renumber, reorder, or delete past entries — this file is append-only.
-5. Cross-reference where useful: task slugs and session files that carry the work out.
+5. Cross-reference where useful: issue slugs and session files that carry the work out.
 
 ## Rules
 - Capture the *why*, not a diff — an entry must still make sense a year later, without the chat.

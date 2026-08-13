@@ -2,14 +2,14 @@
 
 A provider-agnostic **agent-context system** for repositories — the `ACTDIM-AGENTS-PROTOCOL`
 plus the skills/commands that scaffold and maintain it. One convention, honored by
-**Claude Code**, **Codex**, and **OpenCode**.
+**Claude Code**, **Codex**, **OpenCode**, and **Antigravity**.
 
 ## Why
 
 AI agents start every session blind. They don't remember the decisions you made last time,
 the current state of the work, the open tasks, or the project's conventions — so they
 re-ask the same questions, contradict earlier choices, and drift. And each tool keeps its
-guidance in its own place (`~/.claude`, `~/.codex`, `~/.config/opencode`), so nothing is shared.
+guidance in its own place (`~/.claude`, `~/.codex`, `~/.config/opencode`, `~/.gemini/config`), so nothing is shared.
 
 This system fixes that by giving the **repository** a small, durable, human-readable memory
 that every agent reads and keeps up to date.
@@ -18,7 +18,7 @@ that every agent reads and keeps up to date.
 
 - **Persistent project memory, versioned in the repo** (not locked inside one tool): current
   state, task board, architectural decisions, vision/roadmap, glossary, and a per-session log.
-- **One protocol for all three agents** — write conventions once, every tool follows them.
+- **One protocol for all four agents** — write conventions once, every tool follows them.
 - **Low-friction upkeep** — skills/commands scaffold the structure and update it at the end of
   a session (session log, context, tasks, decisions, history) instead of you doing bookkeeping.
 - **Travels with the code** — teammates who clone and CI agents get the same context; there is
@@ -32,6 +32,7 @@ that every agent reads and keeps up to date.
   - Claude Code reads `CLAUDE.md`, which imports `AGENTS.md`.
   - Codex reads `AGENTS.md`.
   - OpenCode reads `AGENTS.md` (and falls back to `~/.claude/CLAUDE.md`).
+  - Antigravity reads `AGENTS.md` (or `GEMINI.md`).
 - The FULL protocol text is stamped **once** at the architecture root; nested folders get a
   short **REF** block pointing up to it — no duplication.
 - `.agents/` holds:
@@ -62,15 +63,16 @@ that every agent reads and keeps up to date.
 | Claude Code  | `CLAUDE.md` → imports `AGENTS.md`   | `~/.claude/skills/<name>/SKILL.md` (copied verbatim) |
 | Codex        | `AGENTS.md` (native)                | `~/.codex/skills/<name>/SKILL.md` (copied verbatim)  |
 | OpenCode     | `AGENTS.md` (native, + `CLAUDE.md`) | `~/.config/opencode/commands/<name>.md` (generated)  |
+| Antigravity  | `AGENTS.md` / `GEMINI.md` (native)  | `~/.gemini/config/skills/<name>/SKILL.md` (copied verbatim) |
 
-Claude & Codex share the identical `SKILL.md` format, so the skill folders are copied as-is.
+Claude, Codex & Antigravity share the identical `SKILL.md` format, so the skill folders are copied as-is.
 OpenCode uses flat `commands/*.md` with different front-matter, so those are **generated from the
 same `SKILL.md` bodies** at install time; `init-agents`' helper files (`protocol.md`, `init-agents.sh`)
 are placed in `~/.config/opencode/actdim-agents/`. Either way the instruction text has a single source.
 
 ### How each tool resolves the files
 
-**Inheritance is automatic — a nested folder does NOT need to reference the level above.** All three
+**Inheritance is automatic — a nested folder does NOT need to reference the level above.** All four
 tools walk UP the directory tree from the working directory and concatenate what they find, so
 instructions written once at the root apply to every folder beneath it.
 
@@ -79,12 +81,13 @@ instructions written once at the root apply to every folder beneath it.
 | Claude Code | **`CLAUDE.md` only** (never `AGENTS.md`) | Every `CLAUDE.md` from the filesystem root down to the cwd is concatenated; the nearest is read last. |
 | Codex | `AGENTS.md` | `~/.codex/AGENTS.md` → git root → down to the cwd, joined root-first; files closer to the cwd override earlier guidance. One file per directory; `AGENTS.override.md` is checked first. |
 | OpenCode | `AGENTS.md` | Walks up from the cwd, then `~/.config/opencode/AGENTS.md`, then falls back to `~/.claude/CLAUDE.md`. |
+| Antigravity | `AGENTS.md` / `GEMINI.md` | Walks up from the cwd to the repo root (`AGENTS.md`, `GEMINI.md`, `.agents/rules/*.md`), plus `~/.gemini/config/`. |
 
 Consequences worth knowing:
 
 - **A subfolder's `CLAUDE.md` is required for Claude Code** — not for inheritance, but because Claude
   never reads `AGENTS.md`. Without it, that folder's own `AGENTS.md` specifics are invisible to Claude
-  (Codex and OpenCode find them by themselves). This is why `init-agents` writes the `@AGENTS.md`
+  (Codex, OpenCode, and Antigravity find them by themselves). This is why `init-agents` writes the `@AGENTS.md`
   pointer in every folder it scaffolds.
 - **The REF block in nested `AGENTS.md` files is optional.** Inheritance already works without it; it
   exists only as a signpost for a reader — or an agent — handed that folder in isolation (a narrow
@@ -117,20 +120,20 @@ The authoritative protocol text is `skills/init-agents/protocol.md`.
 
 ## Install
 
-Targets: `claude`, `codex`, `opencode`, `both` (claude+codex), `all` (default).
+Targets: `claude`, `codex`, `opencode`, `antigravity`, `both` (claude+codex), `all` (default).
 
 **Windows:**
 ```
 install.bat                     # all (copy); re-run after `git pull` to update
-install.bat -Target opencode    # one provider
-install.bat -Symlink            # symlink skill folders (claude/codex); needs admin / Developer Mode
+install.bat -Target antigravity # one provider
+install.bat -Symlink            # symlink skill folders (claude/codex/antigravity); needs admin / Developer Mode
 ```
 
 **Linux / macOS:**
 ```
 bash install.sh                 # all (copy)
-bash install.sh --target=codex  # one provider
-bash install.sh --symlink       # symlink skill folders (claude/codex)
+bash install.sh --target=antigravity # one provider
+bash install.sh --symlink       # symlink skill folders (claude/codex/antigravity)
 ```
 
 ## Use
@@ -138,3 +141,4 @@ bash install.sh --symlink       # symlink skill folders (claude/codex)
 - In a repo (or subfolder) run `/init-agents` (or `bash skills/init-agents/init-agents.sh <dir>`)
   to scaffold `AGENTS.md` + `CLAUDE.md` + `.agents/`.
 - Work as usual; use `/wrap-session` at the end (or `/sync-context` / `/sync-tasks` for focused updates).
+

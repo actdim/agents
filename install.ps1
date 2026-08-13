@@ -1,21 +1,22 @@
-# install.ps1 — install the ACTDIM-AGENTS skills into Claude Code, Codex and/or OpenCode.
+# install.ps1 — install the ACTDIM-AGENTS skills into Claude Code, Codex, OpenCode and/or Antigravity.
 #
-# Claude & Codex use the same ~/.<tool>/skills/<name>/SKILL.md format -> the skill folders are copied verbatim.
+# Claude, Codex & Antigravity use the same ~/.<tool>/skills/<name>/SKILL.md format -> the skill folders are copied verbatim.
 # OpenCode uses flat ~/.config/opencode/commands/<name>.md commands -> generated from the same SKILL.md bodies;
 #   init-agents' helper files (protocol.md, init-agents.sh) go to ~/.config/opencode/actdim-agents/.
-# The ACTDIM-AGENTS-PROTOCOL itself is picked up by all three natively via each repo's AGENTS.md.
+# The ACTDIM-AGENTS-PROTOCOL itself is picked up by all four natively via each repo's AGENTS.md.
 #
 # Usage:
 #   powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1                  # all (default), copy
-#   powershell ... -File install.ps1 -Target claude    # claude | codex | opencode | both | all
-#   powershell ... -File install.ps1 -Symlink          # symlink skill folders (claude/codex)
+#   powershell ... -File install.ps1 -Target claude    # claude | codex | opencode | antigravity | both | all
+#   powershell ... -File install.ps1 -Symlink          # symlink skill folders (claude/codex/antigravity)
 
 param(
-    [ValidateSet('claude', 'codex', 'opencode', 'both', 'all')][string]$Target = 'all',
+    [ValidateSet('claude', 'codex', 'opencode', 'antigravity', 'both', 'all')][string]$Target = 'all',
     [switch]$Symlink,
-    [string]$ClaudeHome   = (Join-Path $env:USERPROFILE '.claude'),
-    [string]$CodexHome    = (Join-Path $env:USERPROFILE '.codex'),
-    [string]$OpencodeHome = (Join-Path $env:USERPROFILE '.config\opencode')
+    [string]$ClaudeHome      = (Join-Path $env:USERPROFILE '.claude'),
+    [string]$CodexHome       = (Join-Path $env:USERPROFILE '.codex'),
+    [string]$OpencodeHome    = (Join-Path $env:USERPROFILE '.config\opencode'),
+    [string]$AntigravityHome = (Join-Path $env:USERPROFILE '.gemini\config')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -74,19 +75,22 @@ function Install-OpenCode {
 }
 
 $targets = switch ($Target) {
-    'claude'   { @('claude') }
-    'codex'    { @('codex') }
-    'opencode' { @('opencode') }
-    'both'     { @('claude', 'codex') }
-    'all'      { @('claude', 'codex', 'opencode') }
+    'claude'      { @('claude') }
+    'codex'       { @('codex') }
+    'opencode'    { @('opencode') }
+    'antigravity' { @('antigravity') }
+    'both'        { @('claude', 'codex') }
+    'all'         { @('claude', 'codex', 'opencode', 'antigravity') }
 }
 
 foreach ($t in $targets) {
     switch ($t) {
-        'claude'   { Install-SkillFolders $ClaudeHome }
-        'codex'    { Install-SkillFolders $CodexHome }
-        'opencode' { Install-OpenCode }
+        'claude'      { Install-SkillFolders $ClaudeHome }
+        'codex'       { Install-SkillFolders $CodexHome }
+        'opencode'    { Install-OpenCode }
+        'antigravity' { Install-SkillFolders $AntigravityHome }
     }
 }
 
-Write-Host "Done. Claude/Codex skills register next session as /init-agents etc.; OpenCode picks up /commands and reads AGENTS.md natively."
+Write-Host "Done. Claude/Codex/Antigravity skills register next session as /init-agents etc.; OpenCode picks up /commands and all read AGENTS.md natively."
+

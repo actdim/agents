@@ -5,7 +5,8 @@ description: Scaffold or refresh the provider-agnostic agent-context structure i
 
 # init-agents
 
-Scaffold (or refresh) the agent-context structure for a project. Both Codex (reads `AGENTS.md` natively) and Claude Code (reads `CLAUDE.md`, which imports `AGENTS.md`) will then pick it up. There is intentionally NO global config — this skill is the single source of truth and stamps everything into the repo.
+Scaffold (or refresh) the agent-context structure for a project. Codex, OpenCode, and Antigravity (read `AGENTS.md` natively) as well as Claude Code (reads `CLAUDE.md`, which imports `AGENTS.md`) will then pick it up. There is intentionally NO global config — this skill is the single source of truth and stamps everything into the repo.
+
 
 **Preferred execution:** run the deterministic helper `bash "<this skill's folder>/init-agents.sh" [TARGET_DIR]` — it does ALL the mechanical work below exactly and idempotently (FULL vs REF detection via walk-up, `.agents/` skeletons, the `CLAUDE.md` pointer, and moving a folder-own `VISION.md` into `.agents/` with the source deleted). It runs under Git Bash on Windows. After it finishes, do ONLY the judgment parts the script cannot: relocate any legacy hand-written `AGENTS.md`/`CLAUDE.md` content into `## Project specifics`, and fill in specifics. The step-by-step spec below is what the script implements — follow it by hand only if you cannot run the script.
 
@@ -56,7 +57,7 @@ This repo carries its own agent context, provider-agnostically. Follow it every 
 
 ## Scope & precedence
 - Any folder may carry its own `AGENTS.md` + `.agents/`; they apply to that folder and everything under it. Use the NEAREST ones for the area you're working in; higher-level ones add broader context. On conflict, the more specific wins.
-- Global/user config still applies as defaults (Claude auto-loads `~/.claude/CLAUDE.md`, Codex `~/.codex/AGENTS.md`). Precedence: nearest > higher-level > global.
+- Global/user config still applies as defaults (Claude auto-loads `~/.claude/CLAUDE.md`, Codex `~/.codex/AGENTS.md`, Antigravity `~/.gemini/config/GEMINI.md`). Precedence: nearest > higher-level > global.
 
 ## At session start — read these yourself (they are NOT auto-loaded)
 Use the NEAREST `.agents/` for the area you're working in (fall back to a higher-level one if the folder has none):
@@ -109,15 +110,17 @@ Determine the current year via `date +%Y` and today's date via `date +%F`.
 
   - Status: initialized (no work recorded yet).
   ```
-- `.agents/TASKS.md`:
+- `.agents/ISSUES.md`:
   ```
-  # Tasks   (glyphs: [ ] open  [~] in-progress  [!] blocked  [x] done)
+  # Issues   (glyphs: [ ] open  [~] in-progress  [!] blocked  [x] done)
 
   ## Active
 
+  ## Backlog
+
   ## Done (recent)
   ```
-- `.agents/TASKS/.gitkeep` and `.agents/TASKS/done/.gitkeep` (empty).
+- `.agents/ISSUES/.gitkeep` and `.agents/ISSUES/done/.gitkeep` (empty).
 - `.agents/DECISIONS.md`:
   ```
   # Decisions (ADR — append-only)
