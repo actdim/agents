@@ -58,8 +58,20 @@ function Install-SkillFolders([string]$homeDir) {
         $target = Join-Path $dst $d.Name
         if (Test-Path $target) { Remove-Item -Recurse -Force $target }
         if ($Symlink) {
-            New-Item -ItemType SymbolicLink -Path $target -Target $d.FullName | Out-Null
-            Write-Host "   linked  $($d.Name)"
+            try {
+                New-Item -ItemType SymbolicLink -Path $target -Target $d.FullName -ErrorAction Stop | Out-Null
+                Write-Host "   linked  $($d.Name)"
+            }
+            catch {
+                $null = cmd /c mklink /J "`"$target`"" "`"$($d.FullName)`"" 2>&1
+                if (Test-Path $target) {
+                    Write-Host "   linked (junction)  $($d.Name)"
+                }
+                else {
+                    Copy-Item -Recurse $d.FullName $target
+                    Write-Host "   copied (fallback)  $($d.Name)"
+                }
+            }
         }
         else {
             Copy-Item -Recurse $d.FullName $target
