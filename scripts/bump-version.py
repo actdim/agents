@@ -47,3 +47,4 @@ for filepath in files_to_update:
     updated_count += 1
 
 print(f"Successfully bumped version to v{new_version} across {updated_count} files!")
+
