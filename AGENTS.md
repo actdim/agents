@@ -30,6 +30,7 @@ Also, when relevant: `.agents/VISION.md`, `.agents/GLOSSARY.md`, and the `.agent
   - `02-domain-model.md`: Domain concepts, business logic, and terms.
   - `03-setup-and-workflow.md`: Build, run, test, and workflow instructions.
 - **Bootstrapping**: Use `/init-kb` to bootstrap or refresh `.agents/KB/` from existing `README.md`, `AGENTS.md`, human `docs/`, and codebase analysis.
+- **Strict Fact Grounding Requirement**: When generating (`/init-kb`) or updating (`/sync-kb`) Knowledge Base articles, agents MUST extract facts strictly from actual `README.md`, `docs/`, `package.json`, and codebase symbols. Generating generic LLM placeholders, placeholder component names (e.g. "Schema Parser"), or domain concepts not explicitly found in the codebase is strictly prohibited.
 - **Maintenance**: When implementing non-trivial features or architectural changes, update corresponding articles in `.agents/KB/` and run `/sync-kb`.
 
 ## While working
