@@ -14,7 +14,8 @@ Use this skill to perform hybrid search across the project's **Knowledge Base (K
 ## Workflow
 
 1. **Perform KB Search**:
-   - Query project Knowledge Base files (`.agents/`, `docs/`, `wiki/`, `README.md`) using targeted semantic and keyword lookup.
+   - If `wiki-llm` MCP tools (`search_wiki_tool`, `get_wiki_article_tool`) are available, call `search_wiki_tool` with `query: "<query>"` to search across project documentation.
+   - Otherwise, perform native hybrid search across project Knowledge Base files (`.agents/`, `docs/`, `wiki/`, `README.md`) using targeted semantic and keyword lookup.
 
 2. **Format & Present Results**:
    - Format header cleanly as `# Project Knowledge Base Search Results (Knowledge Base Search v1.3.1)`.

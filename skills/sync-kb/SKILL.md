@@ -12,6 +12,7 @@ Use this skill to update, verify, and synchronize the hybrid search index across
 
 1. **Scan Knowledge Base Files**:
    - Inspect `.agents/` (`CONTEXT.md`, `ISSUES.md`, `DECISIONS.md`, `VISION.md`, `GLOSSARY.md`), `README.md`, `docs/`, `wiki/`.
+   - If `wiki-llm` MCP tools are available, call `sync_wiki_tool` or `build_or_update_wiki_index_tool` to refresh the vector index.
 
 2. **Reconcile Indexes & Cross-links**:
    - Update semantic cross-links and project context summaries.
