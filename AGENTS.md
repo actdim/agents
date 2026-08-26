@@ -1,5 +1,5 @@
 <!-- BEGIN ACTDIM-AGENTS-PROTOCOL root (managed by init-agents — do not edit by hand) -->
-# ACTDIM-AGENTS-PROTOCOL v1.3.0
+# ACTDIM-AGENTS-PROTOCOL v1.3.1
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
