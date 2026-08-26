@@ -81,12 +81,30 @@ that every agent reads and keeps up to date.
 
 ## Install
 
-**Windows:**
+### Option A: Clone & Install (Recommended)
+
+**Windows (PowerShell):**
 ```powershell
+git clone https://github.com/actdim/actdim-agents.git
+cd actdim-agents
 powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Target all
 ```
 
-**Linux / macOS:**
+**Linux / macOS (Bash):**
 ```bash
+git clone https://github.com/actdim/actdim-agents.git
+cd actdim-agents
 bash install.sh --target=all
+```
+
+### Option B: One-Liner Quick Install
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/actdim/actdim-agents/main/install.ps1 | iex
+```
+
+**Linux / macOS (Bash):**
+```bash
+curl -fsSL https://raw.githubusercontent.com/actdim/actdim-agents/main/install.sh | bash
 ```
