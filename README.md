@@ -45,7 +45,7 @@ that every agent reads and keeps up to date.
   - `GLOSSARY.md` — domain terms.
   - `HISTORY.md` + `SESSIONS/<year>/<date>--<slug>.md` — an index and one log per session (YAML front-matter: date, agent, branch, commit, summary).
 
-### Skills / commands (v1.2.0)
+### Skills / commands (v1.3.1)
 
 | Skill | Purpose |
 |-------|---------|
