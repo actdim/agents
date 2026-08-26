@@ -16,6 +16,7 @@ set -euo pipefail
 
 TARGET=all
 SYMLINK=0
+INSTALL_DEPS=0
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 OPENCODE_HOME="${OPENCODE_HOME:-$HOME/.config/opencode}"
@@ -24,6 +25,7 @@ for arg in "$@"; do
   case "$arg" in
     --target=*)           TARGET="${arg#*=}" ;;
     --symlink)            SYMLINK=1 ;;
+    --install-deps)       INSTALL_DEPS=1 ;;
     --claude-home=*)      CLAUDE_HOME="${arg#*=}" ;;
     --codex-home=*)       CODEX_HOME="${arg#*=}" ;;
     --opencode-home=*)    OPENCODE_HOME="${arg#*=}" ;;
@@ -31,6 +33,20 @@ for arg in "$@"; do
     *) echo "unknown arg: $arg" >&2; exit 1 ;;
   esac
 done
+
+if ! command -v uv >/dev/null 2>&1; then
+  if [ "$INSTALL_DEPS" -eq 1 ]; then
+    echo "-> Installing 'uv' package & Python version manager..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+  else
+    echo "-> [Note] 'uv' is recommended for automatic Python/MCP tool management."
+    echo "   Install uv:  curl -LsSf https://astral.sh/uv/install.sh | sh"
+    echo "   Or run with: ./install.sh --install-deps"
+    echo "   Or use mise: mise install"
+  fi
+else
+  echo "-> 'uv' detected: $(command -v uv)"
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 src="$SCRIPT_DIR/skills"

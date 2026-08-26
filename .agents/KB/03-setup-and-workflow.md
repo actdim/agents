@@ -7,18 +7,23 @@
   ```powershell
   git clone https://github.com/actdim/actdim-agents.git
   cd actdim-agents
-  powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Target all
+  powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Target all -InstallDeps
   ```
 - **Linux / macOS (Bash)**:
   ```bash
   git clone https://github.com/actdim/actdim-agents.git
   cd actdim-agents
-  bash install.sh --target=all
+  bash install.sh --target=all --install-deps
   ```
 
 ### Option B: One-Liner Quick Install
 - **Windows (PowerShell)**: `irm https://raw.githubusercontent.com/actdim/actdim-agents/main/install.ps1 | iex`
 - **Linux / macOS (Bash)**: `curl -fsSL https://raw.githubusercontent.com/actdim/actdim-agents/main/install.sh | bash`
+
+## Dependency & Tool Management (`uv` & `mise`)
+
+- **`uv` (Hermetic Python)**: Handles Python version management automatically. No need to install Python manually.
+- **`mise` (Polyglot Tool Manager)**: Use `mise install` with `.mise.toml` to manage Python, `uv`, Node.js, and CLI dependencies.
 
 ## Slash Commands
 - `/init-agents`: Scaffold agent context in any repository.

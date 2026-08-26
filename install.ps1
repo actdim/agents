@@ -13,6 +13,7 @@
 param(
     [ValidateSet('claude', 'codex', 'opencode', 'antigravity', 'both', 'all')][string]$Target = 'all',
     [switch]$Symlink,
+    [switch]$InstallDeps,
     [string]$ClaudeHome      = (Join-Path $env:USERPROFILE '.claude'),
     [string]$CodexHome       = (Join-Path $env:USERPROFILE '.codex'),
     [string]$OpencodeHome    = (Join-Path $env:USERPROFILE '.config\opencode'),
@@ -20,6 +21,27 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+function Check-Dependencies {
+    $uv = Get-Command 'uv' -ErrorAction SilentlyContinue
+    if (-not $uv) {
+        if ($InstallDeps) {
+            Write-Host "-> Installing 'uv' package & Python version manager..."
+            powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+        }
+        else {
+            Write-Host "-> [Note] 'uv' is recommended for automatic Python/MCP tool management."
+            Write-Host "   Install uv:  powershell -ExecutionPolicy ByPass -c `"irm https://astral.sh/uv/install.ps1 | iex`""
+            Write-Host "   Or run with: powershell ... -File install.ps1 -InstallDeps"
+            Write-Host "   Or use mise: mise install"
+        }
+    }
+    else {
+        Write-Host "-> 'uv' detected: $($uv.Source)"
+    }
+}
+
+Check-Dependencies
 
 $src = Join-Path $PSScriptRoot 'skills'
 if (-not (Test-Path $src)) { throw "Source skills folder not found: $src" }

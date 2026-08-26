@@ -108,3 +108,17 @@ irm https://raw.githubusercontent.com/actdim/actdim-agents/main/install.ps1 | ie
 ```bash
 curl -fsSL https://raw.githubusercontent.com/actdim/actdim-agents/main/install.sh | bash
 ```
+
+## Dependency & Tool Management (`uv` & `mise`)
+
+MCP tools (like `code-review-graph`) require Python and `uv` to run.
+
+- **`uv` (Hermetic Python)**: `uv` manages Python versions automatically without requiring a manually pre-installed global Python.
+  - Auto-install via installer flag: `install.ps1 -InstallDeps` / `./install.sh --install-deps`
+  - Manual `uv` install:
+    - Windows: `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+    - Linux / macOS: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- **`mise` (Polyglot Tool Manager)**: This repo includes a `.mise.toml` config for team environments using [`mise`](https://mise.jdx.dev):
+  ```bash
+  mise install
+  ```

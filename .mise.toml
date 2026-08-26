@@ -1,0 +1,5 @@
+# .mise.toml — Polyglot developer tools configuration (https://mise.jdx.dev)
+
+[tools]
+python = "3.12"
+uv = "latest"
