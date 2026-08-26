@@ -17,10 +17,14 @@ Resolve the target directory deterministically, in this priority:
 3. If that fails (not a git repo), use the current working directory.
 Do NOT infer the target from whichever file is open in the editor. State the resolved `<root>` to the user before scaffolding. Never scaffold into a subfolder's own copy of the shared state.
 
-## Idempotency & merge policy
-Re-running this skill MUST be safe — never destroy existing work. Before writing anything, READ every one of these files that already exists, so you merge against their real content.
-- `.agents/` state files (`CONTEXT.md`, `TASKS.md`, `TASKS/*`, `DECISIONS.md`, `VISION.md`, `GLOSSARY.md`, `HISTORY.md`, `SESSIONS/*`): if the file already exists, LEAVE IT EXACTLY AS IS — do not rewrite, reformat, reorder, or "upgrade" it. Only CREATE the ones that are missing (from the skeletons in Step 3).
-- `AGENTS.md` and `CLAUDE.md`: MERGE, never overwrite. Regenerate ONLY the skill-managed parts (the protocol block / the import line); preserve ALL pre-existing hand-written content verbatim — just re-lay-it-out into the new-standard structure. Take the file's current content as the base and fold the skill's parts into it.
+## Idempotency & Re-initialization Policy
+Re-running this skill MUST be safe, fast, and interactive:
+- **Interactive Prompts on Re-run**: When re-running on an existing project, ask the user (or confirm) whether to:
+  1. Re-initialize / clear the Code Graph (`code-review-graph` `graph.db`) for a fast, clean rebuild.
+  2. Re-generate / refresh the Knowledge Base (`.agents/KB/`) from latest `README.md`, `docs/`, and codebase changes.
+  3. Verify `.code-review-graph-ignore` rules.
+- `.agents/` state files (`CONTEXT.md`, `ISSUES.md`, `DECISIONS.md`, `VISION.md`, `GLOSSARY.md`, `HISTORY.md`): if existing, preserve dynamic user state.
+- `AGENTS.md` and `CLAUDE.md`: MERGE, updating only the managed protocol block while preserving custom project specs.
 - Importing a doc into `.agents/` (e.g. a folder's own `VISION.md`) is a MOVE, not a copy: copy the content into the `.agents/` file, then DELETE the source. This is allowed — the content is preserved in its new home, so the deletion removes only a stale duplicate, it does not destroy work.
 
 ## Step 1 — `<root>/AGENTS.md` (managed protocol block)

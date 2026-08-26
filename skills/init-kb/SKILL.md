@@ -32,9 +32,14 @@ Use this skill to bootstrap or refresh a structured, interlinked **Knowledge Bas
 4. **Self-Audit Check**:
    - Prior to saving any file, verify: *Is every symbol, term, and command in this document directly backed by empirical evidence in the repo?*
 
-## Workflow
+## Workflow & Interactive Re-initialization
 
-1. **Source Content Analysis**:
+1. **Re-initialization Check**:
+   - When running on a project that already has `.agents/KB/`, ask the user if they want to:
+     * Full refresh: Re-extract architecture & domain model from latest `README.md`, `docs/`, `package.json`, and codebase.
+     * Incremental sync: Run `/sync-kb` to update indexes and cross-links without overwriting custom edits.
+
+2. **Source Content Analysis**:
    - Read human documentation in `docs/`, `README.md`.
    - Read agent context files: `AGENTS.md`, `.agents/CONTEXT.md`, `.agents/DECISIONS.md`, `.agents/GLOSSARY.md`.
    - Inspect top-level project structure and main code directories (`src/`).

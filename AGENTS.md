@@ -1,5 +1,4 @@
 <!-- BEGIN ACTDIM-AGENTS-PROTOCOL root (managed by init-agents — do not edit by hand) -->
-# ACTDIM-AGENTS-PROTOCOL v1.2.0
 # ACTDIM-AGENTS-PROTOCOL v1.3.0
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
@@ -39,8 +38,7 @@ Also, when relevant: `.agents/VISION.md`, `.agents/GLOSSARY.md`, and the `.agent
 - `DECISIONS.md` is APPEND-ONLY: add a new dated entry per non-trivial architectural decision; never edit past ones — mark a replaced one "Superseded by #N".
 - Add any new/clarified domain term to `.agents/GLOSSARY.md`.
 - **Context & Token hygiene**: Keep tool output lean to prevent context bloat. Use quiet flags for builds/tests (e.g. `dotnet test -v q`, `pytest -q`), filter/limit command outputs, and inspect targeted line ranges instead of loading whole large files.
-- **Code Graph & Impact analysis**: If code graph tools (e.g. `code-review-graph` MCP: `build_or_update_graph_tool`, `get_impact_radius_tool`, `get_architecture_overview_tool`, `list_flows_tool`) are available, prioritize using them during research and refactoring to inspect dependencies, trace call hierarchies, and measure change impact with minimal token overhead.
-- **Code Graph Exclusions**: Always ensure `.code-review-graph-ignore` or `.gitignore` excludes `node_modules/`, `dist/`, `build/`, `vendor/`, `tmp/`, `.git/`, and minified bundles to keep `code-review-graph` parsing fast (< 10s) and database lean (< 20 MB).
+- **Code graph & Impact analysis**: If code graph tools (e.g. `code-review-graph` MCP: `build_or_update_graph_tool`, `get_impact_radius_tool`, `get_architecture_overview_tool`, `list_flows_tool`) are available, prioritize using them during research and refactoring to inspect dependencies, trace call hierarchies, and measure change impact with minimal token overhead.
 - **Hybrid Knowledge Base Search (KB)**: If `wiki-llm` MCP tools (`search_wiki_tool`, `get_wiki_article_tool`) or KB search tools are available, use them to perform hybrid semantic search (TF-IDF + Vector + Cross-links) across existing project documentation (`.agents/`, `docs/`, `wiki/`, `README.md`) instead of reading whole raw Markdown files. Use `/sync-kb` (or `/sync-wiki`) to update hybrid vector indexes after adding or modifying documentation.
 
 ## Stage Completion Triggers
