@@ -1,11 +1,14 @@
 # Issues   (glyphs: [ ] open  [~] in-progress  [!] blocked  [x] done)
 
 ## Active
-- [ ] `(feat)` [add-sqlite-vector-indexing](file://.agents/ISSUES/feat--add-sqlite-vector-indexing.md)
-- [ ] `(feat)` [integrate-code-review-graph-mcp](file://.agents/ISSUES/feat--integrate-code-review-graph-mcp.md)
+- [ ] `(feat)` [lsif-scip-lsp-mcp-integration](file://.agents/ISSUES/feat--lsif-scip-lsp-mcp-integration.md)
+- [ ] `(feat)` [knowledge-base-management-and-init-kb-skill](file://.agents/ISSUES/feat--knowledge-base-management-and-init-kb-skill.md)
 - [ ] `(feat)` [agentic-goals-and-mandatory-checklists](file://.agents/ISSUES/feat--agentic-goals-and-mandatory-checklists.md)
 - [ ] `(feat)` [token-efficiency-and-context-optimization-skills](file://.agents/ISSUES/feat--token-efficiency-and-context-optimization-skills.md)
 
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [integrate-wiki-llm-mcp](file://.agents/ISSUES/done/feat--integrate-wiki-llm-mcp.md)
+- [x] `(feat)` [add-sqlite-vector-indexing](file://.agents/ISSUES/done/feat--add-sqlite-vector-indexing.md)
+- [x] `(feat)` [integrate-code-review-graph-mcp](file://.agents/ISSUES/done/feat--integrate-code-review-graph-mcp.md)

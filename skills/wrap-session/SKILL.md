@@ -39,7 +39,7 @@ Recognize that a **Stage** is complete when:
    issues advanced (by slug); known gaps / follow-ups.
    ```
 3. **CONTEXT** — rewrite `.agents/CONTEXT.md` to the NEW current state. Keep it SHORT — a snapshot, not a log; push detail into the session file. If it has grown past ~1 screen, compress it.
-4. **ISSUES** — update `.agents/ISSUES.md` and the relevant `.agents/ISSUES/<type>--<slug>.md`: mark progress; for any completed issue MOVE its file to `.agents/ISSUES/done/<type>--<slug>.md` and update the board line. Add newly discovered issues (new file + board line). Keep the board lean.
+4. **ISSUES** — update `.agents/ISSUES.md` and the relevant `.agents/ISSUES/<type>--<slug>.md` in the NEAREST `.agents/` directory for the subproject/area worked on (do not dump subproject issues into the root `.agents/`): mark progress; for any completed issue MOVE its file to `.agents/ISSUES/done/<type>--<slug>.md` and update the board line. Add newly discovered issues to that nearest `.agents/`. Keep the board lean.
 5. **DECISIONS** — if any non-trivial architectural/design decision was made this session, APPEND a dated entry to `.agents/DECISIONS.md` (never edit past entries; mark a replaced one "Superseded by #N").
 6. **GLOSSARY** — if any domain term was introduced/clarified, add it to `.agents/GLOSSARY.md`.
 7. **HISTORY** — APPEND one line to `.agents/HISTORY.md`:
@@ -54,4 +54,6 @@ Recognize that a **Stage** is complete when:
 - Do not `git add`/commit unless the user asks.
 
 ## Report
-Print a concise list of exactly which files you wrote/updated/moved.
+1. Print a concise list of exactly which files you wrote/updated/moved.
+2. Prompt the user to compact their session context:
+   > 💡 **Context Tip**: Stage/Session state is safely committed to `.agents/`. If continuing in the same chat, run `/compact` (or start a fresh session) to free up token budget.

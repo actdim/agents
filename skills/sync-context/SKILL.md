@@ -19,4 +19,5 @@ Maintain `CONTEXT.md`. Operate on the NEAREST `.agents/` for the folder you're w
 - Do not `git add` / commit unless the user asks.
 
 ## Report
-State the path you rewrote and a one-line summary of the new current state.
+1. State the path you rewrote and a one-line summary of the new current state.
+2. If this was called as a midpoint checkpoint during a long session, remind the user that state is saved and they can safely run `/compact` to free tokens.

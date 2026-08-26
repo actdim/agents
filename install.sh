@@ -90,10 +90,59 @@ install_opencode() {  # generate flat commands + place init-agents helper
   done
 }
 
-if [ "$do_claude" -eq 1 ]; then install_skillfolders "$CLAUDE_HOME"; fi
-if [ "$do_codex" -eq 1 ]; then install_skillfolders "$CODEX_HOME"; fi
-if [ "$do_opencode" -eq 1 ]; then install_opencode; fi
-if [ "$do_antigravity" -eq 1 ]; then install_skillfolders "$ANTIGRAVITY_HOME"; fi
+configure_mcp_server() {  # $1 = target file path
+  local file="$1"
+  local dir="$(dirname "$file")"
+  mkdir -p "$dir"
+  if command -v python3 >/dev/null 2>&1; then
+    python3 -c "
+import json, os, sys
+path = sys.argv[1]
+data = {}
+if os.path.exists(path) and os.path.getsize(path) > 0:
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except Exception:
+        data = {}
+if not isinstance(data, dict):
+    data = {}
+if 'mcpServers' not in data or not isinstance(data['mcpServers'], dict):
+    data['mcpServers'] = {}
+if 'code-review-graph' not in data['mcpServers']:
+    data['mcpServers']['code-review-graph'] = {
+        'command': 'uvx',
+        'args': ['code-review-graph']
+    }
+    try:
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        print(f'   registered code-review-graph MCP in {path}')
+    except Exception as e:
+        print(f'   (note: could not write {path}: {e})')
+else:
+    print(f'   code-review-graph MCP already configured in {path}')
+" "$file" 2>/dev/null || true
+  fi
+}
 
-echo "Done. Claude/Codex/Antigravity skills register next session as /init-agents etc.; OpenCode picks up /commands and all read AGENTS.md natively."
+if [ "$do_claude" -eq 1 ]; then
+  install_skillfolders "$CLAUDE_HOME"
+  configure_mcp_server "$(dirname "$CLAUDE_HOME")/.claude.json"
+  configure_mcp_server "$CLAUDE_HOME/mcp_config.json"
+fi
+if [ "$do_codex" -eq 1 ]; then
+  install_skillfolders "$CODEX_HOME"
+  configure_mcp_server "$CODEX_HOME/mcp_config.json"
+fi
+if [ "$do_opencode" -eq 1 ]; then
+  install_opencode
+  configure_mcp_server "$OPENCODE_HOME/mcp_config.json"
+fi
+if [ "$do_antigravity" -eq 1 ]; then
+  install_skillfolders "$ANTIGRAVITY_HOME"
+  configure_mcp_server "$ANTIGRAVITY_HOME/mcp_config.json"
+fi
+
+echo "Done. Claude/Codex/Antigravity skills register next session as /init-agents etc.; OpenCode picks up /commands, code-review-graph MCP is configured, and all read AGENTS.md natively."
 

@@ -1,10 +1,10 @@
 ---
 slug: integrate-code-review-graph-mcp
 type: feat
-status: open
+status: done
 priority: high
 created: 2026-08-13
-updated: 2026-08-13
+updated: 2026-08-15
 ---
 
 # Integrate `code-review-graph` MCP Server via `uv`
@@ -34,6 +34,6 @@ The goal is for agents to recommend, detect, and automatically set up `code-revi
      ```
 
 ## Acceptance Criteria
-- [ ] Protocol updated to include `code-review-graph` recommendation for code analysis.
-- [ ] `init-agents` updated to offer `code-review-graph` MCP configuration via `uv`.
-- [ ] Guidelines added for agents on when to run graph building and impact radius queries.
+- [x] Protocol updated to include `code-review-graph` recommendation for code analysis.
+- [x] `init-agents` updated to offer `code-review-graph` MCP configuration via `uv`.
+- [x] Guidelines added for agents on when to run graph building and impact radius queries.

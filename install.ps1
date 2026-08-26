@@ -74,6 +74,76 @@ function Install-OpenCode {
     }
 }
 
+function Set-McpConfigJson([string]$filePath) {
+    try {
+        $parent = Split-Path -Parent $filePath
+        if ($parent -and -not (Test-Path $parent)) {
+            New-Item -ItemType Directory -Force -Path $parent | Out-Null
+        }
+        
+        $py = Get-Command 'python' -ErrorAction SilentlyContinue
+        if ($py) {
+            $script = @"
+import json, os, sys
+path = sys.argv[1]
+data = {}
+if os.path.exists(path) and os.path.getsize(path) > 0:
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except Exception:
+        data = {}
+if not isinstance(data, dict):
+    data = {}
+if 'mcpServers' not in data or not isinstance(data['mcpServers'], dict):
+    data['mcpServers'] = {}
+if 'code-review-graph' not in data['mcpServers']:
+    data['mcpServers']['code-review-graph'] = {
+        'command': 'uvx',
+        'args': ['code-review-graph']
+    }
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    print(f'   registered code-review-graph MCP in {path}')
+else:
+    print(f'   code-review-graph MCP already configured in {path}')
+"@
+            & python -c $script $filePath
+            return
+        }
+
+        $json = $null
+        if (Test-Path $filePath) {
+            $raw = Get-Content -Raw -Encoding UTF8 $filePath
+            if ($raw -and $raw.Trim()) {
+                $json = $raw | ConvertFrom-Json
+            }
+        }
+        if (-not $json) {
+            $json = [PSCustomObject]@{}
+        }
+        if (-not $json.PSObject.Properties['mcpServers']) {
+            $json | Add-Member -MemberType NoteProperty -Name 'mcpServers' -Value ([PSCustomObject]@{}) -Force
+        }
+        if (-not $json.mcpServers.PSObject.Properties['code-review-graph']) {
+            $crg = [PSCustomObject]@{
+                command = 'uvx'
+                args = @('code-review-graph')
+            }
+            $json.mcpServers | Add-Member -MemberType NoteProperty -Name 'code-review-graph' -Value $crg -Force
+            $out = $json | ConvertTo-Json -Depth 10
+            Write-Utf8NoBom $filePath $out
+            Write-Host "   registered code-review-graph MCP in $filePath"
+        }
+        else {
+            Write-Host "   code-review-graph MCP already configured in $filePath"
+        }
+    }
+    catch {
+        Write-Host "   (note: could not update $filePath - $_)"
+    }
+}
+
 $targets = switch ($Target) {
     'claude'      { @('claude') }
     'codex'       { @('codex') }
@@ -85,12 +155,25 @@ $targets = switch ($Target) {
 
 foreach ($t in $targets) {
     switch ($t) {
-        'claude'      { Install-SkillFolders $ClaudeHome }
-        'codex'       { Install-SkillFolders $CodexHome }
-        'opencode'    { Install-OpenCode }
-        'antigravity' { Install-SkillFolders $AntigravityHome }
+        'claude' {
+            Install-SkillFolders $ClaudeHome
+            Set-McpConfigJson (Join-Path $env:USERPROFILE '.claude.json')
+            Set-McpConfigJson (Join-Path $ClaudeHome 'mcp_config.json')
+        }
+        'codex' {
+            Install-SkillFolders $CodexHome
+            Set-McpConfigJson (Join-Path $CodexHome 'mcp_config.json')
+        }
+        'opencode' {
+            Install-OpenCode
+            Set-McpConfigJson (Join-Path $OpencodeHome 'mcp_config.json')
+        }
+        'antigravity' {
+            Install-SkillFolders $AntigravityHome
+            Set-McpConfigJson (Join-Path $AntigravityHome 'mcp_config.json')
+        }
     }
 }
 
-Write-Host "Done. Claude/Codex/Antigravity skills register next session as /init-agents etc.; OpenCode picks up /commands and all read AGENTS.md natively."
+Write-Host "Done. Claude/Codex/Antigravity skills register next session as /init-agents etc.; OpenCode picks up /commands, code-review-graph MCP is configured, and all read AGENTS.md natively."
 
