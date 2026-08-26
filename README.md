@@ -1,6 +1,8 @@
 # actdim-agents (v1.2.0)
+# actdim-agents (v1.3.0)
 
 A provider-agnostic **agent-context system** for repositories — the `ACTDIM-AGENTS-PROTOCOL v1.2.0`
+A provider-agnostic **agent-context system** for repositories — the `ACTDIM-AGENTS-PROTOCOL v1.3.0`
 plus the skills/commands that scaffold and maintain it. One convention, honored by
 **Claude Code**, **Codex**, **OpenCode**, and **Antigravity**.
 

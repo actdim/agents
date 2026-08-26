@@ -229,4 +229,26 @@ else
   echo "  kept   .agents/VISION.md"
 fi
 
+# --- .code-review-graph-ignore ---
+write_if_missing "$ROOT/.code-review-graph-ignore" <<'EOF'
+# Code Review Graph Exclusions
+node_modules/
+dist/
+build/
+out/
+.next/
+.nuxt/
+vendor/
+tmp/
+temp/
+coverage/
+.git/
+.agents/SESSIONS/
+*.min.js
+*.bundle.js
+*.map
+*.pyc
+__pycache__/
+EOF
+
 echo "Done: $ROOT ($MODE)"
