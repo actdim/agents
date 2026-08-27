@@ -5,6 +5,12 @@ agent: Gemini 3.6 Flash / Antigravity
 branch: main
 commit: 4507d62843be77fbe0fe156adc3531731f00a86f
 summary: Released ACTDIM-AGENTS v1.2.0 with Knowledge Base (KB) architecture, /init-kb, /search-kb, /sync-kb, /check-graph skills, and ADR #002/#003.
+issues_advanced: []
+issues_completed: []
+decisions: []
+risks_logged: []
+spikes_conducted: []
+milestone: v1.5.0-dashboard-and-analytics
 ---
 
 # Session Log: Knowledge Base (KB) Architecture v1.2.0 Integration

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# init-agents.sh — deterministic scaffolder for the ACTDIM-AGENTS agent-context structure.
+# init-agents.sh - deterministic scaffolder for the ACTDIM-AGENTS agent-context structure.
 #
 # Runs under Git Bash on Windows (the shell Claude Code's Bash tool uses); also works on Linux/macOS.
 # Uses only portable tools (awk / grep / date / mktemp) and computes relative paths + walks the tree
@@ -54,7 +54,7 @@ trap 'rm -f "$BLOCK_FILE" "$ROOT/AGENTS.md.new" "$ROOT/CLAUDE.md.new" 2>/dev/nul
 if [ -z "$ANCESTOR" ]; then
   MODE="FULL (this folder is the architecture root)"
   {
-    echo "<!-- BEGIN $MARK root (managed by init-agents — do not edit by hand) -->"
+    echo "<!-- BEGIN $MARK root (managed by init-agents - do not edit by hand) -->"
     cat "$PROTOCOL_FILE"
     echo "<!-- END $MARK -->"
   } > "$BLOCK_FILE"
@@ -71,9 +71,9 @@ else
   REL="${rel}AGENTS.md"
   MODE="REF -> $REL"
   {
-    printf '%s\n' "<!-- BEGIN $MARK ref=$REL (managed by init-agents — do not edit by hand) -->"
+    printf '%s\n' "<!-- BEGIN $MARK ref=$REL (managed by init-agents - do not edit by hand) -->"
     printf '%s\n' 'This folder belongs to a repository that uses the ACTDIM-AGENTS structure. The full working'
-    printf '%s\n' "guidance + agent-context protocol live once in the nearest ancestor \`AGENTS.md\` (\`$REL\`) —"
+    printf '%s\n' "guidance + agent-context protocol live once in the nearest ancestor \`AGENTS.md\` (\`$REL\`) -"
     printf '%s\n' 'read it there. This folder keeps its OWN `.agents/` state; use the nearest one.'
     printf '%s\n' "Only this folder's specifics follow."
     printf '%s\n' "<!-- END $MARK -->"
@@ -146,8 +146,8 @@ if [ -d "$A" ]; then
   done
 fi
 
-mkdir -p "$A/ISSUES/done" "$A/SESSIONS/$YEAR"
-for k in "$A/ISSUES/.gitkeep" "$A/ISSUES/done/.gitkeep" "$A/SESSIONS/$YEAR/.gitkeep"; do
+mkdir -p "$A/ISSUES/done" "$A/SESSIONS/$YEAR" "$A/KB" "$A/MILESTONES" "$A/RISKS" "$A/SPIKES" "$A/CHECKLISTS"
+for k in "$A/ISSUES/.gitkeep" "$A/ISSUES/done/.gitkeep" "$A/SESSIONS/$YEAR/.gitkeep" "$A/MILESTONES/.gitkeep" "$A/RISKS/.gitkeep" "$A/SPIKES/.gitkeep" "$A/CHECKLISTS/.gitkeep"; do
   if [ ! -f "$k" ]; then : > "$k"; fi
 done
 
@@ -175,12 +175,12 @@ write_if_missing "$A/ISSUES.md" <<'EOF'
 EOF
 
 write_if_missing "$A/DECISIONS.md" <<'EOF'
-# Decisions (ADR — append-only)
+# Decisions (ADR - append-only)
 
 _One dated entry per architectural decision. Never edit past entries; mark a replaced one "Superseded by #N"._
 
 <!-- Template:
-## #001 — <title>
+## #001 - <title>
 - Date: YYYY-MM-DD
 - Status: accepted            (or: superseded by #NNN)
 - Context: <why this came up>
@@ -194,14 +194,14 @@ write_if_missing "$A/GLOSSARY.md" <<'EOF'
 
 _Domain terms. Add a term when you introduce or clarify it._
 
-<!-- - **Term** — definition. -->
+<!-- - **Term** - definition. -->
 EOF
 
 write_if_missing "$A/HISTORY.md" <<'EOF'
 # History
 
 _Index of sessions (newest last). One line per session:_
-_`<YYYY-MM-DD> — <slug> — <agent> — <summary> — <relative link>`_
+_`<YYYY-MM-DD> - <slug> - <agent> - <summary> - <relative link>`_
 EOF
 
 
@@ -249,6 +249,11 @@ coverage/
 *.map
 *.pyc
 __pycache__/
-EOF
+# --- Run versioned protocol migration for v1.5.0 compatibility ---
+if command -v python3 >/dev/null 2>&1; then
+  python3 "$SCRIPT_DIR/migrate_protocol.py" "$ROOT" || true
+elif command -v python >/dev/null 2>&1; then
+  python "$SCRIPT_DIR/migrate_protocol.py" "$ROOT" || true
+fi
 
 echo "Done: $ROOT ($MODE)"

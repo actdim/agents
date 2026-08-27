@@ -5,6 +5,9 @@ status: open
 priority: high
 created: 2026-08-13
 updated: 2026-08-13
+agent: antigravity
+tags: []
+milestone: v1.5.0-dashboard-and-analytics
 ---
 
 # Introduce Agentic Goals (Autonomous Loop) & Mandatory Checklists

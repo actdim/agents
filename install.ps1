@@ -1,4 +1,4 @@
-# install.ps1 — install the ACTDIM-AGENTS skills into Claude Code, Codex, OpenCode and/or Antigravity.
+# install.ps1 - install the ACTDIM-AGENTS skills into Claude Code, Codex, OpenCode and/or Antigravity.
 #
 # Claude, Codex & Antigravity use the same ~/.<tool>/skills/<name>/SKILL.md format -> the skill folders are copied verbatim.
 # OpenCode uses flat ~/.config/opencode/commands/<name>.md commands -> generated from the same SKILL.md bodies;
@@ -77,6 +77,16 @@ function Install-SkillFolders([string]$homeDir) {
             Copy-Item -Recurse $d.FullName $target
             Write-Host "   copied  $($d.Name)"
         }
+    }
+}
+
+function Install-RuleFolders([string]$homeDir) {
+    $rulesSrc = Join-Path $PSScriptRoot 'rules'
+    if (Test-Path $rulesSrc) {
+        $dst = Join-Path $homeDir 'rules'
+        New-Item -ItemType Directory -Force -Path $dst | Out-Null
+        Copy-Item -Recurse -Force (Join-Path $rulesSrc '*') $dst
+        Write-Host "   rules copied -> $dst"
     }
 }
 
@@ -191,11 +201,13 @@ foreach ($t in $targets) {
     switch ($t) {
         'claude' {
             Install-SkillFolders $ClaudeHome
+            Install-RuleFolders $ClaudeHome
             Set-McpConfigJson (Join-Path $env:USERPROFILE '.claude.json')
             Set-McpConfigJson (Join-Path $ClaudeHome 'mcp_config.json')
         }
         'codex' {
             Install-SkillFolders $CodexHome
+            Install-RuleFolders $CodexHome
             Set-McpConfigJson (Join-Path $CodexHome 'mcp_config.json')
         }
         'opencode' {
@@ -204,9 +216,17 @@ foreach ($t in $targets) {
         }
         'antigravity' {
             Install-SkillFolders $AntigravityHome
+            Install-RuleFolders $AntigravityHome
             Set-McpConfigJson (Join-Path $AntigravityHome 'mcp_config.json')
         }
     }
+}
+
+# --- Auto-migrate current repository .agents/ metadata if present ---
+$py = Get-Command 'python' -ErrorAction SilentlyContinue
+if ($py -and (Test-Path (Join-Path $PSScriptRoot '.agents'))) {
+    Write-Host "-> Running .agents/ versioned protocol migration for v1.5.0 compatibility..."
+    & python (Join-Path $src 'init-agents\migrate_protocol.py') $PSScriptRoot
 }
 
 Write-Host "Done. Claude/Codex/Antigravity skills register next session as /init-agents etc.; OpenCode picks up /commands, code-review-graph MCP is configured, and all read AGENTS.md natively."

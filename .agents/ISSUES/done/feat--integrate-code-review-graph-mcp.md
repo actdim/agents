@@ -5,6 +5,10 @@ status: done
 priority: high
 created: 2026-08-13
 updated: 2026-08-15
+completed: 2026-08-15
+agent: antigravity
+tags: [mcp]
+milestone: v1.3.0-knowledge-base-and-graph
 ---
 
 # Integrate `code-review-graph` MCP Server via `uv`

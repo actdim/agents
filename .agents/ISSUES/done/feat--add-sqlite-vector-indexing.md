@@ -5,6 +5,10 @@ status: done
 priority: high
 created: 2026-08-13
 updated: 2026-08-26
+completed: 2026-08-26
+agent: antigravity
+tags: []
+milestone: v1.3.0-knowledge-base-and-graph
 ---
 
 # Add SQLite Vector Indexing MCP Server for Fast Issue & Context Search

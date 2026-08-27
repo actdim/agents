@@ -5,6 +5,10 @@ status: done
 priority: high
 created: 2026-08-26
 updated: 2026-08-26
+completed: 2026-08-26
+agent: antigravity
+tags: [mcp]
+milestone: v1.3.0-knowledge-base-and-graph
 ---
 
 # Integrate WikiLLM MCP Server for Hybrid MD Documentation Search

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-bump-version.py — Safely update version numbers across actdim-agents repo.
+bump-version.py - Safely update version numbers across actdim-agents repo.
 Usage:
     python scripts/bump-version.py 1.3.1
 """

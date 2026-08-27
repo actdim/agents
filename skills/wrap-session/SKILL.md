@@ -1,6 +1,6 @@
 ---
 name: wrap-session
-description: Wrap up the current coding session by updating the repo's .agents/ state — write a session log file, refresh CONTEXT, update the ISSUES board (moving completed issues to ISSUES/done/), append a HISTORY line, and record any decisions/glossary terms. Use when the user ends a session, says to wrap up / save context / log the session, or invokes /wrap-session. Requires the .agents/ structure to exist (created by init-agents).
+description: Wrap up the current coding session by updating the repo's .agents/ state - write a session log file, refresh CONTEXT, update the ISSUES board (moving completed issues to ISSUES/done/), append a HISTORY line, and record any decisions/glossary terms. Use when the user ends a session, says to wrap up / save context / log the session, or invokes /wrap-session. Requires the .agents/ structure to exist (created by init-agents).
 ---
 
 # wrap-session (and /wrap-stage)
@@ -20,31 +20,45 @@ Recognize that a **Stage** is complete when:
 - Working tree (for your own summary): `git status --short`.
 - Agent identity = your tool + model (e.g. "Claude Code / claude-opus-4-8"). If the user passed a slug or one-line summary hint when invoking, use it for the slug/summary.
 
-## Update, in this order
-1. **Documentation Check** — Check if `README.md`, `AGENTS.md` (project conventions), or project documentation need updates following the completed stage/task. Update them or prompt the user with required doc changes.
-2. **Session log** — write a NEW file `.agents/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md`
-   (`<short-slug>` = lowercase kebab-case, 2–5 words describing the work; if the file already exists, suffix `-02`, `-03`…). Create the year folder if missing. Start with YAML front-matter, then the body:
-   ```
+## Mandatory Stage & Session Wrap-up Checklist (Execute in exact order)
+Agents MUST execute the following verification steps:
+
+1. **Verification & Tests** - Run unit tests, linters, or build commands with quiet flags (`pytest -q`, `dotnet test -v q`, `npm test --silent`). Ensure no broken builds or lint errors remain.
+2. **Entity & Issue Reconciliation**:
+   - **Issues**: For completed issues, set `status: done` and `completed: <YYYY-MM-DD>` in their YAML front-matter, and MOVE the file to `.agents/ISSUES/done/<type>--<slug>.md`.
+   - **Milestones**: If working towards a milestone, update progress in `.agents/MILESTONES/<slug>.md`.
+   - **Risks**: Mark resolved risks as `status: resolved` / `mitigated` in `.agents/RISKS/<slug>.md`.
+   - **Spikes**: Conclude active spikes in `.agents/SPIKES/<slug>.md` and link resulting ADRs.
+3. **Documentation Check** - Check if `README.md`, `AGENTS.md` (project specifics), or `.agents/KB/` need updates following the completed task.
+4. **Session log** - write a NEW file `.agents/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md`
+   (`<short-slug>` = lowercase kebab-case, 2–5 words describing the work; if the file already exists, suffix `-02`, `-03`…). Create the year folder if missing. Start with YAML front-matter:
+   ```yaml
    ---
    date: <YYYY-MM-DD>
    slug: <short-slug>
-   agent: <tool / model>          # e.g. Claude Code / claude-opus-4-8
+   agent: <tool / model>          # e.g. Gemini 3.7 Flash / Antigravity
    branch: <branch>
    commit: <short-hash>
    summary: <one-line summary>
+   milestone: <optional-milestone-slug>
+   issues_advanced: [<issue-slug-1>, <issue-slug-2>]
+   issues_completed: [<completed-slug>]
+   decisions: ["#001", "#002"]
+   risks_logged: [<risk-slug>]
+   spikes_conducted: [<spike-slug>]
    ---
    # <Title>
 
    What changed this session and why; files touched; decisions made (by slug / #N);
    issues advanced (by slug); known gaps / follow-ups.
    ```
-3. **CONTEXT** — rewrite `.agents/CONTEXT.md` to the NEW current state. Keep it SHORT — a snapshot, not a log; push detail into the session file. If it has grown past ~1 screen, compress it.
-4. **ISSUES** — update `.agents/ISSUES.md` and the relevant `.agents/ISSUES/<type>--<slug>.md` in the NEAREST `.agents/` directory for the subproject/area worked on (do not dump subproject issues into the root `.agents/`): mark progress; for any completed issue MOVE its file to `.agents/ISSUES/done/<type>--<slug>.md` and update the board line. Add newly discovered issues to that nearest `.agents/`. Keep the board lean.
-5. **DECISIONS** — if any non-trivial architectural/design decision was made this session, APPEND a dated entry to `.agents/DECISIONS.md` (never edit past entries; mark a replaced one "Superseded by #N").
-6. **GLOSSARY** — if any domain term was introduced/clarified, add it to `.agents/GLOSSARY.md`.
-7. **HISTORY** — APPEND one line to `.agents/HISTORY.md`:
-   `<YYYY-MM-DD> — <short-slug> — <agent> — <one-line summary> — <relative link to the session file>`.
-8. **VISION** — update `.agents/VISION.md` ONLY if scope/roadmap actually changed.
+5. **CONTEXT** - rewrite `.agents/CONTEXT.md` to the NEW current state. Keep it SHORT - a snapshot (< 20 lines), not a log; push detail into the session file.
+6. **ISSUES** - update `.agents/ISSUES.md` (keep active list lean, reflect done items).
+7. **DECISIONS** - if any non-trivial architectural/design decision was made this session, APPEND a dated entry to `.agents/DECISIONS.md`.
+8. **GLOSSARY** - if any domain term was introduced/clarified, add it to `.agents/GLOSSARY.md`.
+9. **HISTORY** - APPEND one line to `.agents/HISTORY.md`:
+   `<YYYY-MM-DD> - <short-slug> - <agent> - <one-line summary> - <relative link to the session file>`.
+10. **VISION** - update `.agents/VISION.md` ONLY if scope/roadmap actually changed.
 
 ## Rules
 - Filenames Windows-safe: `YYYY-MM-DD`, no `:`, date first. Reference issues by slug, not path.

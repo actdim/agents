@@ -1,13 +1,13 @@
-# actdim-agents (v1.3.3)
+# actdim-agents (v1.5.1)
 
-A provider-agnostic **agent-context system** for repositories — the `ACTDIM-AGENTS-PROTOCOL v1.3.3`
+A provider-agnostic **agent-context system** for repositories - the `ACTDIM-AGENTS-PROTOCOL v1.5.1`
 plus the skills/commands that scaffold and maintain it. One convention, honored by
 **Claude Code**, **Codex**, **OpenCode**, and **Antigravity**.
 
 ## Why
 
 AI agents start every session blind. They don't remember the decisions you made last time,
-the current state of the work, the open issues, or the project's conventions — so they
+the current state of the work, the open issues, or the project's conventions - so they
 re-ask the same questions, contradict earlier choices, and drift. And each tool keeps its
 guidance in its own place (`~/.claude`, `~/.codex`, `~/.config/opencode`, `~/.gemini/config`), so nothing is shared.
 
@@ -18,11 +18,11 @@ that every agent reads and keeps up to date.
 
 - **Persistent project memory, versioned in the repo** (not locked inside one tool): current
   state, issue board, architectural decisions, Knowledge Base, vision/roadmap, glossary, and a per-session log.
-- **One protocol for all four agents** — write conventions once, every tool follows them.
-- **Low-friction upkeep** — skills/commands scaffold the structure and update it at the end of
+- **One protocol for all four agents** - write conventions once, every tool follows them.
+- **Low-friction upkeep** - skills/commands scaffold the structure and update it at the end of
   a stage or session (documentation check, session log, context, issues, decisions, history) instead of you doing bookkeeping.
-- **Structured Knowledge Base (KB)** — `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md` maintained in `.agents/KB/` while keeping `AGENTS.md` lean.
-- **Travels with the code** — teammates who clone and CI agents get the same context; there is
+- **Structured Knowledge Base (KB)** - `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md` maintained in `.agents/KB/` while keeping `AGENTS.md` lean.
+- **Travels with the code** - teammates who clone and CI agents get the same context; there is
   no global state to sync.
 
 ## How it works
@@ -35,17 +35,17 @@ that every agent reads and keeps up to date.
   - OpenCode reads `AGENTS.md` (and falls back to `~/.claude/CLAUDE.md`).
   - Antigravity reads `AGENTS.md` (or `GEMINI.md`).
 - The FULL protocol text is stamped **once** at the architecture root; nested folders get a
-  short **REF** block pointing up to it — no duplication.
+  short **REF** block pointing up to it - no duplication.
 - `.agents/` holds:
-  - `CONTEXT.md` — short "you are here" snapshot of the current state (read every session).
-  - `ISSUES.md` + `ISSUES/<type>--<slug>.md` (+ `ISSUES/done/`) — a compact issue board (`## Active`, `## Backlog`, `## Done`) and one file per typed issue (YAML front-matter: `slug`, `type`, `status`, `priority`, `created`, `updated`). Supported types: `feat`, `bug`, `debt`, `task`, `docs`.
-  - `DECISIONS.md` — append-only ADR log (never rewritten; superseded, not deleted). Kept in a single file rather than multi-file MADR/Nygard format so agents can load all active architectural constraints in a single read at session start.
-  - `KB/` — structured Knowledge Base articles (`INDEX.md`, `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md`).
-  - `VISION.md` — scope, non-goals, roadmap.
-  - `GLOSSARY.md` — domain terms.
-  - `HISTORY.md` + `SESSIONS/<year>/<date>--<slug>.md` — an index and one log per session (YAML front-matter: date, agent, branch, commit, summary).
+  - `CONTEXT.md` - short "you are here" snapshot of the current state (read every session).
+  - `ISSUES.md` + `ISSUES/<type>--<slug>.md` (+ `ISSUES/done/`) - a compact issue board (`## Active`, `## Backlog`, `## Done`) and one file per typed issue (YAML front-matter: `slug`, `type`, `status`, `priority`, `created`, `updated`). Supported types: `feat`, `bug`, `debt`, `task`, `docs`.
+  - `DECISIONS.md` - append-only ADR log (never rewritten; superseded, not deleted). Kept in a single file rather than multi-file MADR/Nygard format so agents can load all active architectural constraints in a single read at session start.
+  - `KB/` - structured Knowledge Base articles (`INDEX.md`, `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md`).
+  - `VISION.md` - scope, non-goals, roadmap.
+  - `GLOSSARY.md` - domain terms.
+  - `HISTORY.md` + `SESSIONS/<year>/<date>--<slug>.md` - an index and one log per session (YAML front-matter: date, agent, branch, commit, summary).
 
-### Skills / commands (v1.3.3)
+### Skills / commands (v1.5.1)
 
 | Skill | Purpose |
 |-------|---------|

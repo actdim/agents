@@ -1,10 +1,10 @@
 ---
 name: sync-wiki
-version: "1.3.3"
+version: "1.5.1"
 description: Reconcile and update the Knowledge Base hybrid vector index and cross-links. (Alias for /sync-kb)
 ---
 
-# Sync Wiki (`/sync-wiki`) [v1.3.3]
+# Sync Wiki (`/sync-wiki`) [v1.5.1]
 
 > [!NOTE]
 > `/sync-wiki` is a backward-compatible alias for [`/sync-kb`](file://skills/sync-kb/SKILL.md).

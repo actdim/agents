@@ -1,6 +1,6 @@
 ---
 name: sync-issues
-description: Reconcile the nearest .agents/ issue board (ISSUES.md) and per-issue files (ISSUES/<type>--<slug>.md) for the target subproject/area — create/update issue files with status/priority in the nearest .agents/, keep the board accurate, and move completed issues to ISSUES/done/. Use when the user wants to capture or describe an issue/bug/feature/debt item, update issue status, groom the backlog, or invokes /sync-issues. Requires an .agents/ structure (created by init-agents).
+description: Reconcile the nearest .agents/ issue board (ISSUES.md) and per-issue files (ISSUES/<type>--<slug>.md) for the target subproject/area - create/update issue files with status/priority in the nearest .agents/, keep the board accurate, and move completed issues to ISSUES/done/. Use when the user wants to capture or describe an issue/bug/feature/debt item, update issue status, groom the backlog, or invokes /sync-issues. Requires an .agents/ structure (created by init-agents).
 ---
 
 # sync-issues

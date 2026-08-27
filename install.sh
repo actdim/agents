@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — install the ACTDIM-AGENTS skills into Claude Code, Codex, OpenCode and/or Antigravity.
+# install.sh - install the ACTDIM-AGENTS skills into Claude Code, Codex, OpenCode and/or Antigravity.
 # For Linux / macOS (and Git Bash on Windows).
 #
 # Claude, Codex & Antigravity use the same ~/.<tool>/skills/<name>/SKILL.md format -> the skill folders are copied verbatim.

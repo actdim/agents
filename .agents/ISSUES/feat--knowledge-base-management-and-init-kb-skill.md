@@ -5,6 +5,9 @@ status: open
 priority: high
 created: 2026-08-26
 updated: 2026-08-26
+agent: antigravity
+tags: [kb]
+milestone: v1.5.0-dashboard-and-analytics
 ---
 
 # Knowledge Base Management Standards & `/init-kb` Skill
