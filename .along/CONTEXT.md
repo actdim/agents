@@ -2,7 +2,7 @@
 
 _Current-state snapshot. Keep SHORT; history goes to SESSIONS/._
 
-- **Status**: Along (ALONG-PROTOCOL v2.0.6) released and deployed; universal release bumper (`along_bump_version.py`), unified `/along-wrap`, smart `/along-commit`, lifecycle suite (`/along-build`, `/along-test`, `/along-dev`), and resilient `/along-dash` dashboard fully synchronized across all 4 providers.
+- **Status**: Along (ALONG-PROTOCOL v2.0.7) released and deployed; universal release bumper (`along_bump_version.py`), unified `/along-wrap`, smart `/along-commit`, lifecycle suite (`/along-build`, `/along-test`, `/along-dev`), and resilient `/along-dash` dashboard fully synchronized across all 4 providers.
 - **Active Focus**:
   - Issue [`feat--external-issue-trackers-sync-and-import`](file://.along/ISSUES/feat--external-issue-trackers-sync-and-import.md) (Jira, Redmine, Linear, GitHub issue import).
   - Issue [`feat--openclaw-and-hermes-agent-integration`](file://.along/ISSUES/feat--openclaw-and-hermes-agent-integration.md) (OpenClaw and Hermes Agent provider support).
