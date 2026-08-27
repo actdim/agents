@@ -130,7 +130,6 @@ When a Stage or session completes, agents MUST execute this verification checkli
 - Windows-safe filenames: dates `YYYY-MM-DD` (no `:`), date first.
 - Keep `CONTEXT.md` and `ISSUES.md` compact - they cost context every session.
 - Never write secrets/credentials/tokens/keys into these files; they are committed.
-
 <!-- END ACTDIM-AGENTS-PROTOCOL -->
 
 ## Project specifics

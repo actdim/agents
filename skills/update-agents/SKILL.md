@@ -1,23 +1,31 @@
 ---
 name: update-agents
-description: Check and update agent protocol and skills to the latest version across the local repository, global installation, and GitHub. Use when the user asks to update agents, upgrade the repository protocol, or invokes /update-agents.
+description: Check and update agent protocol and skills to the latest version across the local repository (including all subprojects where agents are installed), global installation, and GitHub. Use when the user asks to update agents, upgrade the repository protocol, or invokes /update-agents.
 ---
 
 # Update Agents (`/update-agents`)
 
-Automated one-liner update of repository agent context and global skills.
+Automated one-liner update of repository agent context, subproject agent contexts, and global skills.
 
 ---
 
-## 🎯 When to Use
+## When to Use
 
 1. The user asks to update or upgrade agent context/skills (e.g. *"обнови агентов"*, *"обнови контекст"*, *"upgrade agents"*, `/update-agents`).
-2. Opening an existing project to ensure it is running the latest `ACTDIM-AGENTS-PROTOCOL` standard.
+2. Opening an existing project or monorepo to ensure it is running the latest `ACTDIM-AGENTS-PROTOCOL` standard across all subprojects.
 3. Synchronizing local global installations across Claude Code, Codex, Antigravity, and OpenCode with the latest remote GitHub releases.
 
 ---
 
-## 🛠️ Execution Workflow
+## Behavior & Scope
+
+- **Recursive In-Place Discovery**: Recursively traverses down from the repository root to locate all directories that **already have** `AGENTS.md` and/or `.agents/`.
+- **Selective Upgrade**: Refreshes managed protocol blocks and runs migration engines on all detected contexts (root and existing subprojects).
+- **Anti-Pollution Guarantee**: Never creates uninvited agent folders in clean subdirectories. Only directories that already have agent context are updated.
+
+---
+
+## Execution Workflow
 
 ### Step 1: Run the Updater Engine
 Execute the standalone updater engine on the current working directory:
@@ -47,6 +55,6 @@ sys.exit(subprocess.run([sys.executable, os.path.join(cache_dir, 'scripts', 'upd
 ### Step 2: Report Results
 Summarize for the user:
 - Previous repository protocol version vs updated version.
+- List of all updated agent contexts across the repository (root and subprojects).
 - Global installation status (up-to-date or refreshed from GitHub).
-- Status of entity structures, checklists, and migrations applied to the repository.
-
+- Status of entity structures, checklists, and migrations applied to each context.
