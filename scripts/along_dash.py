@@ -1349,24 +1349,27 @@ def main():
 
     agents_dir = find_agents_dir(args.path)
     if not agents_dir.exists():
-        print(f"[Error] No .agents/ directory found in {args.path} or parent directories.", file=sys.stderr)
+        print(f"[Error] No .along/ directory found in {args.path} or parent directories.", file=sys.stderr)
         sys.exit(1)
 
     collector = AgentEntityCollector(agents_dir).collect_all()
 
-    if args.markdown:
-        md_path = agents_dir / "DASHBOARD.md"
-        generate_markdown_report(collector, md_path)
+    # Always generate fresh markdown and static HTML reports
+    md_path = agents_dir / "DASHBOARD.md"
+    generate_markdown_report(collector, md_path)
+    
+    export_path = collector.repo_root / ".along" / "dashboard.html"
+    export_static_html(collector, export_path)
 
-    if args.export:
-        export_path = Path(args.export)
-        if not export_path.is_absolute():
-            export_path = collector.repo_root / export_path
-        export_static_html(collector, export_path)
+    if args.export and args.export != ".along/dashboard.html":
+        custom_export = Path(args.export)
+        if not custom_export.is_absolute():
+            custom_export = collector.repo_root / custom_export
+        export_static_html(collector, custom_export)
 
     if args.web:
         run_web_server(collector, host=args.host, port=args.port, open_browser=not args.no_browser)
-    elif not args.markdown and not args.export:
+    else:
         render_cli(collector)
 
 
