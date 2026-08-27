@@ -141,6 +141,9 @@ function Install-OpenCode {
     if (Test-Path (Join-Path $src 'along-update\along_update.py')) {
         Copy-Item -Force (Join-Path $src 'along-update\along_update.py')  (Join-Path $helper 'along_update.py')
     }
+    if (Test-Path (Join-Path $src 'along-dash\along_dash.py')) {
+        Copy-Item -Force (Join-Path $src 'along-dash\along_dash.py')      (Join-Path $helper 'along_dash.py')
+    }
 
     foreach ($d in Get-ChildItem -Directory $src) {
         $raw = (Get-Content -Raw -Encoding UTF8 (Join-Path $d.FullName 'SKILL.md')) -replace "`r`n", "`n"
