@@ -21,7 +21,7 @@ AI agents start every turn reading project instructions, skills, issue boards, a
 ## Proposed Optimization Strategies
 
 ### 1. Progressive Disclosure & Ultra-Lean `SKILL.md` Architecture
-- Keep main `SKILL.md` instruction files ultra-lean (~30–50 lines max).
+- Keep main `SKILL.md` instruction files ultra-lean (~30-50 lines max).
 - Move bulky reference material, detailed runbooks, and large examples into a `references/` subdirectory.
 - Ensure agents load reference docs only when specifically executing that sub-procedure.
 

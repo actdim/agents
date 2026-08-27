@@ -1,4 +1,4 @@
-﻿---
+---
 name: sync-history
 version: "1.5.2"
 description: Reconstruct and reconcile .agents/ project history (ISSUES, MILESTONES, SESSIONS) from Git commits, tags, and PRs. Use when bootstrapping agent context on an existing git repository (cold start), when commits exist in Git that were not tracked in .agents/ (sync drift), or when the user invokes /sync-history.

@@ -14,7 +14,7 @@ Maintain the issue board and per-issue files.
 2. Determine the current work from the conversation, `git status --short` / the diff, and any slug/description/type the user passed as an argument. Get today's date via `date +%F`.
 3. For each distinct issue, ensure a file `.agents/ISSUES/<type>--<slug>.md` exists inside that NEAREST `.agents/`:
    - `<type>`: `feat` (feature) | `bug` (bug fix) | `debt` (tech debt / refactoring) | `task` (general task) | `docs` (documentation).
-   - `<slug>`: lowercase kebab-case, 2–5 words.
+   - `<slug>`: lowercase kebab-case, 2-5 words.
    - Front-matter + body:
      ```yaml
      ---

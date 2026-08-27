@@ -31,7 +31,7 @@ Agents MUST execute the following verification steps:
    - **Spikes**: Conclude active spikes in `.agents/SPIKES/<slug>.md` and link resulting ADRs.
 3. **Documentation Check** - Check if `README.md`, `AGENTS.md` (project specifics), or `.agents/KB/` need updates following the completed task.
 4. **Session log** - write a NEW file `.agents/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md`
-   (`<short-slug>` = lowercase kebab-case, 2–5 words describing the work; if the file already exists, suffix `-02`, `-03`…). Create the year folder if missing. Start with YAML front-matter:
+   (`<short-slug>` = lowercase kebab-case, 2-5 words describing the work; if the file already exists, suffix `-02`, `-03`...). Create the year folder if missing. Start with YAML front-matter:
    ```yaml
    ---
    date: <YYYY-MM-DD>

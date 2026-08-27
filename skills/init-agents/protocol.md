@@ -20,7 +20,7 @@ All entities are designed for zero-friction auto-parsing by dashboards and tools
 ### 1. Issues (`.agents/ISSUES/<type>--<slug>.md`)
 - **Placement**: Nearest `.agents/ISSUES/`. Types: `feat`, `bug`, `debt`, `task`, `docs`.
 - **Front-matter**:
-  - `slug`: lowercase kebab-case slug (2–5 words).
+  - `slug`: lowercase kebab-case slug (2-5 words).
   - `type`: `feat` | `bug` | `debt` | `task` | `docs`.
   - `status`: `open` | `in-progress` | `blocked` | `done`.
   - `priority`: `critical` | `high` | `medium` | `low`.
@@ -111,8 +111,12 @@ When a Stage or session completes, agents MUST execute this verification checkli
   - **Mandatory Diff Verification**: After modifying any file, inspect the generated diff to ensure only intended lines were touched.
   - **Immediate Rollback**: If an unintended deletion or truncation is detected, restore missing lines immediately.
 - **Technical Markdown & Formatting Standards**:
-  - **Forbidden Symbol (No Em-Dash)**: NEVER use the em-dash character (U+2014) in markdown files, code comments, session logs, or documentation. Use standard ASCII hyphens (`-`), colons (`:`), or parentheses `()`.
-  - **Clean ASCII Punctuation**: Avoid typographic curly quotes (`“`, `”`, `‘`, `’`) in code blocks, shell commands, and YAML front-matter; use standard ASCII quotes (`"`, `'`).
+  - **Forbidden Characters (Clean ASCII & Invisible Character Ban)**:
+    - NEVER use em-dash (U+2014), en-dash (U+2013), or math minus (U+2212) in agent responses, chat messages, code, docstrings, comments, session logs, or documentation. Use standard ASCII hyphens (`-`), colons (`:`), or parentheses `()`.
+    - NEVER use typographic curly quotes or guillemets (left/right single/double quotes, low-9 quotes, angle quotation marks) in code blocks, shell commands, docstrings, chat, or YAML front-matter; use standard ASCII double (`"`) or single (`'`) quotes.
+    - NEVER use unicode ellipsis character (U+2026); use standard three ASCII dots (`...`).
+    - NEVER use non-breaking spaces (NBSP U+00A0, narrow NBSP U+202F) or zero-width invisible characters (ZWSP U+200B, ZWNJ, ZWJ, BOM U+FEFF); use standard ASCII spaces or omit.
+    - NEVER use special bullet glyphs (U+2022, U+2023, U+2043); use standard ASCII hyphen (`-`) for lists.
   - **Explicit Code Fence Languages**: Always specify the language identifier on code fences (e.g. ```` ```bash ````, ```` ```yaml ````, ```` ```typescript ````, ```` ```python ````). Never use bare unlabelled fences.
   - **Relative & Portable Links**: Always use relative paths (`file://...` or standard markdown links) without hardcoding local absolute paths.
   - **UTF-8 Clean Encoding**: Keep all text files in clean UTF-8 without BOM.

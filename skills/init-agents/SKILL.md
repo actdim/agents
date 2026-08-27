@@ -73,7 +73,7 @@ Also, when relevant: `.agents/VISION.md`, `.agents/GLOSSARY.md`, and the `.agent
 
 ## Issues
 - **Placement in Nearest `.agents/`**: In multi-module or nested projects where subfolders carry their own `AGENTS.md` + `.agents/`, ALWAYS create and manage issues in the NEAREST `.agents/` directory for the subproject/area the issue belongs to. DO NOT dump all subproject issues into the root `.agents/`. Only repository-wide or cross-cutting issues belong in the root `.agents/`.
-- One file per issue, formatted as `.agents/ISSUES/<type>--<slug>.md` (slug = lowercase kebab-case, 2–5 words).
+- One file per issue, formatted as `.agents/ISSUES/<type>--<slug>.md` (slug = lowercase kebab-case, 2-5 words).
 - Supported types (`<type>`): `feat` (feature), `bug` (bug fix), `debt` (tech debt / refactoring), `task` (general task), `docs` (documentation).
 - Issue YAML front-matter: `slug`, `type`, `status` (`open` | `in-progress` | `blocked` | `done`), `priority` (`critical` | `high` | `medium` | `low`), `created`, `updated`.
 - `.agents/ISSUES.md` is the compact board read every session (`## Active`, `## Backlog`, `## Done (recent)`).
@@ -96,7 +96,7 @@ A **Stage** (or milestone phase) is a meaningful, verified unit of work. An agen
 ## Stage & Session Wrap-up Protocol (Update in order)
 When a Stage or session completes, perform the following steps:
 1. **Documentation & Protocol Check** - Review if `README.md`, `AGENTS.md` (project conventions), or project guides need updates following the completed stage/task. Update them or report required doc updates.
-2. **Session log** - Write a new session file `.agents/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` (slug 2–5 words; if it exists, suffix `-02`…). Begin with YAML front-matter (`date`, `slug`, `agent` = tool/model, `branch`, `commit`, `summary`), then a body: what changed & why, files touched, decisions (by slug/#N), issues advanced, gaps/follow-ups.
+2. **Session log** - Write a new session file `.agents/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` (slug 2-5 words; if it exists, suffix `-02`...). Begin with YAML front-matter (`date`, `slug`, `agent` = tool/model, `branch`, `commit`, `summary`), then a body: what changed & why, files touched, decisions (by slug/#N), issues advanced, gaps/follow-ups.
 3. **CONTEXT** - Rewrite `.agents/CONTEXT.md` to the new state - a SHORT snapshot, not a log; history goes to the session file.
 4. **ISSUES** - Update `.agents/ISSUES.md` (+ move any completed issue to `ISSUES/done/`).
 5. **HISTORY** - Append one line to `.agents/HISTORY.md`: `<YYYY-MM-DD> - <slug> - <agent> - <summary> - <link>`.

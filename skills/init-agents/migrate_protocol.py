@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
 migrate_protocol.py - Version-aware migration engine for ACTDIM-AGENTS-PROTOCOL.
+migrate_protocol.py - Version-aware migration engine for ACTDIM-AGENTS-PROTOCOL.
 
 Executes sequential, version-specific migration steps on target repository's .agents/ structure:
+  - v1.0.0 -> v1.1.0: Tasks -> Issues directory & kebab-case renaming
+  - v1.1.0 -> v1.3.0: Knowledge Base (.agents/KB/) & .code-review-graph-ignore scaffolding
   - v1.0.0 -> v1.1.0: Tasks -> Issues directory and kebab-case renaming
   - v1.1.0 -> v1.3.0: Knowledge Base (.agents/KB/) and .code-review-graph-ignore scaffolding
   - v1.3.3 -> v1.5.0: Entity Ecosystem (MILESTONES, RISKS, SPIKES, CHECKLISTS),
                      retroactive Milestone synthesis from past sessions/done issues,
                      standard Checklists synthesis, and complete YAML front-matter enrichment.
+  - Typography sanitation: bans em-dash (-) and replaces with standard ASCII hyphens (-).
   - Typography sanitation: bans em-dash (U+2014) and replaces with standard ASCII hyphens (-).
 
 Usage:
@@ -20,6 +24,7 @@ import sys
 import glob
 from datetime import datetime
 
+CURRENT_PROTOCOL_VERSION = "1.5.0"
 CURRENT_PROTOCOL_VERSION = "1.5.2"
 
 def parse_yaml_frontmatter(content):
@@ -327,15 +332,42 @@ def step_migrate_v1_5_entity_ecosystem(repo_root, agents_dir):
 
     return True
 
+TYPOGRAPHY_REPLACEMENTS = {
+    '\u2014': '-',      # em-dash
+    '\u2013': '-',      # en-dash
+    '\u2212': '-',      # math minus
+    '\u2011': '-',      # non-breaking hyphen
+    '\u201c': '"',      # left double quote
+    '\u201d': '"',      # right double quote
+    '\u2018': "'",      # left single quote
+    '\u2019': "'",      # right single quote
+    '\u00ab': '"',      # left guillemet
+    '\u00bb': '"',      # right guillemet
+    '\u2026': '...',    # ellipsis
+    '\u00a0': ' ',      # NBSP
+    '\u202f': ' ',      # narrow NBSP
+    '\u200b': '',       # ZWSP
+    '\ufeff': '',       # BOM
+    '\u2022': '-',      # bullet
+    '\u2023': '-',      # bullet
+    '\u2043': '-',      # bullet
+}
+
 def sanitize_markdown_typography(target_dir):
     md_files = glob.glob(os.path.join(target_dir, "**", "*.md"), recursive=True)
     count = 0
+    em_dash = '\u2014'
     for fpath in md_files:
         with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
-        if "\u2014" in content:
-            cleaned = content.replace(" \u2014 ", " - ").replace("\u2014", "-")
-            with open(fpath, "w", encoding="utf-8") as f:
+        cleaned = content
+        if f" {em_dash} " in cleaned:
+            cleaned = cleaned.replace(f" {em_dash} ", " - ")
+        for char, repl in TYPOGRAPHY_REPLACEMENTS.items():
+            if char in cleaned:
+                cleaned = cleaned.replace(char, repl)
+        if cleaned != content:
+            with open(fpath, "w", encoding="utf-8", newline="\n") as f:
                 f.write(cleaned)
             count += 1
     return count
@@ -367,12 +399,12 @@ def run_migrations(repo_root):
     step_migrate_v1_5_entity_ecosystem(repo_root, agents_dir)
 
     # Step 4
-    print("-> Step 4: Sanitizing Markdown typography (replacing em-dashes with ASCII hyphens)...")
+    print("-> Step 4: Sanitizing Markdown typography & invisible characters...")
     sanitized_count = sanitize_markdown_typography(agents_dir)
     if sanitized_count > 0:
         print(f"   Sanitized typography in {sanitized_count} Markdown files.")
 
-    print("-> [OK] All migrations completed successfully to v1.5.0 standard!")
+    print(f"-> [OK] All migrations completed successfully to v{CURRENT_PROTOCOL_VERSION} standard!")
 
 if __name__ == "__main__":
     root = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()

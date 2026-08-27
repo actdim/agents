@@ -12,4 +12,4 @@ _Domain terms for ACTDIM-AGENTS and repository tracking. Add or refine terms whe
 - **ADR (Architectural Decision Record)** - Append-only record of a non-trivial architectural or technical choice stored in `.agents/DECISIONS.md`.
 - **Knowledge Base (KB)** - Persistent project documentation repository in `.agents/KB/` (`INDEX.md`, `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md`).
 - **Zero Friction** - Operational paradigm where agents automatically infer developer intent from natural conversation and manage project tracking entities in the background without human overhead.
-- **Context Token Hygiene** - Practice of keeping root context files (`CONTEXT.md`, `ISSUES.md`, `AGENTS.md`) strictly compact (< 50–80 lines) to prevent LLM context bloat while pushing details into session logs and KB articles.
+- **Context Token Hygiene** - Practice of keeping root context files (`CONTEXT.md`, `ISSUES.md`, `AGENTS.md`) strictly compact (< 50-80 lines) to prevent LLM context bloat while pushing details into session logs and KB articles.
