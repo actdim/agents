@@ -1,6 +1,7 @@
 # Issues   (glyphs: [ ] open  [~] in-progress  [!] blocked  [x] done)
 
 ## Active
+- [ ] `(feat)` [openclaw-and-hermes-agent-integration](file://.along/ISSUES/feat--openclaw-and-hermes-agent-integration.md)
 - [ ] `(feat)` [automated-ui-screenshots-and-visual-verification](file://.along/ISSUES/feat--automated-ui-screenshots-and-visual-verification.md)
 - [ ] `(feat)` [lsif-scip-lsp-mcp-integration](file://.along/ISSUES/feat--lsif-scip-lsp-mcp-integration.md)
 - [ ] `(feat)` [knowledge-base-management-and-init-kb-skill](file://.along/ISSUES/feat--knowledge-base-management-and-init-kb-skill.md)

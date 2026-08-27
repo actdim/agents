@@ -1,13 +1,13 @@
 # Along Executive Dashboard & Repository Analytics
 
-> Auto-generated on `2026-08-27 21:02:12` for repository `along`.
+> Auto-generated on `2026-08-27 21:02:54` for repository `along`.
 
 ## 1. Executive Summary
 
 | Metric | Value | Details |
 | :--- | :--- | :--- |
-| **Completion Progress** | `75.0%` | `15` done / `20` total |
-| **Active Backlog** | `5` open, `0` in-progress | `0` blocked |
+| **Completion Progress** | `71.4%` | `15` done / `21` total |
+| **Active Backlog** | `6` open, `0` in-progress | `0` blocked |
 | **Active Risks** | `0` active | `0` critical/high |
 | **Milestones Tracked** | `4` | Stage releases |
 | **Session Logs / ADRs** | `9` sessions / `9` ADRs | Architectural record |
@@ -19,7 +19,7 @@
 ```mermaid
 pie title Issues Status Breakdown
     "Done" : 15
-    "Open" : 5
+    "Open" : 6
 ```
 
 ## 3. Active Issues & Backlog
@@ -30,6 +30,7 @@ pie title Issues Status Breakdown
 | `open` | `feat` | `medium` | [Automated UI Screenshots & Visual Verification Attached to Issues](file:///.along/ISSUES/feat--automated-ui-screenshots-and-visual-verification.md) | v2.0.0-along-transition |
 | `open` | `feat` | `high` | [Knowledge Base Management Standards & `/along-init-kb` Skill](file:///.along/ISSUES/feat--knowledge-base-management-and-init-kb-skill.md) | v1.5.0-dashboard-and-analytics |
 | `open` | `feat` | `medium` | [Lsif Scip Lsp Mcp Integration](file:///.along/ISSUES/feat--lsif-scip-lsp-mcp-integration.md) | v1.5.0-dashboard-and-analytics |
+| `open` | `feat` | `medium` | [Support & Integration for OpenClaw / OpenClaude and Hermes Agent Providers](file:///.along/ISSUES/feat--openclaw-and-hermes-agent-integration.md) | v2.0.0-along-transition |
 | `open` | `feat` | `high` | [Token Efficiency & Context Window Optimization System](file:///.along/ISSUES/feat--token-efficiency-and-context-optimization-skills.md) | v1.5.0-dashboard-and-analytics |
 
 ## 5. Milestones & Sprints
