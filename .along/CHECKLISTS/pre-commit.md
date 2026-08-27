@@ -9,7 +9,9 @@ updated: 2026-08-27
 
 # Pre-Commit Verification Checklist
 
-1. [ ] Code compiles and unit tests pass.
-2. [ ] Mandatory git diff inspected for zero unintended deletions.
-3. [ ] No API keys, secrets, or sensitive credentials committed.
-4. [ ] Filenames are Windows-safe (no colons, YYYY-MM-DD dates).
+1. [ ] Mandatory Automated Unit Tests pass: `python -m unittest tests/test_skills_and_scripts.py` (enforced automatically by `along-commit` and `along-bump-version`).
+2. [ ] Mandatory Clean Typography: zero non-ASCII characters (em-dash, curly quotes, NBSP, ZWSP).
+3. [ ] Mandatory git diff inspected for zero unintended deletions or file truncations.
+4. [ ] No API keys, secrets, or sensitive credentials committed.
+5. [ ] Filenames are Windows-safe (no colons, YYYY-MM-DD dates).
+

@@ -337,6 +337,30 @@ if __name__ == "__main__":
     print("=" * 60)
     return None
 
+def run_precommit_tests(repo_root):
+    """Executes repository tests before allowing a release commit."""
+    test_hook = os.path.join(repo_root, ".along", "scripts", "test.py")
+    tests_dir = os.path.join(repo_root, "tests")
+
+    cmd = None
+    if os.path.exists(test_hook):
+        cmd = [sys.executable, test_hook]
+    elif os.path.exists(tests_dir):
+        cmd = [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"]
+
+    if cmd:
+        print(f"-> [Release Quality Gate] Running automated tests: {' '.join(cmd)}")
+        res = subprocess.run(cmd, cwd=repo_root, capture_output=True, text=True)
+        if res.returncode != 0:
+            print(f"[Error] Release automated tests failed!\n", file=sys.stderr)
+            if res.stdout:
+                print(res.stdout, file=sys.stderr)
+            if res.stderr:
+                print(res.stderr, file=sys.stderr)
+            print("Release aborted. Fix failing tests before releasing.", file=sys.stderr)
+            sys.exit(1)
+        print("-> [Release Quality Gate] All tests passed successfully.")
+
 def sanitize_typography(repo_root):
     sanitizer = os.path.join(repo_root, "scripts", "sanitize_typography.py")
     if os.path.exists(sanitizer):
@@ -385,6 +409,10 @@ def main():
 
     print("-> Reconciling .along/ milestones and dashboard...")
     update_along_milestones(repo_root, new_version)
+
+    # Mandatory tests before release commit
+    if do_commit:
+        run_precommit_tests(repo_root)
 
     # Regenerate dashboard if available
     dash_script = os.path.join(repo_root, "scripts", "along_dash.py")
