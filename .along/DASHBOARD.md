@@ -1,13 +1,13 @@
 # Along Executive Dashboard & Repository Analytics
 
-> Auto-generated on `2026-08-27 20:57:07` for repository `along`.
+> Auto-generated on `2026-08-27 21:00:41` for repository `along`.
 
 ## 1. Executive Summary
 
 | Metric | Value | Details |
 | :--- | :--- | :--- |
-| **Completion Progress** | `77.8%` | `14` done / `18` total |
-| **Active Backlog** | `4` open, `0` in-progress | `0` blocked |
+| **Completion Progress** | `70.0%` | `14` done / `20` total |
+| **Active Backlog** | `6` open, `0` in-progress | `0` blocked |
 | **Active Risks** | `0` active | `0` critical/high |
 | **Milestones Tracked** | `4` | Stage releases |
 | **Session Logs / ADRs** | `9` sessions / `8` ADRs | Architectural record |
@@ -19,14 +19,16 @@
 ```mermaid
 pie title Issues Status Breakdown
     "Done" : 14
-    "Open" : 4
+    "Open" : 6
 ```
 
 ## 3. Active Issues & Backlog
 
 | Status | Type | Priority | Issue | Milestone / Blockers |
 | :--- | :--- | :--- | :--- | :--- |
+| `open` | `feat` | `high` | [Agentic Code Review & Blast Radius Impact Assessment Protocol](file:///.along/ISSUES/feat--agentic-code-review-and-impact-radius-assessment.md) | v2.0.0-along-transition |
 | `open` | `feat` | `high` | [Introduce Agentic Goals (Autonomous Loop) & Mandatory Checklists](file:///.along/ISSUES/feat--agentic-goals-and-mandatory-checklists.md) | v1.5.0-dashboard-and-analytics |
+| `open` | `feat` | `medium` | [Automated UI Screenshots & Visual Verification Attached to Issues](file:///.along/ISSUES/feat--automated-ui-screenshots-and-visual-verification.md) | v2.0.0-along-transition |
 | `open` | `feat` | `high` | [Knowledge Base Management Standards & `/along-init-kb` Skill](file:///.along/ISSUES/feat--knowledge-base-management-and-init-kb-skill.md) | v1.5.0-dashboard-and-analytics |
 | `open` | `feat` | `medium` | [Lsif Scip Lsp Mcp Integration](file:///.along/ISSUES/feat--lsif-scip-lsp-mcp-integration.md) | v1.5.0-dashboard-and-analytics |
 | `open` | `feat` | `high` | [Token Efficiency & Context Window Optimization System](file:///.along/ISSUES/feat--token-efficiency-and-context-optimization-skills.md) | v1.5.0-dashboard-and-analytics |
