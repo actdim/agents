@@ -24,8 +24,8 @@ import sys
 import glob
 from datetime import datetime
 
-CURRENT_PROTOCOL_VERSION = "1.5.0"
-CURRENT_PROTOCOL_VERSION = "1.5.2"
+CURRENT_PROTOCOL_VERSION = "1.5.3"
+CURRENT_PROTOCOL_VERSION = "1.5.3"
 
 def parse_yaml_frontmatter(content):
     match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n(.*)$", content, re.DOTALL)

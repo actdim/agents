@@ -9,6 +9,7 @@
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [bump-version-skill-and-typography-sanitizer](file://.agents/ISSUES/done/feat--bump-version-skill-and-typography-sanitizer.md)
 - [x] `(feat)` [protocol-v150-and-migrations-engine](file://.agents/ISSUES/done/feat--protocol-v150-and-migrations-engine.md)
 - [x] `(feat)` [version-bump-automation-and-release-hardening](file://.agents/ISSUES/done/feat--version-bump-automation-and-release-hardening.md)
 - [x] `(feat)` [graph-ignore-and-interactive-skills-refinement](file://.agents/ISSUES/done/feat--graph-ignore-and-interactive-skills-refinement.md)
