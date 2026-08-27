@@ -42,7 +42,6 @@ python scripts/along_bump_version.py 1.5.0
 ```
 
 ### Flags
-- `--no-commit`: Skip automatic `git commit` creation.
 - `-c`, `--commit`: Automatically create release `git commit` (`release: vX.Y.Z`).
 - `-p`, `--push`: Automatically push release commit and tags to remote repository (`git push`).
 - `-cp`, `-pc`: Combine commit and push in one command (`python scripts/along_bump_version.py patch -cp`).

@@ -67,6 +67,10 @@ directory (`.along/`) that every agent reads and keeps up to date.
 | `along-search-kb` (`/along-search-kb`) | Query project Knowledge Base (`.along/`, `docs/`, `wiki/`, `README.md`) using hybrid search. |
 | `along-check-graph` (`/along-check-graph`) | Inspect `code-review-graph` status, impact radius (blast radius), and architecture flows. |
 
+### Deployment Best Practices (Why no `along-deploy`?)
+
+`Along` intentionally does **not** provide an `along-deploy` skill. In modern software engineering, production deployment is a security-critical operation that should not be executed ad-hoc by local agents. Following industry best practices, deployments should be handled by automated **CI/CD pipelines** (e.g., GitHub Actions, GitLab CI, ArgoCD) triggered by version release tags (`git push --tags` or `/along-bump-version -cp`) or release webhooks. If a repository requires a custom local deploy script, it can be placed in `.along/scripts/deploy.py` and executed via `python scripts/along_exec.py deploy`.
+
 ---
 
 ## Executive Dashboard (`/along-dash`)

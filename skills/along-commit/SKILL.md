@@ -24,5 +24,5 @@ python scripts/along_commit.py "fix null reference in auth handler" --push
 ```
 
 ### Flags
-- `-p`, `--push`: Automatically execute `git push` after successful commit.
+- `--push`: Automatically execute `git push` after successful commit.
 
