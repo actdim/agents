@@ -25,3 +25,4 @@ In this session, we fixed an edge validation issue in Cytoscape DAG graph visual
 - **Agent Workflow Standard**: Updated `skills/along-dash/SKILL.md` to mandate instant metric recalculation, markdown/html file links, and live server command output.
 - **Release Automation**: Bumped version to `v2.0.6` via `along_bump_version.py -cp`.
 - **Global Deployment**: Deployed across Claude Code, Codex, Antigravity, and OpenCode.
+
