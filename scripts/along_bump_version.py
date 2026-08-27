@@ -118,7 +118,7 @@ def bump_along_dev_repo(repo_root, new_version):
                     os.path.join(repo_root, "skills", "along-init", "migrate_protocol.py")]:
         if os.path.exists(mp_path):
             with open(mp_path, "r", encoding="utf-8") as f: c = f.read()
-            u = re.sub(r'CURRENT_PROTOCOL_VERSION = "\d+\.\d+\.\d+"', f'CURRENT_PROTOCOL_VERSION = "{new_version}"', u)
+            u = re.sub(r'CURRENT_PROTOCOL_VERSION = "\d+\.\d+\.\d+"', f'CURRENT_PROTOCOL_VERSION = "{new_version}"', c)
             if u != c:
                 with open(mp_path, "w", encoding="utf-8") as f: f.write(u)
                 modified_files.append(mp_path)
@@ -128,7 +128,7 @@ def bump_along_dev_repo(repo_root, new_version):
                     os.path.join(repo_root, "skills", "along-update", "along_update.py")]:
         if os.path.exists(up_path):
             with open(up_path, "r", encoding="utf-8") as f: c = f.read()
-            u = re.sub(r'CURRENT_PROTOCOL_VERSION = "\d+\.\d+\.\d+"', f'CURRENT_PROTOCOL_VERSION = "{new_version}"', u)
+            u = re.sub(r'CURRENT_PROTOCOL_VERSION = "\d+\.\d+\.\d+"', f'CURRENT_PROTOCOL_VERSION = "{new_version}"', c)
             if u != c:
                 with open(up_path, "w", encoding="utf-8") as f: f.write(u)
                 modified_files.append(up_path)
