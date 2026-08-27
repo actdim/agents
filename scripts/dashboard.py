@@ -450,20 +450,36 @@ class AgentEntityCollector:
                 "status": r["status"]
             })
 
+        node_map = {n["id"]: n for n in nodes}
+
         for iss in self.issues:
             src = iss["id"]
             for blocker in iss.get("blocked_by", []):
                 target = blocker if blocker.startswith(("feat--", "bug--", "debt--", "task--", "docs--")) else f"feat--{blocker}"
+                if target not in node_map:
+                    node_map[target] = {"id": target, "label": blocker, "type": "issue", "status": "open", "priority": "medium", "issue_type": "feat"}
                 edges.append({"source": target, "target": src, "type": "blocks", "label": "blocks"})
             for rel in iss.get("related", []):
                 target = rel if rel.startswith(("feat--", "bug--", "debt--", "task--", "docs--", "risk--")) else f"feat--{rel}"
+                if target not in node_map:
+                    node_map[target] = {"id": target, "label": rel, "type": "issue", "status": "open", "priority": "medium", "issue_type": "feat"}
                 edges.append({"source": src, "target": target, "type": "related", "label": "related"})
             if iss.get("milestone"):
-                edges.append({"source": src, "target": f"milestone--{iss['milestone']}", "type": "belongs_to", "label": "part of"})
+                m_key = f"milestone--{iss['milestone']}"
+                if m_key not in node_map:
+                    node_map[m_key] = {"id": m_key, "label": iss['milestone'], "type": "milestone", "status": "in-progress", "progress_pct": 0}
+                edges.append({"source": src, "target": m_key, "type": "belongs_to", "label": "part of"})
             if iss.get("parent"):
-                edges.append({"source": src, "target": iss["parent"], "type": "child_of", "label": "child of"})
+                p_key = iss["parent"]
+                if p_key not in node_map:
+                    node_map[p_key] = {"id": p_key, "label": p_key, "type": "issue", "status": "open", "priority": "medium", "issue_type": "feat"}
+                edges.append({"source": src, "target": p_key, "type": "child_of", "label": "child of"})
 
-        self.graph = {"nodes": nodes, "edges": edges}
+        final_nodes = list(node_map.values())
+        valid_node_ids = set(node_map.keys())
+        valid_edges = [e for e in edges if e["source"] in valid_node_ids and e["target"] in valid_node_ids]
+
+        self.graph = {"nodes": final_nodes, "edges": valid_edges}
 
     def _compute_metrics(self):
         total_issues = len(self.issues)
@@ -730,7 +746,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           Along Dashboard
           <span class="text-xs px-2 py-0.5 rounded-full bg-sky-950 text-sky-400 border border-sky-800 font-mono">{{ repo_name }}</span>
         </h1>
-        <p class="text-xs text-slate-400">Protocol v1.5.7 | Last scanned: <span id="scan-time">{{ metrics.scan_timestamp }}</span></p>
+        <p class="text-xs text-slate-400">Protocol v2.0.2 | Last scanned: <span id="scan-time">{{ metrics.scan_timestamp }}</span></p>
       </div>
     </div>
     <div class="flex items-center space-x-3">
@@ -818,7 +834,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <div class="text-2xl font-bold text-slate-100 mt-2">{{ metrics.total_kb_articles }} KB / {{ metrics.total_decisions }} ADRs</div>
           <div class="text-xs text-slate-400 mt-1">Context: {{ metrics.context_lines }} lines</div>
           <div class="text-xs text-sky-400 mt-2 flex items-center gap-1">
-            <i data-lucide="activity" class="w-3 h-3"></i> Zero-friction metadata v1.5.7
+            <i data-lucide="activity" class="w-3 h-3"></i> Zero-friction metadata v2.0.2
           </div>
         </div>
       </div>
@@ -1124,6 +1140,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const elements = [];
       const nodes = RAW_DATA.graph.nodes || [];
       const edges = RAW_DATA.graph.edges || [];
+      const nodeIds = new Set();
 
       nodes.forEach(n => {
         let color = '#38bdf8';
@@ -1137,14 +1154,17 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           color = '#f43f5e';
           shape = 'diamond';
         }
+        nodeIds.add(n.id);
         elements.push({ data: { id: n.id, label: n.label, color: color, shape: shape } });
       });
 
       edges.forEach(e => {
-        let edgeColor = '#475569';
-        if (e.type === 'blocks') edgeColor = '#ef4444';
-        if (e.type === 'belongs_to') edgeColor = '#38bdf8';
-        elements.push({ data: { id: `${e.source}->${e.target}`, source: e.source, target: e.target, label: e.label, color: edgeColor } });
+        if (nodeIds.has(e.source) && nodeIds.has(e.target)) {
+          let edgeColor = '#475569';
+          if (e.type === 'blocks') edgeColor = '#ef4444';
+          if (e.type === 'belongs_to') edgeColor = '#38bdf8';
+          elements.push({ data: { id: `${e.source}->${e.target}`, source: e.source, target: e.target, label: e.label, color: edgeColor } });
+        }
       });
 
       cyInstance = cytoscape({
@@ -1350,6 +1370,7 @@ def main():
     agents_dir = find_agents_dir(args.path)
     if not agents_dir.exists():
         print(f"[Error] No .agents/ directory found in {args.path} or parent directories.", file=sys.stderr)
+        print(f"[Error] No .along/ directory found in {args.path} or parent directories.", file=sys.stderr)
         sys.exit(1)
 
     collector = AgentEntityCollector(agents_dir).collect_all()
@@ -1357,16 +1378,27 @@ def main():
     if args.markdown:
         md_path = agents_dir / "DASHBOARD.md"
         generate_markdown_report(collector, md_path)
+    # Always generate fresh markdown and static HTML reports
+    md_path = agents_dir / "DASHBOARD.md"
+    generate_markdown_report(collector, md_path)
+    
+    export_path = collector.repo_root / ".along" / "dashboard.html"
+    export_static_html(collector, export_path)
 
     if args.export:
         export_path = Path(args.export)
         if not export_path.is_absolute():
             export_path = collector.repo_root / export_path
         export_static_html(collector, export_path)
+    if args.export and args.export != ".along/dashboard.html":
+        custom_export = Path(args.export)
+        if not custom_export.is_absolute():
+            custom_export = collector.repo_root / custom_export
+        export_static_html(collector, custom_export)
 
     if args.web:
         run_web_server(collector, host=args.host, port=args.port, open_browser=not args.no_browser)
-    elif not args.markdown and not args.export:
+    else:
         render_cli(collector)
 
 

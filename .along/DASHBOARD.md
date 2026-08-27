@@ -1,6 +1,6 @@
 # Along Executive Dashboard & Repository Analytics
 
-> Auto-generated on `2026-08-27 21:40:32` for repository `along`.
+> Auto-generated on `2026-08-27 21:44:17` for repository `along`.
 
 ## 1. Executive Summary
 
@@ -9,7 +9,7 @@
 | **Completion Progress** | `70.8%` | `17` done / `24` total |
 | **Active Backlog** | `7` open, `0` in-progress | `0` blocked |
 | **Active Risks** | `0` active | `0` critical/high |
-| **Milestones Tracked** | `4` | Stage releases |
+| **Milestones Tracked** | `5` | Stage releases |
 | **Session Logs / ADRs** | `11` sessions / `11` ADRs | Architectural record |
 | **Knowledge Base** | `4` articles | `.along/KB/` documentation |
 | **Context Footprint** | `13` lines | `.along/CONTEXT.md` |
@@ -42,4 +42,5 @@ pie title Issues Status Breakdown
 | [v1.1.0: Antigravity Support and Issues Tracking Model](file:///.along/MILESTONES/v1.1.0-antigravity-support-and-issues-model.md) | `completed` | `2026-08-13` | `100%` |
 | [v1.3.0: Knowledge Base Architecture and Code Graph Integration](file:///.along/MILESTONES/v1.3.0-knowledge-base-and-graph.md) | `completed` | `2026-08-26` | `100%` |
 | [v1.5.0: Automated Entity Ecosystem & Project Dashboard](file:///.along/MILESTONES/v1.5.0-dashboard-and-analytics.md) | `in-progress` | `2026-09-05` | `60%` |
+| [v2.0.0: Transition to Along Ecosystem & Universal Tooling](file:///.along/MILESTONES/v2.0.0-along-transition.md) | `completed` | `2026-08-27` | `100%` |
 
