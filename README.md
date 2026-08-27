@@ -52,9 +52,12 @@ directory (`.along/`) that every agent reads and keeps up to date.
 | `along-init` (`/along-init`) | Scaffold/refresh `AGENTS.md` + `CLAUDE.md` + `.along/` in a folder. |
 | `along-update` (`/along-update`) | One-liner update of repository context, protocol, and global skills from GitHub. |
 | `along-dash` (`/along-dash`) | Launch the Along executive dashboard, inspect DAG dependencies, or export reports. |
-| `along-bump-version` (`/along-bump-version`) | Auto-increment version, sanitize typography, deploy global installs, and commit. |
-| `along-wrap-session` (`/along-wrap-session`) | End-of-stage/session update: doc check, session log, context, issues, decisions, history. |
-| `along-wrap-stage` (`/along-wrap-stage`) | Milestone phase completion update. |
+| `along-wrap` (`/along-wrap`) | Unified end-of-stage/session update: code review, session log, context, issues, history. |
+| `along-commit` (`/along-commit`) | Smart pre-commit ASCII check and Conventional Commit linked to active issue. |
+| `along-bump-version` (`/along-bump-version`) | Multi-stack version bump (Node, Python, Rust, .NET, or .along/scripts/bump_version.py). |
+| `along-build` (`/along-build`) | Project build lifecycle hook via `.along/scripts/build.py` or auto-detected runner. |
+| `along-test` (`/along-test`) | Automated tests with quiet flags via `.along/scripts/test.py` or auto-detected runner. |
+| `along-dev` (`/along-dev`) | Development / debugging server via `.along/scripts/dev.py` or auto-detected runner. |
 | `along-sync-context` (`/along-sync-context`) | Refresh just the nearest `.along/CONTEXT.md`. |
 | `along-sync-issues` (`/along-sync-issues`) | Reconcile the issue board + per-issue `<type>--<slug>.md` files with the actual work. |
 | `along-sync-decisions` (`/along-sync-decisions`) | Append architectural decisions as ADR entries; mark superseded ones. |

@@ -141,7 +141,7 @@ When a Stage or session completes, agents MUST execute this verification checkli
 
 This repository is `Along` (`actdim-along`) - the provider-agnostic agent-context protocol and skills suite for Claude Code, Codex, OpenCode, and Antigravity.
 
-- **Skills Source**: `skills/` (`along-init`, `along-update`, `along-dash`, `along-bump-version`, `along-check-graph`, `along-wrap-session`, `along-wrap-stage`, `along-sync-context`, `along-sync-issues`, `along-sync-decisions`, `along-sync-history`, `along-init-kb`, `along-sync-kb`, `along-search-kb`).
+- **Skills Source**: `skills/` (`along-init`, `along-update`, `along-dash`, `along-wrap`, `along-commit`, `along-bump-version`, `along-build`, `along-test`, `along-dev`, `along-check-graph`, `along-sync-context`, `along-sync-issues`, `along-sync-decisions`, `along-sync-history`, `along-init-kb`, `along-sync-kb`, `along-search-kb`).
 - **Install Commands**:
   - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Target all` (or `install.bat`).
   - Linux / macOS: `bash install.sh`.

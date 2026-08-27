@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+"""
+along_exec.py - Non-Destructive Project Lifecycle Dispatcher for Along.
+
+Dispatches:
+- build -> executes .along/scripts/build.py (or auto-detects build command)
+- test  -> executes .along/scripts/test.py (or auto-detects quiet test runner)
+- dev   -> executes .along/scripts/dev.py (or auto-detects dev/start server)
+
+Features:
+- Lazy evaluation: checks project stack non-destructively on first run
+- Creates .along/scripts/<action>.py with # Status: verified or # Status: unconfigured
+- Supports custom flags and pass-through arguments
+"""
+
+import sys
+import os
+import re
+import json
+import subprocess
+
+def find_repo_root():
+    cur = os.path.abspath(os.getcwd())
+    while True:
+        if os.path.exists(os.path.join(cur, ".along")) or os.path.exists(os.path.join(cur, ".git")) or os.path.exists(os.path.join(cur, "AGENTS.md")):
+            return cur
+        parent = os.path.dirname(cur)
+        if parent == cur:
+            return os.path.abspath(os.getcwd())
+        cur = parent
+
+def get_script_path(repo_root, action):
+    scripts_dir = os.path.join(repo_root, ".along", "scripts")
+    for ext in [".py", ".sh", ".ps1", ".bat"]:
+        p = os.path.join(scripts_dir, f"{action}{ext}")
+        if os.path.exists(p):
+            return p
+    return os.path.join(scripts_dir, f"{action}.py")
+
+def synthesize_script(script_path, content):
+    os.makedirs(os.path.dirname(script_path), exist_ok=True)
+    with open(script_path, "w", encoding="utf-8") as f:
+        f.write(content)
+    try:
+        os.chmod(script_path, 0o755)
+    except Exception:
+        pass
+    print(f"-> Created lifecycle hook: {script_path}")
+
+def detect_action(repo_root, action):
+    # Node.js
+    pkg_json = os.path.join(repo_root, "package.json")
+    if os.path.exists(pkg_json):
+        try:
+            with open(pkg_json, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            scripts = data.get("scripts", {})
+            if action == "build" and "build" in scripts:
+                return "npm run build", True
+            elif action == "test":
+                return "npm test -- --silent" if "test" in scripts else "npm test", True
+            elif action == "dev":
+                cmd = "npm run dev" if "dev" in scripts else ("npm start" if "start" in scripts else None)
+                if cmd: return cmd, True
+        except Exception:
+            pass
+
+    # Rust
+    if os.path.exists(os.path.join(repo_root, "Cargo.toml")):
+        if action == "build": return "cargo build", True
+        elif action == "test": return "cargo test -q", True
+        elif action == "dev": return "cargo run", True
+
+    # .NET
+    if glob_files(repo_root, "*.csproj") or os.path.exists(os.path.join(repo_root, "Directory.Build.props")):
+        if action == "build": return "dotnet build -v q", True
+        elif action == "test": return "dotnet test -v q", True
+        elif action == "dev": return "dotnet run", True
+
+    # Python
+    if os.path.exists(os.path.join(repo_root, "pyproject.toml")) or os.path.exists(os.path.join(repo_root, "setup.py")):
+        if action == "build": return "python -m build", True
+        elif action == "test": return "pytest -q" if os.path.exists(os.path.join(repo_root, "tests")) else "python -m unittest", True
+        elif action == "dev":
+            for main_file in ["main.py", "app.py", "server.py"]:
+                if os.path.exists(os.path.join(repo_root, main_file)):
+                    return f"python {main_file}", True
+
+    return None, False
+
+def glob_files(root, pattern):
+    import glob
+    return bool(glob.glob(os.path.join(root, pattern)))
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python along_exec.py [build|test|dev|debug] [args...]")
+        sys.exit(1)
+
+    action = sys.argv[1].lower().strip()
+    extra_args = sys.argv[2:]
+    repo_root = find_repo_root()
+
+    script_file = get_script_path(repo_root, action)
+
+    # 1. Custom Script Execution
+    if os.path.exists(script_file):
+        with open(script_file, "r", encoding="utf-8", errors="ignore") as f:
+            header = f.read(500)
+        if "# Status: unconfigured" in header:
+            print(f"[Notice] {script_file} is unconfigured. Please customize it for this repository.")
+        
+        print(f"-> Executing .along/scripts/{os.path.basename(script_file)}...")
+        if script_file.endswith(".py"):
+            res = subprocess.run([sys.executable, script_file] + extra_args, cwd=repo_root)
+        else:
+            res = subprocess.run([script_file] + extra_args, cwd=repo_root, shell=True)
+        sys.exit(res.returncode)
+
+    # 2. Auto-Detection and Non-Destructive Synthesis
+    detected_cmd, verified = detect_action(repo_root, action)
+
+    if detected_cmd and verified:
+        status_tag = "verified"
+        py_content = f'''#!/usr/bin/env python3
+# Status: {status_tag}
+# Auto-generated by Along for {action}
+import sys, subprocess, os
+
+def main():
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    cmd = "{detected_cmd}"
+    extra = " ".join(sys.argv[1:])
+    full_cmd = f"{{cmd}} {{extra}}".strip()
+    print(f"-> Running: {{full_cmd}}")
+    res = subprocess.run(full_cmd, shell=True, cwd=repo_root)
+    sys.exit(res.returncode)
+
+if __name__ == "__main__":
+    main()
+'''
+        synthesize_script(script_file, py_content)
+        print(f"-> Running: {detected_cmd}")
+        res = subprocess.run(f"{detected_cmd} {' '.join(extra_args)}".strip(), shell=True, cwd=repo_root)
+        sys.exit(res.returncode)
+    else:
+        status_tag = "unconfigured"
+        py_content = f'''#!/usr/bin/env python3
+# Status: {status_tag}
+# Template for {action} in this repository
+import sys, subprocess, os
+
+def main():
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    print("[Notice] Please configure {action} command in .along/scripts/{action}.py")
+    # Example:
+    # res = subprocess.run("npm run {action}", shell=True, cwd=repo_root)
+    # sys.exit(res.returncode)
+
+if __name__ == "__main__":
+    main()
+'''
+        synthesize_script(script_file, py_content)
+        print(f"[Notice] Created unconfigured template: {script_file}")
+        print(f"Please customize .along/scripts/{action}.py for your repository build/test configuration.")
+
+if __name__ == "__main__":
+    main()

@@ -31,3 +31,4 @@ Transform `/along-bump-version` into a universal, multi-stack release engine tha
 3. **Skill & ADR #009**:
    - Updated `skills/along-bump-version/SKILL.md` with multi-stack usage.
    - Documented architectural decision in `.along/DECISIONS.md`.
+

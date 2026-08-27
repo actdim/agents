@@ -363,8 +363,9 @@ def main():
         print("Usage: python along_bump_version.py [patch|minor|major|<version>] [--no-commit]")
         sys.exit(0)
 
-    no_commit = "--no-commit" in sys.argv
-    bump_arg_clean = [a for a in sys.argv[1:] if not a.startswith("--")][0] if any(not a.startswith("--") for a in sys.argv[1:]) else "patch"
+    do_commit = "--commit" in sys.argv or "-c" in sys.argv
+    do_push = "--push" in sys.argv
+    bump_arg_clean = [a for a in sys.argv[1:] if not a.startswith("-")][0] if any(not a.startswith("-") for a in sys.argv[1:]) else "patch"
 
     print("==================================================")
     print(f"-> Along Universal Release & Version Bumper")
@@ -389,8 +390,7 @@ def main():
     if os.path.exists(dash_script):
         subprocess.run([sys.executable, dash_script, "--markdown"], cwd=repo_root, capture_output=True)
 
-    if not no_commit:
-        # Check if git repo
+    if do_commit:
         git_dir = os.path.join(repo_root, ".git")
         if os.path.exists(git_dir):
             try:
@@ -398,10 +398,17 @@ def main():
                 commit_msg = f"release: v{new_version} - bump version and release reconciliation"
                 subprocess.run(["git", "commit", "-m", commit_msg], cwd=repo_root, check=True)
                 print(f"-> Git commit created: {commit_msg}")
+                if do_push:
+                    print("-> Pushing release commit to remote...")
+                    subprocess.run(["git", "push"], cwd=repo_root, check=True)
+                    print("-> Pushed successfully.")
             except subprocess.CalledProcessError as e:
                 print(f"[Note] Git commit skipped or working tree already clean: {e}")
+    else:
+        print("-> [Notice] Version updated on disk. Use --commit (-c) to create release commit automatically.")
 
     print(f"\n[OK] Release v{new_version} finalized successfully!")
 
 if __name__ == "__main__":
     main()
+

@@ -26,7 +26,8 @@ $LegacySkills = @(
     'init-agents', 'update-agents', 'dashboard', 'repo-dashboard',
     'bump-version', 'check-graph', 'wrap-session', 'wrap-stage',
     'sync-context', 'sync-issues', 'sync-tasks', 'sync-decisions',
-    'sync-history', 'init-kb', 'sync-kb', 'sync-wiki', 'search-kb', 'search-wiki'
+    'sync-history', 'init-kb', 'sync-kb', 'sync-wiki', 'search-kb', 'search-wiki',
+    'along-wrap-session', 'along-wrap-stage'
 )
 
 function Check-Dependencies {

@@ -27,6 +27,7 @@ LEGACY_SKILLS=(
   "bump-version" "check-graph" "wrap-session" "wrap-stage"
   "sync-context" "sync-issues" "sync-tasks" "sync-decisions"
   "sync-history" "init-kb" "sync-kb" "sync-wiki" "search-kb" "search-wiki"
+  "along-wrap-session" "along-wrap-stage"
 )
 
 for arg in "$@"; do
