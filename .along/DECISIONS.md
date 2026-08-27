@@ -83,3 +83,14 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   3. Require verification of ADR conformance in `.along/DECISIONS.md`, null-safety, and edge-case handling.
   4. Document the code review findings and impact summary in the session log (`.along/SESSIONS/`).
 - Consequences: Significantly reduced regression rate, improved long-term architectural health, and explicit accountability for multi-module impact.
+
+## #009 - Universal Project Version Bumping & Repository Scripts Ecosystem (.along/scripts/)
+- Date: 2026-08-27
+- Status: accepted
+- Context: `along-bump-version` was initially hardcoded for `actdim/along` internal development, failing when executed in external consumer repositories (Node, Python, Rust, .NET).
+- Decision:
+  1. Transform `/along-bump-version` (`along_bump_version.py`) into a universal release engine.
+  2. Establish `.along/scripts/` convention in project memory directories for repo-tailored automation scripts.
+  3. Support execution of custom `.along/scripts/bump_version.py` hooks with fallback to automatic stack detection (Node `package.json`, Python `pyproject.toml`, Rust `Cargo.toml`, .NET `*.csproj`, Along dev).
+  4. Auto-synthesize `.along/scripts/bump_version.py` on first run for detected stacks, with diagnostic templates for custom environments.
+- Consequences: Every project adopting Along gains automated, stack-agnostic version bumping and release orchestration out-of-the-box.

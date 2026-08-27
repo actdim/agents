@@ -1,15 +1,45 @@
 ---
 name: along-bump-version
-description: Increment repository version (patch by default), sanitize typography, execute wrap-session reconciliation, deploy global installation, and create a release git commit. Use when finalizing work or when the user invokes /along-bump-version.
+description: Increment project or protocol version (patch by default), sanitize typography, execute wrap-session reconciliation, and create a release git commit. Universal support for Node, Python, Rust, .NET, and custom .along/scripts/bump_version.py hooks.
 ---
 
-# Along Bump Version (`/along-bump-version`) [v2.0.2]
+# Along Bump Version (`/along-bump-version`) [v2.0.3]
 
-Automates version bumping, clean ASCII typography verification, global installation deployment, and release git commit.
+Universal project version bumper and release pipeline engine for repositories adopting Along.
+
+---
+
+## When to Use
+- Finalizing a milestone, stage, or version release (`/along-bump-version`, "bump version", "release new version").
+- Incrementing `package.json`, `pyproject.toml`, `Cargo.toml`, or `.along/` state.
+- Preparing clean ASCII typography and release git commit.
+
+---
+
+## Supported Stacks & Custom Hooks
+
+1. **Custom Project Hook**:
+   If `.along/scripts/bump_version.py` exists, it is executed directly to handle project-specific version files.
+2. **Auto-Detected Stacks**:
+   - **Node.js / TypeScript**: `package.json` & `package-lock.json`
+   - **Python**: `pyproject.toml`, `setup.py`, `__init__.py`
+   - **Rust**: `Cargo.toml`
+   - **.NET / C#**: `Directory.Build.props`, `*.csproj`
+   - **Along Development Repository**: `skills/along-*/SKILL.md`, `protocol.md`, `AGENTS.md`
+   - Automatically synthesizes `.along/scripts/bump_version.py` for future transparent execution.
+3. **Custom Stack Guidance**:
+   If the project stack is non-standard, the engine outputs a template to scaffold `.along/scripts/bump_version.py`.
+
+---
 
 ## Usage
+
 ```bash
-python scripts/bump-version.py patch
-python scripts/bump-version.py minor
-python scripts/bump-version.py major
+python scripts/along_bump_version.py patch
+python scripts/along_bump_version.py minor
+python scripts/along_bump_version.py major
+python scripts/along_bump_version.py 1.5.0
 ```
+
+### Flags
+- `--no-commit`: Skip automatic `git commit` creation.

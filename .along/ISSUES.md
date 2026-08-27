@@ -12,6 +12,7 @@
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [universal-project-version-bumping-and-along-scripts](file://.along/ISSUES/done/feat--universal-project-version-bumping-and-along-scripts.md)
 - [x] `(feat)` [agentic-code-review-and-impact-radius-assessment](file://.along/ISSUES/done/feat--agentic-code-review-and-impact-radius-assessment.md)
 - [x] `(feat)` [project-dashboard-and-analytics-skill](file://.along/ISSUES/done/feat--project-dashboard-and-analytics-skill.md)
 - [x] `(feat)` [update-agents-skill-and-automation](file://.along/ISSUES/done/feat--update-agents-skill-and-automation.md)
