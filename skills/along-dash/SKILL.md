@@ -32,36 +32,27 @@ Agents MUST resolve the path to `along_dash.py` using this precedence:
 
 ## Standard Agent Workflow for `/along-dash`
 
-When `/along-dash` is invoked, agents MUST:
+When `/along-dash` is invoked (or the user asks for the dashboard), agents MUST:
 
-1. **Execute CLI Mode First**:
+1. **Execute CLI Mode & Recalculate Metrics**:
    Run `python <path-to-along_dash.py> . --cli` (or `uv run <path-to-along_dash.py> . --cli`).
-   This prints the terminal summary and automatically generates fresh [`.along/dashboard.html`](file://.along/dashboard.html) and [`.along/DASHBOARD.md`](file://.along/DASHBOARD.md).
+   This recalculates metrics, prints the terminal summary, and automatically refreshes [`.along/dashboard.html`](file://.along/dashboard.html) and [`.along/DASHBOARD.md`](file://.along/DASHBOARD.md).
 
-2. **Present Executive Summary in Chat**:
-   Directly output the key statistics table to the user:
-   - Total Issues & Completion Percentage (Done / Open / In-Progress / Blocked)
-   - Milestones & Sprints progress
-   - Active Risks / Blockers
-   - Sessions & ADR Decisions recorded
-   - KB articles count & Context hygiene (< 20 lines)
+2. **Present Executive Summary & Backlog in Chat**:
+   Directly output the key statistics table and active issues list in the chat response.
 
-3. **Provide Direct File Links**:
-   - [`.along/dashboard.html`](file://.along/dashboard.html) - Standalone interactive HTML report.
-   - [`.along/DASHBOARD.md`](file://.along/DASHBOARD.md) - Markdown summary with Mermaid graphs.
+3. **Launch the Live Web Dashboard in Background**:
+   Start the interactive FastAPI web server as a background daemon task (`run_command` with `IsDaemon: true`):
+   ```bash
+   uv run --with fastapi --with uvicorn --with jinja2 --with pyyaml --with rich <path-to-along_dash.py> . --web --no-browser
+   ```
 
-4. **Provide Interactive Web Server Controls**:
-   - **Launch Web Dashboard**:
-     If the user asked to run/launch the web server, run it as a background task:
-     ```bash
-     uv run <path-to-along_dash.py> . --web
-     ```
-     Provide the clickable URL: `http://127.0.0.1:8765`.
-   - **Stop Web Dashboard**:
-     - Terminal: `Ctrl+C`
-     - Background task: Stop via task manager or terminate process on port 8765:
-       - PowerShell: `Get-NetTCPConnection -LocalPort 8765 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }`
-       - Bash: `fuser -k 8765/tcp || lsof -ti :8765 | xargs kill -9`
+4. **Provide Direct Clickable Links & Controls**:
+   - **Live Interactive Dashboard**: [**http://127.0.0.1:8765**](http://127.0.0.1:8765) (Cytoscape DAG graph, real-time node previews).
+   - **Static HTML File**: [`.along/dashboard.html`](file://.along/dashboard.html) (Single-file standalone report).
+   - **Markdown Report**: [`.along/DASHBOARD.md`](file://.along/DASHBOARD.md) (Mermaid diagrams).
+   - **Server Control**: Clearly state that the web server is actively running in the background, and the user can stop it at any time by asking *"останови дашборд"* / *"stop dashboard"*, or pressing `Ctrl+C` if running in terminal.
+
 
 ---
 
