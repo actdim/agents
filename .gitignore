@@ -1,3 +1,7 @@
 # OS / editor cruft
 Thumbs.db
 .DS_Store
+__pycache__/
+*.pyc
+*.pyo
+.cache/

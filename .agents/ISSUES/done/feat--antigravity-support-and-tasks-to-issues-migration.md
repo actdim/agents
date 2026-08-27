@@ -9,6 +9,8 @@ completed: 2026-08-13
 agent: git-reconstructed
 tags: [git-sync, antigravity, issues]
 milestone: v1.1.0-antigravity-support-and-issues-model
+blocked_by: []
+related: []
 ---
 
 # Antigravity Support and Tasks-to-Issues Model Migration

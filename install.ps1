@@ -95,9 +95,10 @@ function Install-OpenCode {
     $helper = Join-Path $OpencodeHome 'actdim-agents'
     New-Item -ItemType Directory -Force -Path $cmddir | Out-Null
     New-Item -ItemType Directory -Force -Path $helper | Out-Null
-    Write-Host "-> $cmddir (commands) + $helper (helper)"
-    Copy-Item -Force (Join-Path $src 'init-agents\protocol.md')   (Join-Path $helper 'protocol.md')
-    Copy-Item -Force (Join-Path $src 'init-agents\init-agents.sh') (Join-Path $helper 'init-agents.sh')
+    Copy-Item -Force (Join-Path $src 'init-agents\protocol.md')       (Join-Path $helper 'protocol.md')
+    Copy-Item -Force (Join-Path $src 'init-agents\init-agents.sh')     (Join-Path $helper 'init-agents.sh')
+    Copy-Item -Force (Join-Path $src 'init-agents\migrate_protocol.py') (Join-Path $helper 'migrate_protocol.py')
+    Copy-Item -Force (Join-Path $src 'update-agents\update_agents.py')  (Join-Path $helper 'update_agents.py')
     foreach ($d in Get-ChildItem -Directory $src) {
         $raw = (Get-Content -Raw -Encoding UTF8 (Join-Path $d.FullName 'SKILL.md')) -replace "`r`n", "`n"
         $desc = ''

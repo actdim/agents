@@ -9,6 +9,8 @@ completed: 2026-08-27
 agent: antigravity
 tags: [skills, release, typography, versioning]
 milestone: v1.5.0-dashboard-and-analytics
+blocked_by: []
+related: []
 ---
 
 # Bump Version Skill & Comprehensive Typography Sanitizer

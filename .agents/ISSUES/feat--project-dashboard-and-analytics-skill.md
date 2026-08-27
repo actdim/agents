@@ -8,6 +8,8 @@ updated: 2026-08-27
 agent: antigravity
 tags: [dashboard]
 milestone: v1.5.0-dashboard-and-analytics
+blocked_by: []
+related: []
 ---
 
 # Project Dashboard & Repository Analytics Skill (`/repo-dashboard`)

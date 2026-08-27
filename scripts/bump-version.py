@@ -53,6 +53,9 @@ files_to_update = [
     'AGENTS.md',
     'skills/init-agents/protocol.md',
     'skills/init-agents/migrate_protocol.py',
+    'scripts/migrate_protocol.py',
+    'scripts/update_agents.py',
+    'skills/update-agents/update_agents.py',
     '.agents/CONTEXT.md',
 ] + glob.glob('skills/*/SKILL.md') + glob.glob('.agents/KB/*.md')
 

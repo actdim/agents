@@ -83,9 +83,10 @@ install_opencode() {  # generate flat commands + place init-agents helper
   local cmddir="$OPENCODE_HOME/commands"
   local helper="$OPENCODE_HOME/actdim-agents"
   mkdir -p "$cmddir" "$helper"
-  echo "-> $cmddir (commands) + $helper (helper)"
-  cp -f "$src/init-agents/protocol.md"   "$helper/protocol.md"
-  cp -f "$src/init-agents/init-agents.sh" "$helper/init-agents.sh"
+  cp -f "$src/init-agents/protocol.md"        "$helper/protocol.md"
+  cp -f "$src/init-agents/init-agents.sh"      "$helper/init-agents.sh"
+  cp -f "$src/init-agents/migrate_protocol.py" "$helper/migrate_protocol.py"
+  cp -f "$src/update-agents/update_agents.py"  "$helper/update_agents.py"
   local d name sk desc out
   for d in "$src"/*/; do
     [ -d "$d" ] || continue

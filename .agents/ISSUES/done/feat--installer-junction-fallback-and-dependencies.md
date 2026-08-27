@@ -9,6 +9,8 @@ completed: 2026-08-26
 agent: git-reconstructed
 tags: [git-sync, installer, dependencies]
 milestone: v1.3.0-knowledge-base-and-graph
+blocked_by: []
+related: []
 ---
 
 # Installer Junction Fallback and Dependency Management

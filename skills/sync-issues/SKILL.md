@@ -24,17 +24,24 @@ Maintain the issue board and per-issue files.
      priority: medium        # critical | high | medium | low
      created: <YYYY-MM-DD>
      updated: <YYYY-MM-DD>
+     agent: <antigravity | claude-code | codex>
+     tags: []
+     milestone: <milestone-slug>   # optional
+     blocked_by: []                # optional list of blocking <type>--<slug>
+     related: []                   # optional list of associative <type>--<slug>
+     parent: <parent-slug>         # optional parent epic/task slug
      ---
      # <Title>
      Goal / acceptance criteria / steps / links to sessions & decisions (by slug / #N).
      ```
-4. Update `status` and `updated` to match reality. When an issue is DONE, MOVE its file to `.agents/ISSUES/done/<type>--<slug>.md` within that same nearest `.agents/`.
+4. Update `status` and `updated` to match reality (set `status: blocked` if active dependencies in `blocked_by` remain unfinished). When an issue is DONE, MOVE its file to `.agents/ISSUES/done/<type>--<slug>.md` within that same nearest `.agents/`.
 5. Update the board `.agents/ISSUES.md` in that nearest `.agents/` so every issue file has a line under **Active**, **Backlog**, or **Done (recent)**, with the right glyph (`[ ]` open, `[~]` in-progress, `[!]` blocked, `[x]` done), type tag, and relative link:
    - Example line: `- [~] (feat) [add-user-login](file://.agents/ISSUES/feat--add-user-login.md)`
 
 ## Rules
 - Always create and maintain issue files in the NEAREST `.agents/` directory for the subproject/area affected. Never dump subproject issues into the root `.agents/` if a subfolder `.agents/` exists.
-- Reference issues by slug/file, keep filenames as `<type>--<slug>.md`. The only move is open → `ISSUES/done/`.
+- Reference entities strictly by canonical slug or `<type>--<slug>` in `blocked_by`, `related`, and `parent`, never by local filesystem paths.
+- Filenames follow `<type>--<slug>.md`. The only move is open -> `ISSUES/done/`.
 - Never write secrets / credentials / tokens / keys.
 - Do not `git add` / commit unless the user asks.
 

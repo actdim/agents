@@ -9,6 +9,8 @@ completed: 2026-08-26
 agent: antigravity
 tags: [mcp]
 milestone: v1.3.0-knowledge-base-and-graph
+blocked_by: []
+related: []
 ---
 
 # Integrate WikiLLM MCP Server for Hybrid MD Documentation Search

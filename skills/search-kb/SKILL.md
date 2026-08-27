@@ -1,10 +1,10 @@
 ---
 name: search-kb
-version: "1.5.3"
+version: "1.5.4"
 description: Query project Knowledge Base (.agents/, docs/, wiki/, *.md) using hybrid semantic search and cross-linking.
 ---
 
-# Search Knowledge Base (`/search-kb`) [v1.5.3]
+# Search Knowledge Base (`/search-kb`) [v1.5.4]
 
 Use this skill to perform hybrid search across the project's **Knowledge Base (KB)** (`.agents/`, `docs/`, `wiki/`, `README.md`).
 

@@ -9,6 +9,8 @@ completed: 2026-08-27
 agent: antigravity
 tags: [protocol, migration, rules, sync-history]
 milestone: v1.5.0-dashboard-and-analytics
+blocked_by: []
+related: []
 ---
 
 # Protocol v1.5.0 and Versioned Migration Engine

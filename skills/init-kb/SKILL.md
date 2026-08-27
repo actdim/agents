@@ -1,10 +1,10 @@
 ---
 name: init-kb
-version: "1.5.3"
+version: "1.5.4"
 description: Bootstrap or refresh the structured Knowledge Base (.agents/KB/ or docs/) from README.md, AGENTS.md, docs/, and codebase analysis.
 ---
 
-# Init Knowledge Base (`/init-kb`) [v1.5.3]
+# Init Knowledge Base (`/init-kb`) [v1.5.4]
 
 Use this skill to bootstrap or refresh a structured, interlinked **Knowledge Base (KB)** in `.agents/KB/` for any repository.
 

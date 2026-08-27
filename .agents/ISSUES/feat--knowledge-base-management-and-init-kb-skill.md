@@ -8,6 +8,8 @@ updated: 2026-08-26
 agent: antigravity
 tags: [kb]
 milestone: v1.5.0-dashboard-and-analytics
+blocked_by: []
+related: []
 ---
 
 # Knowledge Base Management Standards & `/init-kb` Skill

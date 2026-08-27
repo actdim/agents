@@ -74,8 +74,7 @@ Also, when relevant: `.agents/VISION.md`, `.agents/GLOSSARY.md`, and the `.agent
 ## Issues
 - **Placement in Nearest `.agents/`**: In multi-module or nested projects where subfolders carry their own `AGENTS.md` + `.agents/`, ALWAYS create and manage issues in the NEAREST `.agents/` directory for the subproject/area the issue belongs to. DO NOT dump all subproject issues into the root `.agents/`. Only repository-wide or cross-cutting issues belong in the root `.agents/`.
 - One file per issue, formatted as `.agents/ISSUES/<type>--<slug>.md` (slug = lowercase kebab-case, 2-5 words).
-- Supported types (`<type>`): `feat` (feature), `bug` (bug fix), `debt` (tech debt / refactoring), `task` (general task), `docs` (documentation).
-- Issue YAML front-matter: `slug`, `type`, `status` (`open` | `in-progress` | `blocked` | `done`), `priority` (`critical` | `high` | `medium` | `low`), `created`, `updated`.
+- Issue YAML front-matter: `slug`, `type`, `status` (`open` | `in-progress` | `blocked` | `done`), `priority` (`critical` | `high` | `medium` | `low`), `created`, `updated`, `agent`, `tags: []`, `milestone`, `blocked_by: []`, `related: []`, `parent`.
 - `.agents/ISSUES.md` is the compact board read every session (`## Active`, `## Backlog`, `## Done (recent)`).
 - On completion, MOVE the file to `.agents/ISSUES/done/<type>--<slug>.md` and update the board in that same nearest `.agents/`.
 

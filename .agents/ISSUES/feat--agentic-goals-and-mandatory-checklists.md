@@ -8,6 +8,8 @@ updated: 2026-08-13
 agent: antigravity
 tags: []
 milestone: v1.5.0-dashboard-and-analytics
+blocked_by: []
+related: []
 ---
 
 # Introduce Agentic Goals (Autonomous Loop) & Mandatory Checklists

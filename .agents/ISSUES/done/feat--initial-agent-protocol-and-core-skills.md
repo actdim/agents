@@ -9,6 +9,8 @@ completed: 2026-08-04
 agent: git-reconstructed
 tags: [git-sync, protocol, core-skills]
 milestone: v1.0.0-initial-architecture
+blocked_by: []
+related: []
 ---
 
 # Initial Agent Protocol and Core Skills

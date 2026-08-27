@@ -1,6 +1,6 @@
-# actdim-agents (v1.5.3)
+# actdim-agents (v1.5.4)
 
-A provider-agnostic **agent-context system** for repositories - the `ACTDIM-AGENTS-PROTOCOL v1.5.3`
+A provider-agnostic **agent-context system** for repositories - the `ACTDIM-AGENTS-PROTOCOL v1.5.4`
 plus the skills/commands that scaffold and maintain it. One convention, honored by
 **Claude Code**, **Codex**, **OpenCode**, and **Antigravity**.
 
@@ -45,11 +45,12 @@ that every agent reads and keeps up to date.
   - `GLOSSARY.md` - domain terms.
   - `HISTORY.md` + `SESSIONS/<year>/<date>--<slug>.md` - an index and one log per session (YAML front-matter: date, agent, branch, commit, summary).
 
-### Skills / commands (v1.5.3)
+### Skills / commands (v1.5.4)
 
 | Skill | Purpose |
 |-------|---------|
 | `init-agents`  | Scaffold/refresh `AGENTS.md` + `CLAUDE.md` + `.agents/` in a folder. |
+| `update-agents`| One-liner update of repository context and global skills from GitHub (`/update-agents`). |
 | `init-kb`      | Bootstrap or refresh structured Knowledge Base articles in `.agents/KB/` from `README.md`, `AGENTS.md`, and `docs/`. |
 | `search-kb`    | Query project Knowledge Base (`.agents/`, `docs/`, `wiki/`, `README.md`) using hybrid search (`/search-kb`). |
 | `search-wiki`  | Alias for `/search-kb`. |
@@ -69,7 +70,7 @@ that every agent reads and keeps up to date.
 
 | Provider     | Reads the protocol via              | Skills installed as                                  |
 |--------------|-------------------------------------|------------------------------------------------------|
-| Claude Code  | `CLAUDE.md` → imports `AGENTS.md`   | `~/.claude/skills/<name>/SKILL.md` (copied verbatim) |
+| Claude Code  | `CLAUDE.md` -> imports `AGENTS.md`   | `~/.claude/skills/<name>/SKILL.md` (copied verbatim) |
 | Codex        | `AGENTS.md` (native)                | `~/.codex/skills/<name>/SKILL.md` (copied verbatim)  |
 | OpenCode     | `AGENTS.md` (native, + `CLAUDE.md`) | `~/.config/opencode/commands/<name>.md` (generated)  |
 | Antigravity  | `AGENTS.md` / `GEMINI.md` (native)  | `~/.gemini/config/skills/<name>/SKILL.md` (copied verbatim) |

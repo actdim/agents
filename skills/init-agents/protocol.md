@@ -1,4 +1,4 @@
-# ACTDIM-AGENTS-PROTOCOL v1.5.3
+# ACTDIM-AGENTS-PROTOCOL v1.5.4
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
@@ -30,6 +30,12 @@ All entities are designed for zero-friction auto-parsing by dashboards and tools
   - `agent`: model or tool name (e.g. `antigravity`, `claude-code`).
   - `tags`: array of tags (e.g. `[mcp, protocol]`).
   - `milestone`: optional milestone slug (e.g. `v1.5.0-dashboard`).
+  - `blocked_by`: optional array of blocking entity keys/slugs (e.g. `[feat--core-parser]`).
+  - `related`: optional array of associative entity keys/slugs (e.g. `[risk--api-limit]`).
+  - `parent`: optional parent entity key/slug (e.g. `feat--epic-container`).
+- **Entity Linking & Graph Invariance**:
+  - Reference entities strictly by canonical key (`<type>--<slug>` or `<slug>`), NEVER by local file path, ensuring links survive moves into `done/`.
+  - Links are unidirectional in front-matter; inverse relationships (`blocks`, `children`) and full DAGs are resolved dynamically by graph tools and dashboards.
 - `.agents/ISSUES.md` is the compact board read every session (`## Active`, `## Backlog`, `## Done (recent)`).
 - On completion: set `status: done` and `completed: YYYY-MM-DD`, MOVE to `.agents/ISSUES/done/<type>--<slug>.md`, and update `.agents/ISSUES.md`.
 
