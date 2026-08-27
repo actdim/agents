@@ -5,7 +5,7 @@ slug: protocol-v205-and-global-migration-sync
 agent: antigravity
 branch: main
 commit: unknown
-summary: "Synchronized CURRENT_PROTOCOL_VERSION across migration engines, refined PowerShell quoting resilience, deployed v2.0.5 release with CI/CD deployment documentation."
+summary: Synchronized CURRENT_PROTOCOL_VERSION across migration engines, refined PowerShell quoting resilience, deployed v2.0.5 release with CI/CD deployment documentation.
 milestone: v2.0.0-along-transition
 issues_advanced: []
 issues_completed: []

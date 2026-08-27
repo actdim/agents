@@ -9,7 +9,7 @@ summary: Implemented universal multi-stack project version bumper (.along/script
 milestone: v2.0.0-along-transition
 issues_advanced: []
 issues_completed: [feat--universal-project-version-bumping-and-along-scripts, feat--agentic-code-review-and-impact-radius-assessment, feat--unified-wrap-lifecycle-and-commit-skills]
-decisions: ["008: Mandatory Agentic Code Review and Blast Radius Assessment Gate", "009: Universal Project Version Bumping and Repository Scripts Ecosystem (.along/scripts/)", "010: Unified /along-wrap, Smart /along-commit, and Lifecycle Execution Suite"]
+decisions: ["008: Mandatory Agentic Code Review and Blast Radius Assessment Gate", "009: Universal Project Version Bumping and Repository Scripts Ecosystem (.along/scripts/)", "010: Unified /along-wrap", "Smart /along-commit", "and Lifecycle Execution Suite"]
 risks_logged: []
 spikes_conducted: []
 ---
