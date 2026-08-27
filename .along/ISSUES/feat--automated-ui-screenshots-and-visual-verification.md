@@ -45,3 +45,4 @@ When agents build frontend features, UI components, or fix visual layout bugs, t
 - [ ] Standard convention for saving and embedding visual proof in `.along/ISSUES/` established.
 - [ ] Slash command / CLI script implemented for capturing local web routes.
 - [ ] Dashboard updated to preview attached visual verification assets.
+

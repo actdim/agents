@@ -1,32 +1,31 @@
 # Along Executive Dashboard & Repository Analytics
 
-> Auto-generated on `2026-08-27 21:00:41` for repository `along`.
+> Auto-generated on `2026-08-27 21:02:12` for repository `along`.
 
 ## 1. Executive Summary
 
 | Metric | Value | Details |
 | :--- | :--- | :--- |
-| **Completion Progress** | `70.0%` | `14` done / `20` total |
-| **Active Backlog** | `6` open, `0` in-progress | `0` blocked |
+| **Completion Progress** | `75.0%` | `15` done / `20` total |
+| **Active Backlog** | `5` open, `0` in-progress | `0` blocked |
 | **Active Risks** | `0` active | `0` critical/high |
 | **Milestones Tracked** | `4` | Stage releases |
-| **Session Logs / ADRs** | `9` sessions / `8` ADRs | Architectural record |
+| **Session Logs / ADRs** | `9` sessions / `9` ADRs | Architectural record |
 | **Knowledge Base** | `4` articles | `.along/KB/` documentation |
-| **Context Footprint** | `9` lines | `.along/CONTEXT.md` |
+| **Context Footprint** | `11` lines | `.along/CONTEXT.md` |
 
 ## 2. Issues Breakdown
 
 ```mermaid
 pie title Issues Status Breakdown
-    "Done" : 14
-    "Open" : 6
+    "Done" : 15
+    "Open" : 5
 ```
 
 ## 3. Active Issues & Backlog
 
 | Status | Type | Priority | Issue | Milestone / Blockers |
 | :--- | :--- | :--- | :--- | :--- |
-| `open` | `feat` | `high` | [Agentic Code Review & Blast Radius Impact Assessment Protocol](file:///.along/ISSUES/feat--agentic-code-review-and-impact-radius-assessment.md) | v2.0.0-along-transition |
 | `open` | `feat` | `high` | [Introduce Agentic Goals (Autonomous Loop) & Mandatory Checklists](file:///.along/ISSUES/feat--agentic-goals-and-mandatory-checklists.md) | v1.5.0-dashboard-and-analytics |
 | `open` | `feat` | `medium` | [Automated UI Screenshots & Visual Verification Attached to Issues](file:///.along/ISSUES/feat--automated-ui-screenshots-and-visual-verification.md) | v2.0.0-along-transition |
 | `open` | `feat` | `high` | [Knowledge Base Management Standards & `/along-init-kb` Skill](file:///.along/ISSUES/feat--knowledge-base-management-and-init-kb-skill.md) | v1.5.0-dashboard-and-analytics |

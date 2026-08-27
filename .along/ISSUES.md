@@ -1,7 +1,6 @@
 # Issues   (glyphs: [ ] open  [~] in-progress  [!] blocked  [x] done)
 
 ## Active
-- [ ] `(feat)` [agentic-code-review-and-impact-radius-assessment](file://.along/ISSUES/feat--agentic-code-review-and-impact-radius-assessment.md)
 - [ ] `(feat)` [automated-ui-screenshots-and-visual-verification](file://.along/ISSUES/feat--automated-ui-screenshots-and-visual-verification.md)
 - [ ] `(feat)` [lsif-scip-lsp-mcp-integration](file://.along/ISSUES/feat--lsif-scip-lsp-mcp-integration.md)
 - [ ] `(feat)` [knowledge-base-management-and-init-kb-skill](file://.along/ISSUES/feat--knowledge-base-management-and-init-kb-skill.md)
@@ -11,6 +10,7 @@
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [agentic-code-review-and-impact-radius-assessment](file://.along/ISSUES/done/feat--agentic-code-review-and-impact-radius-assessment.md)
 - [x] `(feat)` [project-dashboard-and-analytics-skill](file://.along/ISSUES/done/feat--project-dashboard-and-analytics-skill.md)
 - [x] `(feat)` [update-agents-skill-and-automation](file://.along/ISSUES/done/feat--update-agents-skill-and-automation.md)
 - [x] `(feat)` [entity-relationships-and-dependency-graph](file://.along/ISSUES/done/feat--entity-relationships-and-dependency-graph.md)

@@ -93,23 +93,27 @@ To keep `.along/` lean and avoid token bloat:
 - `DECISIONS.md` is APPEND-ONLY: add a new dated entry per non-trivial architectural decision; never edit past ones - mark a replaced one "Superseded by #N".
 - Add any new/clarified domain term to `.along/GLOSSARY.md`.
 - **Context & Token hygiene**: Keep tool output lean to prevent context bloat. Use quiet flags for builds/tests (`pytest -q`, `dotnet test -v q`), filter command outputs, and inspect targeted line ranges.
-- **Code graph & Impact analysis**: Prioritize `code-review-graph` MCP tools (`build_or_update_graph_tool`, `get_impact_radius_tool`) during research and refactoring to inspect dependencies with minimal token overhead.
+- **Mandatory Agentic Code Review & Blast Radius Impact**: After completing non-trivial code modifications, agents MUST critically inspect their own diffs and evaluate systemic blast radius. Use `code-review-graph` MCP tools (`build_or_update_graph_tool`, `get_impact_radius_tool`, `get_affected_flows_tool`) to verify that downstream callers, interfaces, and dependent systems remain unbroken, edge cases and nulls are handled, and active ADRs in `.along/DECISIONS.md` are respected.
 - **Hybrid Knowledge Base Search (KB)**: Prioritize `along-search-kb` or `wiki-llm` MCP tools for targeted searches across `.along/`, `docs/`, `wiki/`, `README.md`.
 
 ## Mandatory Stage & Session Completion Checklist
 When a Stage or session completes, agents MUST execute this verification checklist in exact order:
 1. [ ] **Verification & Tests**: Run automated unit tests / linting / builds with quiet flags.
-2. [ ] **Entity Reconciliation**:
+2. [ ] **Code Review & Blast Radius Assessment**:
+   - Inspect git diff for unintended side effects, unhandled nulls/errors, and edge cases.
+   - Evaluate systemic impact radius on callers/dependents using `code-review-graph` or AST analysis.
+   - Verify compliance with architectural decisions in `.along/DECISIONS.md`.
+3. [ ] **Entity Reconciliation**:
    - Set `status: done` and `completed: YYYY-MM-DD` for finished issues; MOVE to `.along/ISSUES/done/`.
    - Update related `.along/MILESTONES/` progress percentages.
    - Resolve mitigated `.along/RISKS/` (`status: resolved` / `mitigated`).
    - Conclude active `.along/SPIKES/` and log any resulting ADR in `.along/DECISIONS.md`.
-3. [ ] **Documentation Check**: Update `README.md`, `AGENTS.md` (project specifics), or `.along/KB/` if code interfaces or architecture changed.
-4. [ ] **Session Log**: Write `.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` with complete front-matter (`protocol: along`, `issues_advanced`, `issues_completed`, `decisions`, `risks_logged`, `spikes_conducted`).
-5. [ ] **CONTEXT Snapshot**: Rewrite `.along/CONTEXT.md` to a short "you are here" snapshot (< 20 lines).
-6. [ ] **ISSUES Board**: Update `.along/ISSUES.md` (keep active list lean, reflect done items).
-7. [ ] **HISTORY**: Append one line to `.along/HISTORY.md`: `<YYYY-MM-DD> - <slug> - <agent> - <summary> - <link>`.
-8. [ ] **Compaction Prompt**: Advise user to run `/compact` to free up token budget.
+4. [ ] **Documentation Check**: Update `README.md`, `AGENTS.md` (project specifics), or `.along/KB/` if code interfaces or architecture changed.
+5. [ ] **Session Log**: Write `.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` with complete front-matter (`protocol: along`, `issues_advanced`, `issues_completed`, `decisions`, `risks_logged`, `spikes_conducted`) and a concise Code Review & Impact summary.
+6. [ ] **CONTEXT Snapshot**: Rewrite `.along/CONTEXT.md` to a short "you are here" snapshot (< 20 lines).
+7. [ ] **ISSUES Board**: Update `.along/ISSUES.md` (keep active list lean, reflect done items).
+8. [ ] **HISTORY**: Append one line to `.along/HISTORY.md`: `<YYYY-MM-DD> - <slug> - <agent> - <summary> - <link>`.
+9. [ ] **Compaction Prompt**: Advise user to run `/compact` to free up token budget.
 
 ## Rules
 - **Strict File Modification & Anti-Deletion**:
