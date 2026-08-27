@@ -360,9 +360,12 @@ def main():
     bump_arg = sys.argv[1] if len(sys.argv) > 1 else "patch"
     
     if bump_arg in ["-h", "--help"]:
+        print("Usage: python along_bump_version.py [patch|minor|major|<version>] [--no-commit]")
         print("Usage: python along_bump_version.py [patch|minor|major|<version>] [-c|--commit] [-p|--push]")
         sys.exit(0)
 
+    do_commit = "--commit" in sys.argv or "-c" in sys.argv
+    do_push = "--push" in sys.argv
     flags = [a for a in sys.argv[1:] if a.startswith("-")]
     do_commit = "--commit" in flags or "-c" in flags or "-cp" in flags or "-pc" in flags or "--push" in flags or "-p" in flags
     do_push = "--push" in flags or "-p" in flags or "-cp" in flags or "-pc" in flags

@@ -75,15 +75,15 @@ def format_commit_message(raw_msg, active_issue):
 
 def main():
     repo_root = find_repo_root()
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    flags = [a for a in sys.argv[1:] if a.startswith("--")]
+    args = [a for a in sys.argv[1:] if not a.startswith("-")]
+    flags = [a for a in sys.argv[1:] if a.startswith("-")]
     
-    push = "--push" in flags
+    push = "--push" in flags or "-p" in flags
     all_files = "--all" in flags or "-a" in flags or len(args) > 0
 
     if not args:
-        print("Usage: python along_commit.py \"<commit message>\" [--push] [--all]")
-        print("Example: python along_commit.py \"add cytoscape graph view\" --push")
+        print("Usage: python along_commit.py \"<commit message>\" [-p|--push] [--all]")
+        print("Example: python along_commit.py \"add cytoscape graph view\" -p")
         sys.exit(1)
 
     raw_msg = " ".join(args)
