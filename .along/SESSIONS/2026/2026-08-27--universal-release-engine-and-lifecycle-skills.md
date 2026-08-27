@@ -5,17 +5,11 @@ slug: universal-release-engine-and-lifecycle-skills
 agent: antigravity
 branch: main
 commit: unknown
-summary: "Implemented universal multi-stack project version bumper (.along/scripts/bump_version.py), unified /along-wrap, smart /along-commit, and non-destructive lifecycle suite (/along-build, /along-test, /along-dev)."
+summary: Implemented universal multi-stack project version bumper (.along/scripts/bump_version.py), unified /along-wrap, smart /along-commit, and non-destructive lifecycle suite (/along-build, /along-test, /along-dev).
 milestone: v2.0.0-along-transition
 issues_advanced: []
-issues_completed:
-  - feat--universal-project-version-bumping-and-along-scripts
-  - feat--agentic-code-review-and-impact-radius-assessment
-  - feat--unified-wrap-lifecycle-and-commit-skills
-decisions:
-  - "008: Mandatory Agentic Code Review and Blast Radius Assessment Gate"
-  - "009: Universal Project Version Bumping and Repository Scripts Ecosystem (.along/scripts/)"
-  - "010: Unified /along-wrap, Smart /along-commit, and Lifecycle Execution Suite"
+issues_completed: [feat--universal-project-version-bumping-and-along-scripts, feat--agentic-code-review-and-impact-radius-assessment, feat--unified-wrap-lifecycle-and-commit-skills]
+decisions: ["008: Mandatory Agentic Code Review and Blast Radius Assessment Gate", "009: Universal Project Version Bumping and Repository Scripts Ecosystem (.along/scripts/)", "010: Unified /along-wrap, Smart /along-commit, and Lifecycle Execution Suite"]
 risks_logged: []
 spikes_conducted: []
 ---
