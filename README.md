@@ -1,6 +1,6 @@
 # Along (v2.0.0)
 
-A provider-agnostic **agent-context and memory system** for repositories *(formerly `actdim-agents`)* - the `ALONG-PROTOCOL v2.0.1`
+A provider-agnostic **agent-context and memory system** for repositories *(formerly `actdim-agents`)* - the `ALONG-PROTOCOL v2.0.2`
 plus the skills/commands that scaffold and maintain it. One convention, honored by
 **Claude Code**, **Codex**, **OpenCode**, and **Antigravity**.
 

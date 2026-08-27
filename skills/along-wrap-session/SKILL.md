@@ -3,7 +3,7 @@ name: along-wrap-session
 description: Wrap up the current coding session by updating the repo's .along/ state - write a session log file, refresh CONTEXT, update the ISSUES board (moving completed issues to ISSUES/done/), append a HISTORY line, and record any decisions/glossary terms. Use when the user ends a session, says to wrap up / save context / log the session, or invokes /along-wrap-session.
 ---
 
-# Along Wrap Session (`/along-wrap-session`) [v2.0.1]
+# Along Wrap Session (`/along-wrap-session`) [v2.0.2]
 
 Mandatory session finalization protocol.
 
