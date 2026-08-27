@@ -33,3 +33,4 @@ Universal finalization and memory synchronization protocol for sessions, tasks, 
 7. [ ] **ISSUES Board**: Update `.along/ISSUES.md` (keep active list lean, reflect done items).
 8. [ ] **HISTORY**: Append one line to `.along/HISTORY.md`: `<YYYY-MM-DD> - <slug> - <agent> - <summary> - <link>`.
 9. [ ] **Compaction Prompt**: Advise user to run `/compact` to free up token budget.
+

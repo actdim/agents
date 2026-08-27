@@ -33,3 +33,4 @@ Consolidate redundant session/stage wrap skills into a single **`/along-wrap`** 
    - Safe disk update by default; commits only when `--commit` (`-c`) is specified.
 5. **ADR #010**:
    - Architectural decision logged in `.along/DECISIONS.md`.
+
