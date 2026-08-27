@@ -131,7 +131,7 @@ When a Stage or session completes, agents MUST execute this verification checkli
 
 This repository is `actdim-agents` - the provider-agnostic agent-context protocol and skills suite for Claude Code, Codex, OpenCode, and Antigravity.
 
-- **Skills Source**: `skills/` (`init-agents`, `wrap-session`, `sync-context`, `sync-issues`, `sync-decisions`, `sync-tasks`).
+- **Skills Source**: `skills/` (`init-agents`, `init-kb`, `search-kb`, `sync-kb`, `check-graph`, `sync-history`, `bump-version`, `wrap-session`, `sync-context`, `sync-issues`, `sync-decisions`, `sync-tasks`).
 - **Install Commands**:
   - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Target all` (or `install.bat`).
   - Linux / macOS: `bash install.sh`.

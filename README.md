@@ -56,6 +56,8 @@ that every agent reads and keeps up to date.
 | `sync-kb`      | Reconcile and update Knowledge Base hybrid search indexes (`/sync-kb`). |
 | `sync-wiki`    | Alias for `/sync-kb`. |
 | `check-graph`  | Inspect `code-review-graph` status, impact radius (blast radius), and architecture flows (`/check-graph`). |
+| `sync-history` | Reconstruct and reconcile `.agents/` milestones, issues, and sessions from Git commits (`/sync-history`). |
+| `bump-version` | Auto-increment version, sanitize typography, deploy global installs, and commit (`/bump-version`). |
 | `wrap-session` | End-of-stage/session update: documentation check, session log, context, issues, decisions, history. |
 | `wrap-stage`   | Alias for `wrap-session` focused on completing a work stage / milestone phase. |
 | `sync-context` | Refresh just the nearest `.agents/CONTEXT.md`. |

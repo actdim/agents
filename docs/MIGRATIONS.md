@@ -44,7 +44,6 @@ flowchart TD
     - Sets `completed: YYYY-MM-DD` for all closed issues.
     - Links every issue to its corresponding `milestone: <slug>`.
   - **Typography Sanitation (Banning Em-Dashes)**:
-    - Automatically scans all `.md` files in `.agents/` and replaces non-standard em-dashes (`-`) with standard ASCII hyphens (`-`).
     - Automatically scans all `.md` files in `.agents/` and replaces non-standard em-dashes (U+2014) with standard ASCII hyphens (`-`).
     - Standardizes quotes and clean UTF-8 encoding across all documentation.
 
