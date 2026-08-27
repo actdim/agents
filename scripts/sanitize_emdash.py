@@ -15,7 +15,7 @@ def sanitize_file(filepath):
         return False
 
     # Replace em-dashes
-    # Context-aware replacement: " - " -> " - ", "-" -> "-"
+    # Context-aware replacement: " <em_dash> " -> " - ", "<em_dash>" -> "-"
     cleaned = content.replace(f' {em_dash} ', ' - ').replace(em_dash, '-')
 
     with open(filepath, 'w', encoding='utf-8') as f:
@@ -37,4 +37,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
