@@ -17,63 +17,39 @@ Inspect, visualize, and analyze repository status across all `.along/` entities 
 
 ---
 
+## Standard Agent Workflow for `/along-dash`
+
+When `/along-dash` is invoked, agents MUST:
+1. Run `python scripts/along_dash.py --cli` (which automatically recalculates metrics, updates `.along/DASHBOARD.md`, and exports `.along/dashboard.html`).
+2. Present the Executive Summary and Active Issues tables in the chat response.
+3. Provide clickable file links to [`.along/DASHBOARD.md`](file://.along/DASHBOARD.md) and [`.along/dashboard.html`](file://.along/dashboard.html).
+4. Provide the exact command to launch the live interactive Cytoscape web server:
+   ```bash
+   uv run --with fastapi --with uvicorn scripts/along_dash.py --web
+   ```
+
+---
+
 ## Execution Modes
 
-### Mode 1: Terminal Summary (CLI - Fast & Lightweight)
-Print a structured summary with Rich tables and priority breakdowns directly in the terminal:
+### Mode 1: Terminal Summary (CLI - Default & Fast)
 ```bash
-uv run scripts/along_dash.py --cli
 python scripts/along_dash.py --cli
 ```
-*(Or `python scripts/along_dash.py --cli`)*
-*(Or `uv run scripts/along_dash.py --cli`)*
-
-```text
-+-------------------------------------------------------------------+
-| Along Dashboard (along)                                           |
-| Scanned 2026-08-27 20:41:45 | Root: D:\Src\my\actdim\public\along |
-+-------------------------------------------------------------------+
-                        Executive Summary                         
-+----------------------------------------------------------------+
-| Metric               |   Value | Details                       |
-|----------------------+---------+-------------------------------|
-| Total Issues         |      18 | Done: 14 (77.8%)              |
-| In-Progress / Open   |   0 / 4 | Active backlog                |
-| Blocked Issues       |       0 | None                          |
-| Active Risks         |       0 | Critical/High: 0              |
-| Milestones & Sprints |       4 | Tracked targets               |
-| Sessions & ADRs      |   8 / 7 | Recorded progress             |
-| KB Articles          |       4 | Knowledge base docs           |
-| Context Hygiene      | 9 lines | CONTEXT.md (<20 lines target) |
-+----------------------------------------------------------------+
-```
-
----
 
 ### Mode 2: Interactive Local Web Dashboard (FastAPI + Cytoscape DAG)
-Launch the interactive web UI with real-time entity search, status filters, markdown preview drawer, and visual dependency graph:
 ```bash
-uv run scripts/along_dash.py --web
 uv run --with fastapi --with uvicorn scripts/along_dash.py --web
 ```
-*(Or `python scripts/along_dash.py --web`)*
-- Automatically refreshes `.along/DASHBOARD.md` and exports `.along/dashboard.html`.
-- Opens `http://127.0.0.1:8765` in the default browser.
-- Displays interactive DAG graph showing blockers (`blocked_by`), relationships (`related`), and milestones.
-- Live data refresh endpoint (`/api/refresh`).
+- Automatically serves at `http://127.0.0.1:8765`.
+- Interactive Cytoscape DAG graph with real-time entity preview.
 
----
-
-### Mode 3: Standalone Static HTML Report (Zero Server Overhead)
-Export a portable, self-contained single HTML report with embedded JSON and client-side filtering:
+### Mode 3: Standalone Static HTML Report
 ```bash
-uv run scripts/along_dash.py --export .along/dashboard.html
+python scripts/along_dash.py --export .along/dashboard.html
 ```
 
----
-
-### Mode 4: Markdown Dashboard Report (`.along/DASHBOARD.md`)
-Generate or update the repository's `.along/DASHBOARD.md` containing Mermaid status charts, active issue tables, and file links:
+### Mode 4: Markdown Dashboard Report
 ```bash
-uv run scripts/along_dash.py --markdown
+python scripts/along_dash.py --markdown
 ```
