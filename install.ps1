@@ -1,9 +1,9 @@
-# install.ps1 - install the ACTDIM-AGENTS skills into Claude Code, Codex, OpenCode and/or Antigravity.
+# install.ps1 - install the ALONG skills into Claude Code, Codex, OpenCode and/or Antigravity.
 #
 # Claude, Codex & Antigravity use the same ~/.<tool>/skills/<name>/SKILL.md format -> the skill folders are copied verbatim.
 # OpenCode uses flat ~/.config/opencode/commands/<name>.md commands -> generated from the same SKILL.md bodies;
-#   init-agents' helper files (protocol.md, init-agents.sh) go to ~/.config/opencode/actdim-agents/.
-# The ACTDIM-AGENTS-PROTOCOL itself is picked up by all four natively via each repo's AGENTS.md.
+#   along-init's helper files (protocol.md, along_update.py, migrate_protocol.py) go to ~/.config/opencode/actdim-along/.
+# The ALONG-PROTOCOL itself is picked up by all four natively via each repo's AGENTS.md.
 #
 # Usage:
 #   powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1                  # all (default), copy
@@ -21,6 +21,13 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+$LegacySkills = @(
+    'init-agents', 'update-agents', 'dashboard', 'repo-dashboard',
+    'bump-version', 'check-graph', 'wrap-session', 'wrap-stage',
+    'sync-context', 'sync-issues', 'sync-tasks', 'sync-decisions',
+    'sync-history', 'init-kb', 'sync-kb', 'sync-wiki', 'search-kb', 'search-wiki'
+)
 
 function Check-Dependencies {
     $uv = Get-Command 'uv' -ErrorAction SilentlyContinue
@@ -50,9 +57,23 @@ function Write-Utf8NoBom([string]$path, [string]$text) {
     [System.IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding($false)))
 }
 
+function Purge-LegacySkillFolders([string]$homeDir) {
+    $dst = Join-Path $homeDir 'skills'
+    if (Test-Path $dst) {
+        foreach ($legacy in $LegacySkills) {
+            $legacyPath = Join-Path $dst $legacy
+            if (Test-Path $legacyPath) {
+                Remove-Item -Recurse -Force $legacyPath -ErrorAction SilentlyContinue
+                Write-Host "   purged legacy skill: $legacy"
+            }
+        }
+    }
+}
+
 function Install-SkillFolders([string]$homeDir) {
     $dst = Join-Path $homeDir 'skills'
     New-Item -ItemType Directory -Force -Path $dst | Out-Null
+    Purge-LegacySkillFolders $homeDir
     Write-Host "-> $dst"
     foreach ($d in Get-ChildItem -Directory $src) {
         $target = Join-Path $dst $d.Name
@@ -93,13 +114,33 @@ function Install-RuleFolders([string]$homeDir) {
 
 function Install-OpenCode {
     $cmddir = Join-Path $OpencodeHome 'commands'
-    $helper = Join-Path $OpencodeHome 'actdim-agents'
+    $helper = Join-Path $OpencodeHome 'actdim-along'
+    $oldHelper = Join-Path $OpencodeHome 'actdim-agents'
+
     New-Item -ItemType Directory -Force -Path $cmddir | Out-Null
     New-Item -ItemType Directory -Force -Path $helper | Out-Null
-    Copy-Item -Force (Join-Path $src 'init-agents\protocol.md')       (Join-Path $helper 'protocol.md')
-    Copy-Item -Force (Join-Path $src 'init-agents\init-agents.sh')     (Join-Path $helper 'init-agents.sh')
-    Copy-Item -Force (Join-Path $src 'init-agents\migrate_protocol.py') (Join-Path $helper 'migrate_protocol.py')
-    Copy-Item -Force (Join-Path $src 'update-agents\update_agents.py')  (Join-Path $helper 'update_agents.py')
+
+    # Clean legacy OpenCode files
+    if (Test-Path $oldHelper) {
+        Remove-Item -Recurse -Force $oldHelper -ErrorAction SilentlyContinue
+    }
+    foreach ($legacy in $LegacySkills) {
+        $legacyCmd = Join-Path $cmddir "$legacy.md"
+        if (Test-Path $legacyCmd) {
+            Remove-Item -Force $legacyCmd -ErrorAction SilentlyContinue
+        }
+    }
+
+    if (Test-Path (Join-Path $src 'along-init\protocol.md')) {
+        Copy-Item -Force (Join-Path $src 'along-init\protocol.md')       (Join-Path $helper 'protocol.md')
+    }
+    if (Test-Path (Join-Path $src 'along-init\migrate_protocol.py')) {
+        Copy-Item -Force (Join-Path $src 'along-init\migrate_protocol.py') (Join-Path $helper 'migrate_protocol.py')
+    }
+    if (Test-Path (Join-Path $src 'along-update\along_update.py')) {
+        Copy-Item -Force (Join-Path $src 'along-update\along_update.py')  (Join-Path $helper 'along_update.py')
+    }
+
     foreach ($d in Get-ChildItem -Directory $src) {
         $raw = (Get-Content -Raw -Encoding UTF8 (Join-Path $d.FullName 'SKILL.md')) -replace "`r`n", "`n"
         $desc = ''
@@ -111,8 +152,8 @@ function Install-OpenCode {
             }
         }
         $note = ''
-        if ($d.Name -eq 'init-agents') {
-            $note = '> OpenCode: the helper script is at `' + $helper + '\init-agents.sh` and the protocol at `' + $helper + '\protocol.md`. Where the steps below say "this skill''s folder", use `' + $helper + '`.' + "`n`n"
+        if ($d.Name -eq 'along-init') {
+            $note = '> OpenCode: helper files live at `' + $helper + '`. Where the steps below say "this skill''s folder", use `' + $helper + '`.' + "`n`n"
         }
         $content = "---`n" + 'description: "' + $desc + '"' + "`n---`n`n" + $note + $body
         Write-Utf8NoBom (Join-Path $cmddir ($d.Name + '.md')) $content
@@ -224,12 +265,11 @@ foreach ($t in $targets) {
     }
 }
 
-# --- Auto-migrate current repository .agents/ metadata if present ---
+# --- Auto-migrate current repository .along/ or .agents/ metadata if present ---
 $py = Get-Command 'python' -ErrorAction SilentlyContinue
-if ($py -and (Test-Path (Join-Path $PSScriptRoot '.agents'))) {
-    Write-Host "-> Running .agents/ versioned protocol migration for v1.5.0 compatibility..."
-    & python (Join-Path $src 'init-agents\migrate_protocol.py') $PSScriptRoot
+if ($py -and ((Test-Path (Join-Path $PSScriptRoot '.along')) -or (Test-Path (Join-Path $PSScriptRoot '.agents')))) {
+    Write-Host "-> Running Along versioned protocol migration for v2.0.0 compatibility..."
+    & python (Join-Path $PSScriptRoot 'scripts\migrate_protocol.py') $PSScriptRoot
 }
 
-Write-Host "Done. Claude/Codex/Antigravity skills register next session as /init-agents etc.; OpenCode picks up /commands, code-review-graph MCP is configured, and all read AGENTS.md natively."
-
+Write-Host "Done. Claude/Codex/Antigravity skills register next session as /along-* (/along-init, /along-update, /along-dash, etc.); OpenCode picks up /commands, code-review-graph MCP is configured, and all read AGENTS.md natively."

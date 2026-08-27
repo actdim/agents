@@ -19,7 +19,7 @@ os.chdir(repo_dir)
 def get_current_version():
     with open('AGENTS.md', 'r', encoding='utf-8') as f:
         content = f.read()
-    m = re.search(r'ACTDIM-AGENTS-PROTOCOL v(\d+\.\d+\.\d+)', content)
+    m = re.search(r'(?:ALONG-PROTOCOL|ACTDIM-AGENTS-PROTOCOL) v(\d+\.\d+\.\d+)', content)
     if m:
         return m.group(1)
     return "1.0.0"
@@ -51,14 +51,14 @@ new_version = calculate_next_version(current_version, mode)
 files_to_update = [
     'README.md',
     'AGENTS.md',
-    'skills/init-agents/protocol.md',
-    'skills/init-agents/migrate_protocol.py',
+    'skills/along-init/protocol.md',
+    'skills/along-init/migrate_protocol.py',
     'scripts/migrate_protocol.py',
-    'scripts/update_agents.py',
-    'skills/update-agents/update_agents.py',
-    'scripts/dashboard.py',
-    '.agents/CONTEXT.md',
-] + glob.glob('skills/*/SKILL.md') + glob.glob('.agents/KB/*.md')
+    'scripts/along_update.py',
+    'skills/along-update/along_update.py',
+    'scripts/along_dash.py',
+    '.along/CONTEXT.md',
+] + glob.glob('skills/*/SKILL.md') + glob.glob('.along/KB/*.md')
 
 updated_count = 0
 for filepath in files_to_update:
@@ -71,8 +71,8 @@ for filepath in files_to_update:
     updated = re.sub(r'version:\s*"[^"]+"', f'version: "{new_version}"', content)
     updated = re.sub(r'CURRENT_PROTOCOL_VERSION\s*=\s*"[^"]+"', f'CURRENT_PROTOCOL_VERSION = "{new_version}"', updated)
     updated = re.sub(r'\[v\d+\.\d+\.\d+\]', f'[v{new_version}]', updated)
-    updated = re.sub(r'ACTDIM-AGENTS-PROTOCOL v\d+\.\d+\.\d+', f'ACTDIM-AGENTS-PROTOCOL v{new_version}', updated)
-    updated = re.sub(r'actdim-agents \(v\d+\.\d+\.\d+\)', f'actdim-agents (v{new_version})', updated)
+    updated = re.sub(r'ALONG-PROTOCOL v\d+\.\d+\.\d+', f'ALONG-PROTOCOL v{new_version}', updated)
+    updated = re.sub(r'actdim-agents \(v\d+\.\d+\.\d+\)', f'along (v{new_version})', updated)
     updated = re.sub(r'Skills / commands \(v\d+\.\d+\.\d+\)', f'Skills / commands (v{new_version})', updated)
     updated = re.sub(r'Protocol v\d+\.\d+\.\d+', f'Protocol v{new_version}', updated)
     updated = re.sub(r'metadata v\d+\.\d+\.\d+', f'metadata v{new_version}', updated)

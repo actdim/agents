@@ -1,12 +1,12 @@
 # Engineering Standards & Rule Packs
 
-Modular language-specific and platform-specific engineering standards for `actdim-agents`.
+Modular language-specific and platform-specific engineering standards for `Along` (`actdim-along`).
 
 ---
 
 ## Overview
 
-Rule packs provide strict, pragmatic engineering standards for both programming languages and software application archetypes. When running `/init-agents` in a repository, the agent inspects project descriptors (`package.json`, `pyproject.toml`, `*.csproj`, `tauri.conf.json`, `pnpm-workspace.yaml`, `Directory.Packages.props`, etc.) and attaches matching guidelines to `## Project specifics` in `AGENTS.md` and `.agents/KB/03-setup-and-workflow.md`.
+Rule packs provide strict, pragmatic engineering standards for both programming languages and software application archetypes. When running `/along-init` in a repository, the agent inspects project descriptors (`package.json`, `pyproject.toml`, `*.csproj`, `tauri.conf.json`, `pnpm-workspace.yaml`, `Directory.Packages.props`, etc.) and attaches matching guidelines to `## Project specifics` in `AGENTS.md` and `.along/KB/03-setup-and-workflow.md`.
 
 ---
 
@@ -37,7 +37,7 @@ Rule packs provide strict, pragmatic engineering standards for both programming 
 
 ## Automatic Detection Matrix
 
-When `/init-agents` scaffolds or refreshes a project:
+When `/along-init` scaffolds or refreshes a project:
 
 | Detected File or Dependency | Inferred Rule Pack |
 | :--- | :--- |
@@ -55,8 +55,8 @@ When `/init-agents` scaffolds or refreshes a project:
 
 ## Usage in Repositories
 
-1. **Automatic Detection (`/init-agents`)**:
+1. **Automatic Detection (`/along-init`)**:
    - The agent inspects project descriptors and adds matching rules to `AGENTS.md`.
 2. **Manual Reference**:
    - Reference in `AGENTS.md`: `See rules/platforms/monorepo.md, rules/platforms/web.md and rules/languages/typescript.md for engineering guidelines.`
-   - Or include as Knowledge Base articles in `.agents/KB/`.
+   - Or include as Knowledge Base articles in `.along/KB/`.

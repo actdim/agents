@@ -730,7 +730,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           Along Dashboard
           <span class="text-xs px-2 py-0.5 rounded-full bg-sky-950 text-sky-400 border border-sky-800 font-mono">{{ repo_name }}</span>
         </h1>
-        <p class="text-xs text-slate-400">Protocol v1.5.7 | Last scanned: <span id="scan-time">{{ metrics.scan_timestamp }}</span></p>
+        <p class="text-xs text-slate-400">Protocol v2.0.0 | Last scanned: <span id="scan-time">{{ metrics.scan_timestamp }}</span></p>
       </div>
     </div>
     <div class="flex items-center space-x-3">
@@ -818,7 +818,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <div class="text-2xl font-bold text-slate-100 mt-2">{{ metrics.total_kb_articles }} KB / {{ metrics.total_decisions }} ADRs</div>
           <div class="text-xs text-slate-400 mt-1">Context: {{ metrics.context_lines }} lines</div>
           <div class="text-xs text-sky-400 mt-2 flex items-center gap-1">
-            <i data-lucide="activity" class="w-3 h-3"></i> Zero-friction metadata v1.5.7
+            <i data-lucide="activity" class="w-3 h-3"></i> Zero-friction metadata v2.0.0
           </div>
         </div>
       </div>

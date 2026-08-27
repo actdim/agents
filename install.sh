@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# install.sh - install the ACTDIM-AGENTS skills into Claude Code, Codex, OpenCode and/or Antigravity.
+# install.sh - install the ALONG skills into Claude Code, Codex, OpenCode and/or Antigravity.
 # For Linux / macOS (and Git Bash on Windows).
 #
 # Claude, Codex & Antigravity use the same ~/.<tool>/skills/<name>/SKILL.md format -> the skill folders are copied verbatim.
 # OpenCode uses flat ~/.config/opencode/commands/<name>.md commands -> generated from the same SKILL.md bodies;
-#   init-agents' helper files (protocol.md, init-agents.sh) are placed in ~/.config/opencode/actdim-agents/.
-# The ACTDIM-AGENTS-PROTOCOL itself is picked up by all four natively via each repo's AGENTS.md.
+#   along-init's helper files (protocol.md, along_update.py, migrate_protocol.py) are placed in ~/.config/opencode/actdim-along/.
+# The ALONG-PROTOCOL itself is picked up by all four natively via each repo's AGENTS.md.
 #
 # Usage:
 #   ./install.sh                        # all (default), copy
@@ -21,6 +21,14 @@ CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 OPENCODE_HOME="${OPENCODE_HOME:-$HOME/.config/opencode}"
 ANTIGRAVITY_HOME="${ANTIGRAVITY_HOME:-$HOME/.gemini/config}"
+
+LEGACY_SKILLS=(
+  "init-agents" "update-agents" "dashboard" "repo-dashboard"
+  "bump-version" "check-graph" "wrap-session" "wrap-stage"
+  "sync-context" "sync-issues" "sync-tasks" "sync-decisions"
+  "sync-history" "init-kb" "sync-kb" "sync-wiki" "search-kb" "search-wiki"
+)
+
 for arg in "$@"; do
   case "$arg" in
     --target=*)           TARGET="${arg#*=}" ;;
@@ -63,9 +71,19 @@ case "$TARGET" in
   *) echo "invalid --target: $TARGET (claude|codex|opencode|antigravity|both|all)" >&2; exit 1 ;;
 esac
 
+purge_legacy_skills() {
+  local dst="$1/skills"
+  if [ -d "$dst" ]; then
+    for leg in "${LEGACY_SKILLS[@]}"; do
+      rm -rf "$dst/$leg"
+    done
+  fi
+}
+
 install_skillfolders() {  # $1 = tool home dir; installs SKILL.md folders verbatim
   local dst="$1/skills"
   mkdir -p "$dst"
+  purge_legacy_skills "$1"
   echo "-> $dst"
   local d name target
   for d in "$src"/*/; do
@@ -79,14 +97,22 @@ install_skillfolders() {  # $1 = tool home dir; installs SKILL.md folders verbat
   done
 }
 
-install_opencode() {  # generate flat commands + place init-agents helper
+install_opencode() {  # generate flat commands + place along-init helper
   local cmddir="$OPENCODE_HOME/commands"
-  local helper="$OPENCODE_HOME/actdim-agents"
+  local helper="$OPENCODE_HOME/actdim-along"
+  local old_helper="$OPENCODE_HOME/actdim-agents"
   mkdir -p "$cmddir" "$helper"
-  cp -f "$src/init-agents/protocol.md"        "$helper/protocol.md"
-  cp -f "$src/init-agents/init-agents.sh"      "$helper/init-agents.sh"
-  cp -f "$src/init-agents/migrate_protocol.py" "$helper/migrate_protocol.py"
-  cp -f "$src/update-agents/update_agents.py"  "$helper/update_agents.py"
+  rm -rf "$old_helper"
+
+  # Clean legacy commands
+  for leg in "${LEGACY_SKILLS[@]}"; do
+    rm -f "$cmddir/$leg.md"
+  done
+
+  [ -f "$src/along-init/protocol.md" ] && cp -f "$src/along-init/protocol.md" "$helper/protocol.md"
+  [ -f "$src/along-init/migrate_protocol.py" ] && cp -f "$src/along-init/migrate_protocol.py" "$helper/migrate_protocol.py"
+  [ -f "$src/along-update/along_update.py" ] && cp -f "$src/along-update/along_update.py" "$helper/along_update.py"
+
   local d name sk desc out
   for d in "$src"/*/; do
     [ -d "$d" ] || continue
@@ -97,8 +123,8 @@ install_opencode() {  # generate flat commands + place init-agents helper
       printf 'description: "%s"\n' "$desc"
       echo '---'
       echo
-      if [ "$name" = "init-agents" ]; then
-        echo "> OpenCode: the helper script is at \`$helper/init-agents.sh\` and the protocol at \`$helper/protocol.md\`. Where the steps below say \"this skill's folder\", use \`$helper\`."
+      if [ "$name" = "along-init" ]; then
+        echo "> OpenCode: helper files live at \`$helper\`. Where the steps below say \"this skill's folder\", use \`$helper\`."
         echo
       fi
       awk 'c>=2{print} /^---[[:space:]]*$/{c++}' "$sk"
@@ -161,5 +187,9 @@ if [ "$do_antigravity" -eq 1 ]; then
   configure_mcp_server "$ANTIGRAVITY_HOME/mcp_config.json"
 fi
 
-echo "Done. Claude/Codex/Antigravity skills register next session as /init-agents etc.; OpenCode picks up /commands, code-review-graph MCP is configured, and all read AGENTS.md natively."
+if command -v python3 >/dev/null 2>&1 && { [ -d "$SCRIPT_DIR/.along" ] || [ -d "$SCRIPT_DIR/.agents" ]; }; then
+  echo "-> Running Along versioned protocol migration for v2.0.0 compatibility..."
+  python3 "$SCRIPT_DIR/scripts/migrate_protocol.py" "$SCRIPT_DIR"
+fi
 
+echo "Done. Claude/Codex/Antigravity skills register next session as /along-* (/along-init, /along-update, /along-dash, etc.); OpenCode picks up /commands, code-review-graph MCP is configured, and all read AGENTS.md natively."
