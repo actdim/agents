@@ -5,7 +5,7 @@ slug: dashboard-resilience-and-agent-workflow
 agent: antigravity
 branch: main
 commit: unknown
-summary: "Fixed Cytoscape DAG graph edge validation crash, created v2.0.0 milestone file, standardized /along-dash agent workflow, and released v2.0.6."
+summary: Fixed Cytoscape DAG graph edge validation crash, created v2.0.0 milestone file, standardized /along-dash agent workflow, and released v2.0.6.
 milestone: v2.0.0-along-transition
 issues_advanced: []
 issues_completed: []
