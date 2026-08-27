@@ -1,6 +1,6 @@
-# actdim-agents (v1.5.6)
+# actdim-agents (v1.5.7)
 
-A provider-agnostic **agent-context system** for repositories - the `ACTDIM-AGENTS-PROTOCOL v1.5.6`
+A provider-agnostic **agent-context system** for repositories - the `ACTDIM-AGENTS-PROTOCOL v1.5.7`
 plus the skills/commands that scaffold and maintain it. One convention, honored by
 **Claude Code**, **Codex**, **OpenCode**, and **Antigravity**.
 
@@ -45,7 +45,7 @@ that every agent reads and keeps up to date.
   - `GLOSSARY.md` - domain terms.
   - `HISTORY.md` + `SESSIONS/<year>/<date>--<slug>.md` - an index and one log per session (YAML front-matter: date, agent, branch, commit, summary).
 
-### Skills / commands (v1.5.6)
+### Skills / commands (v1.5.7)
 
 | Skill | Purpose |
 |-------|---------|

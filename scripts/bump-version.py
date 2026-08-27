@@ -56,6 +56,7 @@ files_to_update = [
     'scripts/migrate_protocol.py',
     'scripts/update_agents.py',
     'skills/update-agents/update_agents.py',
+    'scripts/dashboard.py',
     '.agents/CONTEXT.md',
 ] + glob.glob('skills/*/SKILL.md') + glob.glob('.agents/KB/*.md')
 
@@ -73,6 +74,8 @@ for filepath in files_to_update:
     updated = re.sub(r'ACTDIM-AGENTS-PROTOCOL v\d+\.\d+\.\d+', f'ACTDIM-AGENTS-PROTOCOL v{new_version}', updated)
     updated = re.sub(r'actdim-agents \(v\d+\.\d+\.\d+\)', f'actdim-agents (v{new_version})', updated)
     updated = re.sub(r'Skills / commands \(v\d+\.\d+\.\d+\)', f'Skills / commands (v{new_version})', updated)
+    updated = re.sub(r'Protocol v\d+\.\d+\.\d+', f'Protocol v{new_version}', updated)
+    updated = re.sub(r'metadata v\d+\.\d+\.\d+', f'metadata v{new_version}', updated)
     
     with open(filepath, 'w', encoding='utf-8', newline='\n') as f:
         f.write(updated)

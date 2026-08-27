@@ -9,6 +9,7 @@
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [project-dashboard-and-analytics-skill](file://.agents/ISSUES/done/feat--project-dashboard-and-analytics-skill.md)
 - [x] `(feat)` [update-agents-skill-and-automation](file://.agents/ISSUES/done/feat--update-agents-skill-and-automation.md)
 - [x] `(feat)` [entity-relationships-and-dependency-graph](file://.agents/ISSUES/done/feat--entity-relationships-and-dependency-graph.md)
 - [x] `(feat)` [bump-version-skill-and-typography-sanitizer](file://.agents/ISSUES/done/feat--bump-version-skill-and-typography-sanitizer.md)

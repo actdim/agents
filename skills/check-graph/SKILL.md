@@ -1,10 +1,10 @@
 ---
 name: check-graph
-version: "1.5.6"
+version: "1.5.7"
 description: Debug and inspect code-review-graph status, blast radius, and enforce .code-review-graph-ignore filters to prevent node_modules ballooning.
 ---
 
-# Check Graph (`/check-graph`) [v1.5.6]
+# Check Graph (`/check-graph`) [v1.5.7]
 
 Use this skill to test, debug, and inspect the status of the **`code-review-graph`** MCP server and enforce strict exclusion filters.
 

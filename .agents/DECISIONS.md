@@ -51,3 +51,18 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   3. Validate DAGs for cyclic dependencies and dangling references in `migrate_protocol.py` and provide a `/update-agents` one-liner skill for automated global and project upgrades.
 - Consequences: Eliminates link drift, guarantees graph invariance across entity lifecycles, and enables automated dashboard dependency graphs.
 
+## #006 - Autonomous Multi-Mode Repository Dashboard & Analytics Engine
+- Date: 2026-08-27
+- Status: accepted
+- Context: Developers and agents require instant visibility into `.agents/` entity lifecycles, milestone completion rates, active blockers, and dependency DAGs without manual data compilation or heavy infrastructure.
+- Decision:
+  1. Implement an autonomous Python script (`scripts/dashboard.py`) using PEP 723 inline dependencies (`# /// script ...`) executable directly via `uv run scripts/dashboard.py`.
+  2. Provide 4 decoupled operational modes in a single codebase:
+     - **CLI Mode**: Terminal summary with Rich tables and priority breakdowns.
+     - **Interactive Web Mode**: Lightweight FastAPI + Uvicorn server hosting a modern single-page dashboard with Cytoscape DAG visualization, search, status filters, and markdown entity drawer.
+     - **Static HTML Export**: Self-contained single-file HTML report with embedded JSON dataset for zero-server sharing.
+     - **Markdown Dashboard**: GFM report (`.agents/DASHBOARD.md`) with Mermaid status charts and entity links.
+  3. Expose the `/repo-dashboard` and `/dashboard` skills across Claude Code, Codex, OpenCode, and Antigravity.
+- Consequences: Zero setup cost, instant offline/online dashboard visualization across all execution environments.
+
+
