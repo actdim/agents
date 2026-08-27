@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-sanitize_emdash.py — Replace em-dash (—) with standard ASCII hyphens (-) or colons across all files.
+sanitize_emdash.py - Replace em-dash (U+2014) with standard ASCII hyphens (-) or colons across all files.
 """
 
 import os
@@ -10,12 +10,13 @@ def sanitize_file(filepath):
     with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
         content = f.read()
 
-    if '—' not in content:
+    em_dash = '\u2014'
+    if em_dash not in content:
         return False
 
     # Replace em-dashes
-    # Context-aware replacement: " — " -> " - ", "—" -> "-"
-    cleaned = content.replace(' — ', ' - ').replace('—', '-')
+    # Context-aware replacement: " - " -> " - ", "-" -> "-"
+    cleaned = content.replace(f' {em_dash} ', ' - ').replace(em_dash, '-')
 
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(cleaned)

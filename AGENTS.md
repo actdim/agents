@@ -1,5 +1,5 @@
 <!-- BEGIN ACTDIM-AGENTS-PROTOCOL root (managed by init-agents - do not edit by hand) -->
-# ACTDIM-AGENTS-PROTOCOL v1.5.1
+# ACTDIM-AGENTS-PROTOCOL v1.5.2
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
@@ -112,7 +112,7 @@ When a Stage or session completes, agents MUST execute this verification checkli
   - **Mandatory Diff Verification**: After modifying any file, inspect the generated diff to ensure only intended lines were touched.
   - **Immediate Rollback**: If an unintended deletion or truncation is detected, restore missing lines immediately.
 - **Technical Markdown & Formatting Standards**:
-  - **Forbidden Symbol (No Em-Dash `—`)**: NEVER use the em-dash character (`—`, U+2014) in markdown files, code comments, session logs, or documentation. Use standard ASCII hyphens (`-`), colons (`:`), or parentheses `()`.
+  - **Forbidden Symbol (No Em-Dash)**: NEVER use the em-dash character (U+2014) in markdown files, code comments, session logs, or documentation. Use standard ASCII hyphens (`-`), colons (`:`), or parentheses `()`.
   - **Clean ASCII Punctuation**: Avoid typographic curly quotes (`“`, `”`, `‘`, `’`) in code blocks, shell commands, and YAML front-matter; use standard ASCII quotes (`"`, `'`).
   - **Explicit Code Fence Languages**: Always specify the language identifier on code fences (e.g. ```` ```bash ````, ```` ```yaml ````, ```` ```typescript ````, ```` ```python ````). Never use bare unlabelled fences.
   - **Relative & Portable Links**: Always use relative paths (`file://...` or standard markdown links) without hardcoding local absolute paths.

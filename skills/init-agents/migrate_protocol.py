@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-migrate_protocol.py — Version-aware migration engine for ACTDIM-AGENTS-PROTOCOL.
+migrate_protocol.py - Version-aware migration engine for ACTDIM-AGENTS-PROTOCOL.
 
 Executes sequential, version-specific migration steps on target repository's .agents/ structure:
-  - v1.0.0 -> v1.1.0: Tasks -> Issues directory & kebab-case renaming
-  - v1.1.0 -> v1.3.0: Knowledge Base (.agents/KB/) & .code-review-graph-ignore scaffolding
+  - v1.0.0 -> v1.1.0: Tasks -> Issues directory and kebab-case renaming
+  - v1.1.0 -> v1.3.0: Knowledge Base (.agents/KB/) and .code-review-graph-ignore scaffolding
   - v1.3.3 -> v1.5.0: Entity Ecosystem (MILESTONES, RISKS, SPIKES, CHECKLISTS),
                      retroactive Milestone synthesis from past sessions/done issues,
                      standard Checklists synthesis, and complete YAML front-matter enrichment.
-  - Typography sanitation: bans em-dash (—) and replaces with standard ASCII hyphens (-).
+  - Typography sanitation: bans em-dash (U+2014) and replaces with standard ASCII hyphens (-).
 
 Usage:
     python skills/init-agents/migrate_protocol.py [TARGET_REPO_ROOT]
@@ -20,7 +20,7 @@ import sys
 import glob
 from datetime import datetime
 
-CURRENT_PROTOCOL_VERSION = "1.5.0"
+CURRENT_PROTOCOL_VERSION = "1.5.2"
 
 def parse_yaml_frontmatter(content):
     match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n(.*)$", content, re.DOTALL)

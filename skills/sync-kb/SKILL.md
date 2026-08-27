@@ -1,10 +1,10 @@
 ---
 name: sync-kb
-version: "1.5.1"
+version: "1.5.2"
 description: Reconcile and update the Knowledge Base hybrid vector index and cross-links across project documentation (.agents/, docs/, wiki/, *.md).
 ---
 
-# Sync Knowledge Base (`/sync-kb`) [v1.5.1]
+# Sync Knowledge Base (`/sync-kb`) [v1.5.2]
 
 Use this skill to update, verify, and synchronize the hybrid search index across the project's **Knowledge Base (KB)** (`.agents/`, `docs/`, `wiki/`, `README.md`).
 

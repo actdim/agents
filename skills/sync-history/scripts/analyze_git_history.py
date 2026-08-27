@@ -29,13 +29,19 @@ def run_git_cmd(args, cwd=None):
 
 def get_mapped_commits(agents_dir):
     mapped_commits = set()
-    session_files = glob.glob(os.path.join(agents_dir, "SESSIONS", "**", "*.md"), recursive=True)
-    for sf in session_files:
+    scan_files = glob.glob(os.path.join(agents_dir, "SESSIONS", "**", "*.md"), recursive=True) +                  glob.glob(os.path.join(agents_dir, "ISSUES", "**", "*.md"), recursive=True)
+    for sf in scan_files:
         with open(sf, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
-        m = re.search(r"^commit:\s*([a-fA-F0-9]+)", content, re.MULTILINE)
-        if m:
-            mapped_commits.add(m.group(1).strip()[:7])
+        for m in re.finditer(r"commit:\s*([a-fA-F0-9]+)", content):
+            mapped_commits.add(m.group(1).strip()[:7].lower())
+        for m in re.finditer(r"commits(?:_covered)?:\s*\[([^\]]+)\]", content):
+            for h in m.group(1).split(","):
+                clean = h.strip().strip("'\"")[:7].lower()
+                if clean:
+                    mapped_commits.add(clean)
+        for m in re.finditer(r"`([a-fA-F0-9]{7,40})`", content):
+            mapped_commits.add(m.group(1).strip()[:7].lower())
     return mapped_commits
 
 def get_git_tags(repo_root):
@@ -65,7 +71,6 @@ def extract_commits(repo_root, max_count=100, since_commit=None):
         if len(parts) == 5:
             full_hash, short_hash, author, date, subject = parts
             
-            # Classify conventional commit prefix
             c_type = "feat"
             lower_s = subject.lower()
             if lower_s.startswith("fix") or "bug" in lower_s:
@@ -97,7 +102,9 @@ def main():
 
     unmapped = []
     for c in commits:
-        if c["short_hash"] not in mapped and not any(c["full_hash"].startswith(m) for m in mapped):
+        short = c["short_hash"].lower()
+        full = c["full_hash"].lower()
+        if short not in mapped and not any(full.startswith(m) for m in mapped):
             unmapped.append(c)
 
     result = {
@@ -105,7 +112,7 @@ def main():
         "total_tags": len(tags),
         "tags": tags[:10],
         "total_commits_scanned": len(commits),
-        "mapped_commits_count": len(mapped),
+        "mapped_commits_count": len(commits) - len(unmapped),
         "unmapped_commits_count": len(unmapped),
         "unmapped_commits": unmapped
     }

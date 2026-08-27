@@ -3,11 +3,11 @@ date: 2026-08-27
 slug: protocol-v150-and-migrations-engine
 agent: Antigravity / Gemini 2.5 Flash
 branch: main
-commit: 4a8f968
+commit: 044cb40
 summary: Protocol v1.5.0 upgrade, versioned migration engine, Language Rule Packs, and sync-history skill.
 milestone: v1.5.0-dashboard-and-analytics
 issues_advanced: [feat--project-dashboard-and-analytics-skill, feat--agentic-goals-and-mandatory-checklists]
-issues_completed: []
+issues_completed: [feat--protocol-v150-and-migrations-engine]
 decisions: ["#004"]
 risks_logged: []
 spikes_conducted: []
