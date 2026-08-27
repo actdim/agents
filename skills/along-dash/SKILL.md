@@ -3,7 +3,7 @@ name: along-dash
 description: Launch the Along executive dashboard, inspect entity DAG dependency graph, print terminal analytics, or export static/markdown reports. Use when the user requests a dashboard, status overview, repository metrics, or invokes /along-dash.
 ---
 
-# Along Dashboard & Executive Analytics (`/along-dash`) [v2.0.3]
+# Along Dashboard & Executive Analytics (`/along-dash`) [v2.0.4]
 
 Inspect, visualize, and analyze repository status across all `.along/` entities (`ISSUES`, `MILESTONES`, `RISKS`, `SPIKES`, `CHECKLISTS`, `SESSIONS`, `KB`, and ADR decisions).
 

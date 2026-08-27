@@ -1,24 +1,24 @@
 # Along Executive Dashboard & Repository Analytics
 
-> Auto-generated on `2026-08-27 21:12:31` for repository `along`.
+> Auto-generated on `2026-08-27 21:32:54` for repository `along`.
 
 ## 1. Executive Summary
 
 | Metric | Value | Details |
 | :--- | :--- | :--- |
-| **Completion Progress** | `69.6%` | `16` done / `23` total |
+| **Completion Progress** | `70.8%` | `17` done / `24` total |
 | **Active Backlog** | `7` open, `0` in-progress | `0` blocked |
 | **Active Risks** | `0` active | `0` critical/high |
 | **Milestones Tracked** | `4` | Stage releases |
-| **Session Logs / ADRs** | `9` sessions / `10` ADRs | Architectural record |
+| **Session Logs / ADRs** | `10` sessions / `11` ADRs | Architectural record |
 | **Knowledge Base** | `4` articles | `.along/KB/` documentation |
-| **Context Footprint** | `11` lines | `.along/CONTEXT.md` |
+| **Context Footprint** | `13` lines | `.along/CONTEXT.md` |
 
 ## 2. Issues Breakdown
 
 ```mermaid
 pie title Issues Status Breakdown
-    "Done" : 16
+    "Done" : 17
     "Open" : 7
 ```
 

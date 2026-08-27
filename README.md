@@ -1,6 +1,6 @@
-# Along (v2.0.3)
+# Along (v2.0.4)
 
-A provider-agnostic **agent-context and memory system** for repositories *(formerly `actdim-agents`)* - the `ALONG-PROTOCOL v2.0.3`
+A provider-agnostic **agent-context and memory system** for repositories *(formerly `actdim-agents`)* - the `ALONG-PROTOCOL v2.0.4`
 plus the skills/commands that scaffold and maintain it. One convention, honored by
 **Claude Code**, **Codex**, **OpenCode**, and **Antigravity**.
 
@@ -45,7 +45,7 @@ directory (`.along/`) that every agent reads and keeps up to date.
   - `GLOSSARY.md` - domain terms.
   - `HISTORY.md` + `SESSIONS/<year>/<date>--<slug>.md` - an index and one log per session (YAML front-matter: `protocol: along`, date, agent, branch, commit, summary).
 
-### Skills & Slash Commands (v2.0.3)
+### Skills & Slash Commands (v2.0.4)
 
 | Skill / Command | Purpose |
 | :--- | :--- |
