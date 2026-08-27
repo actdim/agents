@@ -45,3 +45,4 @@ While `Along` natively supports Claude Code, Codex, OpenCode, and Antigravity, d
 - [ ] `install.ps1` and `install.sh` updated to support deployment to OpenClaw and Hermes Agent.
 - [ ] Provider support matrix updated in `README.md` and `AGENTS.md`.
 - [ ] Automated protocol verification and MCP configuration tested on both frameworks.
+
