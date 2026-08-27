@@ -1,10 +1,10 @@
 ---
 name: search-wiki
-version: "1.5.4"
+version: "1.5.5"
 description: Query project Knowledge Base (.agents/, docs/, wiki/, *.md) using hybrid search. (Alias for /search-kb)
 ---
 
-# Search Wiki (`/search-wiki`) [v1.5.4]
+# Search Wiki (`/search-wiki`) [v1.5.5]
 
 > [!NOTE]
 > `/search-wiki` is a backward-compatible alias for [`/search-kb`](file://skills/search-kb/SKILL.md).

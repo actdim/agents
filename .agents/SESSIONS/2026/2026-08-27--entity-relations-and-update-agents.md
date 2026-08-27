@@ -39,3 +39,4 @@ spikes_conducted: []
 - `.agents/ISSUES.md`
 - `.agents/ISSUES/done/feat--entity-relationships-and-dependency-graph.md`
 - `.agents/ISSUES/done/feat--update-agents-skill-and-automation.md`
+

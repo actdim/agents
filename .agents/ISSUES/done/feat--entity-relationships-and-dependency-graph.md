@@ -23,3 +23,4 @@ Introduce standardized metadata fields (`blocked_by`, `related`, `parent`) acros
 - Update `skills/sync-issues/SKILL.md` and `skills/init-agents/SKILL.md` to guide agents in managing relationship front-matter without dual-sync drift.
 - Enhance `migrate_protocol.py` with validation and extraction helpers (detecting dangling references and cyclic dependencies in `blocked_by`).
 - Ensure full ASCII compliance (no typographic Unicode).
+

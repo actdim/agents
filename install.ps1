@@ -84,8 +84,9 @@ function Install-RuleFolders([string]$homeDir) {
     $rulesSrc = Join-Path $PSScriptRoot 'rules'
     if (Test-Path $rulesSrc) {
         $dst = Join-Path $homeDir 'rules'
+        if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }
         New-Item -ItemType Directory -Force -Path $dst | Out-Null
-        Copy-Item -Recurse -Force (Join-Path $rulesSrc '*') $dst
+        Copy-Item -Path "$rulesSrc\*" -Destination $dst -Recurse -Force
         Write-Host "   rules copied -> $dst"
     }
 }
