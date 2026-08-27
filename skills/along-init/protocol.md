@@ -1,4 +1,4 @@
-# ALONG-PROTOCOL v2.0.5
+# ALONG-PROTOCOL v2.0.6
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
