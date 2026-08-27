@@ -1,10 +1,10 @@
 ---
 name: bump-version
-version: "1.5.5"
+version: "1.5.6"
 description: Increment repository version (patch by default), sanitize typography, execute wrap-session reconciliation, deploy global installation, and create a release git commit. Use when finalizing work or when the user invokes /bump-version.
 ---
 
-# Bump Version & Release (`/bump-version`) [v1.5.5]
+# Bump Version & Release (`/bump-version`) [v1.5.6]
 
 Automate the atomic patch bump, session finalization, global installation sync, and Git commit.
 

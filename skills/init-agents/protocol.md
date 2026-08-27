@@ -1,4 +1,4 @@
-# ACTDIM-AGENTS-PROTOCOL v1.5.5
+# ACTDIM-AGENTS-PROTOCOL v1.5.6
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
