@@ -125,8 +125,8 @@ class TestAlongSkillsAndScripts(unittest.TestCase):
 
         for pat in patterns:
             for filepath in glob.glob(os.path.join(REPO_ROOT, pat), recursive=True):
-                # Skip .git, caches, tests, and typography sanitizer itself
-                if any(x in filepath for x in [".git", "__pycache__", "scratch", "tests", "sanitize_typography.py"]):
+                # Skip .git, caches, tests, node_modules, dist, and typography sanitizer itself
+                if any(x in filepath for x in [".git", "__pycache__", "scratch", "tests", "node_modules", "dist", ".vite", "sanitize_typography.py"]):
                     continue
                 try:
                     with open(filepath, "r", encoding="utf-8") as f:
@@ -146,10 +146,16 @@ class TestAlongSkillsAndScripts(unittest.TestCase):
         dash_script = os.path.join(REPO_ROOT, "scripts", "along_dash.py")
         self.assertTrue(os.path.exists(dash_script), "scripts/along_dash.py must exist")
 
-        res = subprocess.run([sys.executable, dash_script, REPO_ROOT, "--cli"], capture_output=True, text=True)
+        cmd = [sys.executable, dash_script, REPO_ROOT, "--cli"]
+        res = subprocess.run(cmd, capture_output=True, text=True)
+        if res.returncode != 0 and "No module named 'fastapi'" in res.stderr:
+            # Fallback to uv run if fastapi is managed via uv
+            cmd = ["uv", "run", "--with", "fastapi", "--with", "uvicorn", "--with", "httpx2", "--with", "pyyaml", "--with", "rich", dash_script, REPO_ROOT, "--cli"]
+            res = subprocess.run(cmd, capture_output=True, text=True)
+
         self.assertEqual(res.returncode, 0, f"along_dash.py --cli failed:\n{res.stderr}")
-        self.assertIn("Along Dashboard", res.stdout)
-        self.assertIn("Executive Summary", res.stdout)
+        self.assertIn("Along Executive Dashboard", res.stdout)
+        self.assertIn("Project Metrics Summary", res.stdout)
 
         self.assertTrue(os.path.exists(os.path.join(REPO_ROOT, ".along", "DASHBOARD.md")))
         self.assertTrue(os.path.exists(os.path.join(REPO_ROOT, ".along", "dashboard.html")))

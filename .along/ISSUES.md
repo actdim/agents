@@ -12,6 +12,7 @@
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [dynamic-dashboard-and-kb-engine](file://.along/ISSUES/done/feat--dynamic-dashboard-and-kb-engine.md)
 - [x] `(feat)` [unified-wrap-lifecycle-and-commit-skills](file://.along/ISSUES/done/feat--unified-wrap-lifecycle-and-commit-skills.md)
 - [x] `(feat)` [universal-project-version-bumping-and-along-scripts](file://.along/ISSUES/done/feat--universal-project-version-bumping-and-along-scripts.md)
 - [x] `(feat)` [agentic-code-review-and-impact-radius-assessment](file://.along/ISSUES/done/feat--agentic-code-review-and-impact-radius-assessment.md)

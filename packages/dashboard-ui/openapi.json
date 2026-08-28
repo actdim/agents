@@ -1,0 +1,1997 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Along Dashboard & Knowledge Base API",
+    "description": "Type-safe OpenAPI REST & SSE service for Along Protocol entities, dependency DAGs, and Knowledge Base search.",
+    "version": "2.0.8"
+  },
+  "paths": {
+    "/api/metrics": {
+      "get": {
+        "tags": [
+          "Metrics & Data"
+        ],
+        "summary": "Get dashboard metrics",
+        "operationId": "getMetrics",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardMetricsSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/data": {
+      "get": {
+        "tags": [
+          "Metrics & Data"
+        ],
+        "summary": "Get full combined dashboard dataset",
+        "operationId": "getFullData",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FullDashboardDataSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/graph": {
+      "get": {
+        "tags": [
+          "Metrics & Data"
+        ],
+        "summary": "Get entity DAG dependency graph for Cytoscape",
+        "operationId": "getDagGraph",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/entities/issues": {
+      "get": {
+        "tags": [
+          "Entities"
+        ],
+        "summary": "List all issues",
+        "operationId": "listIssues",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by status (open, in-progress, blocked, done)",
+              "title": "Status"
+            },
+            "description": "Filter by status (open, in-progress, blocked, done)"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by type (feat, bug, debt, task, docs)",
+              "title": "Type"
+            },
+            "description": "Filter by type (feat, bug, debt, task, docs)"
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by priority (critical, high, medium, low)",
+              "title": "Priority"
+            },
+            "description": "Filter by priority (critical, high, medium, low)"
+          },
+          {
+            "name": "milestone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by milestone slug",
+              "title": "Milestone"
+            },
+            "description": "Filter by milestone slug"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IssueSchema"
+                  },
+                  "title": "Response Listissues"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/entities/issues/{issue_id}": {
+      "get": {
+        "tags": [
+          "Entities"
+        ],
+        "summary": "Get issue details",
+        "operationId": "getIssue",
+        "parameters": [
+          {
+            "name": "issue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Issue Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/entities/milestones": {
+      "get": {
+        "tags": [
+          "Entities"
+        ],
+        "summary": "List all milestones",
+        "operationId": "listMilestones",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MilestoneSchema"
+                  },
+                  "type": "array",
+                  "title": "Response Listmilestones"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/entities/risks": {
+      "get": {
+        "tags": [
+          "Entities"
+        ],
+        "summary": "List all risks",
+        "operationId": "listRisks",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RiskSchema"
+                  },
+                  "type": "array",
+                  "title": "Response Listrisks"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/entities/spikes": {
+      "get": {
+        "tags": [
+          "Entities"
+        ],
+        "summary": "List all spikes",
+        "operationId": "listSpikes",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SpikeSchema"
+                  },
+                  "type": "array",
+                  "title": "Response Listspikes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/entities/sessions": {
+      "get": {
+        "tags": [
+          "Entities"
+        ],
+        "summary": "List all session logs",
+        "operationId": "listSessions",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SessionSchema"
+                  },
+                  "type": "array",
+                  "title": "Response Listsessions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/entities/decisions": {
+      "get": {
+        "tags": [
+          "Entities"
+        ],
+        "summary": "List all ADR decisions",
+        "operationId": "listDecisions",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DecisionSchema"
+                  },
+                  "type": "array",
+                  "title": "Response Listdecisions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/kb": {
+      "get": {
+        "tags": [
+          "Knowledge Base"
+        ],
+        "summary": "List all Knowledge Base articles",
+        "operationId": "listArticles",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by category type",
+              "title": "Type"
+            },
+            "description": "Filter by category type"
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by tag",
+              "title": "Tag"
+            },
+            "description": "Filter by tag"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KBArticleSchema"
+                  },
+                  "title": "Response Listarticles"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/kb/search": {
+      "get": {
+        "tags": [
+          "Knowledge Base"
+        ],
+        "summary": "Search Knowledge Base and entities",
+        "operationId": "searchKb",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Search query string",
+              "default": "",
+              "title": "Q"
+            },
+            "description": "Search query string"
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by tag",
+              "title": "Tag"
+            },
+            "description": "Filter by tag"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by entity type (kb, issue, decision, session)",
+              "title": "Type"
+            },
+            "description": "Filter by entity type (kb, issue, decision, session)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/kb/graph": {
+      "get": {
+        "tags": [
+          "Knowledge Base"
+        ],
+        "summary": "Get Knowledge Base cross-link graph",
+        "operationId": "getKbGraph",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KBGraphSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/kb/{slug}": {
+      "get": {
+        "tags": [
+          "Knowledge Base"
+        ],
+        "summary": "Get single Knowledge Base article",
+        "operationId": "getArticle",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Slug"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KBArticleSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/events": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Stream live repository changes via Server-Sent Events (SSE)",
+        "operationId": "streamEvents",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DashboardMetricsSchema": {
+        "properties": {
+          "total_issues": {
+            "type": "integer",
+            "title": "Total Issues",
+            "default": 0
+          },
+          "open_issues": {
+            "type": "integer",
+            "title": "Open Issues",
+            "default": 0
+          },
+          "in_progress_issues": {
+            "type": "integer",
+            "title": "In Progress Issues",
+            "default": 0
+          },
+          "blocked_issues": {
+            "type": "integer",
+            "title": "Blocked Issues",
+            "default": 0
+          },
+          "done_issues": {
+            "type": "integer",
+            "title": "Done Issues",
+            "default": 0
+          },
+          "completion_pct": {
+            "type": "integer",
+            "title": "Completion Pct",
+            "default": 0
+          },
+          "active_risks": {
+            "type": "integer",
+            "title": "Active Risks",
+            "default": 0
+          },
+          "active_milestones": {
+            "type": "integer",
+            "title": "Active Milestones",
+            "default": 0
+          },
+          "total_kb_articles": {
+            "type": "integer",
+            "title": "Total Kb Articles",
+            "default": 0
+          },
+          "total_decisions": {
+            "type": "integer",
+            "title": "Total Decisions",
+            "default": 0
+          },
+          "total_sessions": {
+            "type": "integer",
+            "title": "Total Sessions",
+            "default": 0
+          },
+          "by_status": {
+            "$ref": "#/components/schemas/StatusBreakdown"
+          },
+          "by_type": {
+            "$ref": "#/components/schemas/TypeBreakdown"
+          },
+          "by_priority": {
+            "$ref": "#/components/schemas/PriorityBreakdown"
+          },
+          "scan_timestamp": {
+            "type": "string",
+            "title": "Scan Timestamp",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "DashboardMetricsSchema",
+        "description": "Aggregated project metrics."
+      },
+      "DecisionSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Decision identifier, e.g. ADR-001"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number",
+            "description": "Sequential ADR number"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Decision title"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date",
+            "description": "Date recorded YYYY-MM-DD"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "ADR status (Accepted, Superseded, etc.)",
+            "default": "Accepted"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context",
+            "description": "Context and problem description"
+          },
+          "decision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision",
+            "description": "Decision made"
+          },
+          "consequences": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consequences",
+            "description": "Consequences and trade-offs"
+          },
+          "superseded_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Superseded By",
+            "description": "ADR identifier that supersedes this"
+          },
+          "raw_markdown": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Raw Markdown",
+            "description": "Full raw markdown of the entry"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "DecisionSchema",
+        "description": "Schema for an ADR entry in .along/DECISIONS.md."
+      },
+      "FullDashboardDataSchema": {
+        "properties": {
+          "repo_name": {
+            "type": "string",
+            "title": "Repo Name"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/DashboardMetricsSchema"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/IssueSchema"
+            },
+            "type": "array",
+            "title": "Issues"
+          },
+          "milestones": {
+            "items": {
+              "$ref": "#/components/schemas/MilestoneSchema"
+            },
+            "type": "array",
+            "title": "Milestones"
+          },
+          "risks": {
+            "items": {
+              "$ref": "#/components/schemas/RiskSchema"
+            },
+            "type": "array",
+            "title": "Risks"
+          },
+          "spikes": {
+            "items": {
+              "$ref": "#/components/schemas/SpikeSchema"
+            },
+            "type": "array",
+            "title": "Spikes"
+          },
+          "sessions": {
+            "items": {
+              "$ref": "#/components/schemas/SessionSchema"
+            },
+            "type": "array",
+            "title": "Sessions"
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionSchema"
+            },
+            "type": "array",
+            "title": "Decisions"
+          },
+          "kb_articles": {
+            "items": {
+              "$ref": "#/components/schemas/KBArticleSchema"
+            },
+            "type": "array",
+            "title": "Kb Articles"
+          },
+          "graph": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Graph"
+          },
+          "context_text": {
+            "type": "string",
+            "title": "Context Text",
+            "default": ""
+          },
+          "issues_board_text": {
+            "type": "string",
+            "title": "Issues Board Text",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "repo_name",
+          "metrics"
+        ],
+        "title": "FullDashboardDataSchema",
+        "description": "Complete dataset for dashboard SPA."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "IssueSchema": {
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "title": "Protocol",
+            "description": "Protocol identifier",
+            "default": "along"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug",
+            "description": "Unique kebab-case slug of the entity"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Canonical entity identifier, e.g. feat--login"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Human readable title"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body",
+            "description": "Markdown body content"
+          },
+          "file_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Path",
+            "description": "Relative file path in repository"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "feat",
+              "bug",
+              "debt",
+              "task",
+              "docs"
+            ],
+            "title": "Type",
+            "description": "Issue type",
+            "default": "feat"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "in-progress",
+              "blocked",
+              "done"
+            ],
+            "title": "Status",
+            "description": "Current lifecycle status",
+            "default": "open"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Priority",
+            "description": "Priority level",
+            "default": "medium"
+          },
+          "created": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created",
+            "description": "Creation date YYYY-MM-DD"
+          },
+          "updated": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated",
+            "description": "Last update date YYYY-MM-DD"
+          },
+          "completed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed",
+            "description": "Completion date YYYY-MM-DD"
+          },
+          "agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent",
+            "description": "Agent or author that worked on the issue"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags",
+            "description": "Array of topical tags"
+          },
+          "milestone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Milestone",
+            "description": "Milestone slug this issue belongs to"
+          },
+          "blocked_by": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Blocked By",
+            "description": "List of blocking entity keys"
+          },
+          "related": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Related",
+            "description": "List of related entity keys"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent",
+            "description": "Parent epic/entity key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "id"
+        ],
+        "title": "IssueSchema",
+        "description": "Schema for .along/ISSUES/<type>--<slug>.md."
+      },
+      "KBArticleSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Unique article ID, e.g. kb--architecture or docs--setup"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug",
+            "description": "Article slug or filename"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Article title"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "topic",
+              "architecture",
+              "domain-model",
+              "setup-workflow",
+              "index",
+              "doc"
+            ],
+            "title": "Type",
+            "description": "Article topic category",
+            "default": "topic"
+          },
+          "created": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created",
+            "description": "Creation date YYYY-MM-DD"
+          },
+          "updated": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated",
+            "description": "Last update date YYYY-MM-DD"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags",
+            "description": "List of topic tags"
+          },
+          "file_path": {
+            "type": "string",
+            "title": "File Path",
+            "description": "Relative path in repository"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body",
+            "description": "Markdown body",
+            "default": ""
+          },
+          "headings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Headings",
+            "description": "Extracted Markdown headings"
+          },
+          "outgoing_links": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Outgoing Links",
+            "description": "Outgoing wiki or entity links"
+          },
+          "incoming_links": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Incoming Links",
+            "description": "Incoming links referencing this article"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "file_path"
+        ],
+        "title": "KBArticleSchema",
+        "description": "Schema for Knowledge Base article in .along/KB/ or docs/."
+      },
+      "KBGraphEdge": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "type"
+        ],
+        "title": "KBGraphEdge"
+      },
+      "KBGraphNode": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "type",
+          "category"
+        ],
+        "title": "KBGraphNode"
+      },
+      "KBGraphSchema": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/KBGraphNode"
+            },
+            "type": "array",
+            "title": "Nodes"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/KBGraphEdge"
+            },
+            "type": "array",
+            "title": "Edges"
+          }
+        },
+        "type": "object",
+        "title": "KBGraphSchema",
+        "description": "Bidirectional graph of Knowledge Base articles and related entities."
+      },
+      "MilestoneSchema": {
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "title": "Protocol",
+            "description": "Protocol identifier",
+            "default": "along"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug",
+            "description": "Unique kebab-case slug of the entity"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Canonical entity identifier, e.g. feat--login"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Human readable title"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body",
+            "description": "Markdown body content"
+          },
+          "file_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Path",
+            "description": "Relative file path in repository"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "in-progress",
+              "completed"
+            ],
+            "title": "Status",
+            "description": "Milestone status",
+            "default": "open"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date",
+            "description": "Target due date YYYY-MM-DD"
+          },
+          "created": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created",
+            "description": "Creation date YYYY-MM-DD"
+          },
+          "target_issues": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Target Issues",
+            "description": "Target issue slugs or keys"
+          },
+          "progress_pct": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Progress Pct",
+            "description": "Completion percentage",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "id"
+        ],
+        "title": "MilestoneSchema",
+        "description": "Schema for .along/MILESTONES/<slug>.md."
+      },
+      "PriorityBreakdown": {
+        "properties": {
+          "critical": {
+            "type": "integer",
+            "title": "Critical",
+            "default": 0
+          },
+          "high": {
+            "type": "integer",
+            "title": "High",
+            "default": 0
+          },
+          "medium": {
+            "type": "integer",
+            "title": "Medium",
+            "default": 0
+          },
+          "low": {
+            "type": "integer",
+            "title": "Low",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "PriorityBreakdown"
+      },
+      "RiskSchema": {
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "title": "Protocol",
+            "description": "Protocol identifier",
+            "default": "along"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug",
+            "description": "Unique kebab-case slug of the entity"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Canonical entity identifier, e.g. feat--login"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Human readable title"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body",
+            "description": "Markdown body content"
+          },
+          "file_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Path",
+            "description": "Relative file path in repository"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Severity",
+            "description": "Risk severity level",
+            "default": "medium"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "mitigated",
+              "resolved"
+            ],
+            "title": "Status",
+            "description": "Risk status",
+            "default": "active"
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner",
+            "description": "Owner (agent or user)",
+            "default": "agent"
+          },
+          "mitigation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mitigation",
+            "description": "Mitigation strategy summary"
+          },
+          "created": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created",
+            "description": "Creation date YYYY-MM-DD"
+          },
+          "updated": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated",
+            "description": "Update date YYYY-MM-DD"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "id"
+        ],
+        "title": "RiskSchema",
+        "description": "Schema for .along/RISKS/<slug>.md."
+      },
+      "SearchResponse": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SearchResultItem"
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "total"
+        ],
+        "title": "SearchResponse"
+      },
+      "SearchResultItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "snippet": {
+            "type": "string",
+            "title": "Snippet"
+          },
+          "file_path": {
+            "type": "string",
+            "title": "File Path"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score",
+            "default": 1.0
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "type",
+          "snippet",
+          "file_path"
+        ],
+        "title": "SearchResultItem"
+      },
+      "SessionSchema": {
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "title": "Protocol",
+            "description": "Protocol identifier",
+            "default": "along"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug",
+            "description": "Unique kebab-case slug of the entity"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Canonical entity identifier, e.g. feat--login"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Human readable title"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body",
+            "description": "Markdown body content"
+          },
+          "file_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Path",
+            "description": "Relative file path in repository"
+          },
+          "date": {
+            "type": "string",
+            "title": "Date",
+            "description": "Session date YYYY-MM-DD"
+          },
+          "agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent",
+            "description": "Agent model/tool name"
+          },
+          "branch": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Branch",
+            "description": "Git branch name"
+          },
+          "commit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commit",
+            "description": "Git commit hash"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary",
+            "description": "Summary of work completed"
+          },
+          "milestone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Milestone",
+            "description": "Associated milestone"
+          },
+          "issues_advanced": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Issues Advanced",
+            "description": "Advanced issue keys"
+          },
+          "issues_completed": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Issues Completed",
+            "description": "Completed issue keys"
+          },
+          "decisions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Decisions",
+            "description": "Recorded ADR numbers/titles"
+          },
+          "risks_logged": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Risks Logged",
+            "description": "Logged risk keys"
+          },
+          "spikes_conducted": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Spikes Conducted",
+            "description": "Conducted spike keys"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "id",
+          "date"
+        ],
+        "title": "SessionSchema",
+        "description": "Schema for .along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<slug>.md."
+      },
+      "SpikeSchema": {
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "title": "Protocol",
+            "description": "Protocol identifier",
+            "default": "along"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug",
+            "description": "Unique kebab-case slug of the entity"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Canonical entity identifier, e.g. feat--login"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Human readable title"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body",
+            "description": "Markdown body content"
+          },
+          "file_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Path",
+            "description": "Relative file path in repository"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "hypothesis",
+              "evaluating",
+              "concluded"
+            ],
+            "title": "Status",
+            "description": "Spike state",
+            "default": "hypothesis"
+          },
+          "hypothesis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hypothesis",
+            "description": "Spike hypothesis statement"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome",
+            "description": "Spike outcome and conclusion"
+          },
+          "resulting_adr": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resulting Adr",
+            "description": "Linked ADR in DECISIONS.md"
+          },
+          "created": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created",
+            "description": "Creation date YYYY-MM-DD"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "id"
+        ],
+        "title": "SpikeSchema",
+        "description": "Schema for .along/SPIKES/<slug>.md."
+      },
+      "StatusBreakdown": {
+        "properties": {
+          "open": {
+            "type": "integer",
+            "title": "Open",
+            "default": 0
+          },
+          "in_progress": {
+            "type": "integer",
+            "title": "In Progress",
+            "default": 0
+          },
+          "blocked": {
+            "type": "integer",
+            "title": "Blocked",
+            "default": 0
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "StatusBreakdown"
+      },
+      "TypeBreakdown": {
+        "properties": {
+          "feat": {
+            "type": "integer",
+            "title": "Feat",
+            "default": 0
+          },
+          "bug": {
+            "type": "integer",
+            "title": "Bug",
+            "default": 0
+          },
+          "debt": {
+            "type": "integer",
+            "title": "Debt",
+            "default": 0
+          },
+          "task": {
+            "type": "integer",
+            "title": "Task",
+            "default": 0
+          },
+          "docs": {
+            "type": "integer",
+            "title": "Docs",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "TypeBreakdown"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

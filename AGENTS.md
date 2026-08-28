@@ -1,5 +1,5 @@
 <!-- BEGIN ALONG-PROTOCOL root (managed by along-init - do not edit by hand) -->
-# ALONG-PROTOCOL v2.0.8
+# ALONG-PROTOCOL v2.0.9
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
@@ -145,3 +145,10 @@ This repository is `Along` (`actdim-along`) - the provider-agnostic agent-contex
 - **Install Commands**:
   - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Target all` (or `install.bat`).
   - Linux / macOS: `bash install.sh`.
+- **Frontend Architecture (`packages/along-dash-ui/`)**:
+  - Full architectural rules in `[[.along/KB/04-frontend-frameworks.md]]` and `[[.along/DECISIONS.md#011]]`.
+  - Strict `@actdim/dynstruct` component architecture with MobX reactive state; zero raw `useState`/`useEffect` hooks.
+  - Zero manual API channels or manual `fetch` calls: client generated via NSwag (`pnpm run generate:api`) and wired dynamically using `@actdim/msgmesh/adapters` (`ToMsgChannelPrefix`, `ToMsgStruct`, `registerAdapters`).
+  - Strict 100% typing: zero `any`, zero `as ...`, zero global `window` state storage.
+  - MsgMesh bus injected via React `<ComponentContextProvider>` and accessed via component proxy `c.msgBus`.
+

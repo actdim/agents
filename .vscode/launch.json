@@ -1,0 +1,47 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend: FastAPI Dashboard",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "dashboard.app:create_app_dev",
+        "--factory",
+        "--reload",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8765"
+      ],
+      "jinja": true,
+      "justMyCode": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Frontend: Debug in Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/packages/dashboard-ui"
+    },
+    {
+      "name": "Frontend: Debug in Edge",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/packages/dashboard-ui"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Dev (Backend + Frontend Chrome)",
+      "configurations": [
+        "Backend: FastAPI Dashboard",
+        "Frontend: Debug in Chrome"
+      ]
+    }
+  ]
+}
+

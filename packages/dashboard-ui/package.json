@@ -1,0 +1,44 @@
+{
+  "name": "@along/dashboard-ui",
+  "version": "2.0.9",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "generate:api": "npx nswag run nswag.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@actdim/dynstruct": "^1.5.9",
+    "@actdim/dynstruct-mui": "^1.5.9",
+    "@actdim/msgmesh": "^1.5.9",
+    "@actdim/utico": "^1.5.9",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@iconify/react": "^5.2.0",
+    "@mui/material": "^6.4.0",
+    "cytoscape": "^3.30.4",
+    "marked": "^15.0.7",
+    "mobx": "^6.15.0",
+    "mobx-react-lite": "^4.1.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "rxjs": "^7.8.2",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@iconify/tailwind4": "^1.1.4",
+    "@tailwindcss/vite": "^4.0.9",
+    "@types/cytoscape": "^3.21.9",
+    "@types/node": "^22.13.5",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.9",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.0"
+  }
+}
+
