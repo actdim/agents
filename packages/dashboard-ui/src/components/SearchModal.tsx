@@ -7,8 +7,7 @@ import {
   type ComponentModel,
 } from '@actdim/dynstruct/componentModel/contracts';
 import { useComponent, toReact } from '@actdim/dynstruct/componentModel/react/hooks';
-import { useDialog, type DialogStruct } from '@actdim/dynstruct-mui/Dialog';
-import { bind } from '@actdim/dynstruct/componentModel/core';
+import { Dialog } from '@mui/material';
 import { Icon } from '@iconify/react';
 import { SearchResultItem, FullDashboardData } from '../types';
 import { DashboardAppMsgStruct, DashboardMsgChannels } from '../bus';
@@ -27,13 +26,13 @@ export type SearchModalStruct = ComponentStruct<
     };
     msgScope: {
       publish: DashboardMsgChannels<'API.DASHBOARD.SEARCHKB' | 'APP.ENTITY.SELECT'>;
+      subscribe: DashboardMsgChannels<'APP.SEARCH.OPEN' | 'APP.SEARCH.CLOSE'>;
     };
     actions: {
       performSearch: (queryText: string) => Promise<void>;
       selectResult: (r: SearchResultItem) => void;
-    };
-    children: {
-      dialog: DialogStruct;
+      open: () => void;
+      close: () => void;
     };
   }
 >;
@@ -56,6 +55,13 @@ export const useSearchModal = (
       data: null,
     },
     actions: {
+      open: () => {
+        m.isOpen = true;
+      },
+      close: () => {
+        m.isOpen = false;
+        m.onClose();
+      },
       performSearch: async (queryText: string) => {
         m.query = queryText;
         const q = queryText.trim().toLowerCase();
@@ -180,30 +186,51 @@ export const useSearchModal = (
           channel: 'APP.ENTITY.SELECT',
           payload: { id: r.id, type: r.type },
         });
-        m.onClose();
+        m.close();
       },
     },
-    children: {
-      dialog: useDialog({
-        open: bind(() => m.isOpen),
-        onClose: bind(() => m.onClose),
-        fullWidth: true,
-        maxWidth: 'md',
-        sx: {
-          '& .MuiDialog-paper': {
-            backgroundColor: '#0f172a',
-            color: '#f8fafc',
-            backgroundImage: 'none',
-            borderRadius: '16px',
-            border: '1px solid #1e293b',
-            overflow: 'hidden',
-          },
-          '& .MuiDialogContent-root': {
-            padding: 0,
-            backgroundColor: '#0f172a',
+    msgBroker: {
+      subscribe: {
+        'APP.SEARCH.OPEN': {
+          in: {
+            callback: () => {
+              m.isOpen = true;
+            },
           },
         },
-        content: () => (
+        'APP.SEARCH.CLOSE': {
+          in: {
+            callback: () => {
+              m.isOpen = false;
+            },
+          },
+        },
+      },
+    },
+    view: () => {
+      return (
+        <Dialog
+          open={Boolean(m.isOpen)}
+          onClose={() => m.close()}
+          maxWidth="md"
+          fullWidth
+          sx={{
+            zIndex: 1400,
+            '& .MuiDialog-paper': {
+              backgroundColor: '#0f172a',
+              color: '#f8fafc',
+              backgroundImage: 'none',
+              borderRadius: '16px',
+              border: '1px solid #1e293b',
+              overflow: 'hidden',
+              margin: '16px',
+            },
+            '& .MuiBackdrop-root': {
+              backgroundColor: 'rgba(2, 6, 23, 0.8)',
+              backdropFilter: 'blur(4px)',
+            },
+          }}
+        >
           <div className="bg-slate-900 text-slate-100 p-0 flex flex-col max-h-[80vh]">
             {/* Search Bar Input */}
             <div className="flex items-center px-4 py-3.5 border-b border-slate-800 gap-3">
@@ -219,7 +246,12 @@ export const useSearchModal = (
               {m.loading && (
                 <Icon icon="lucide:loader-2" className="w-4 h-4 text-sky-400 animate-spin shrink-0" />
               )}
-              <button onClick={m.onClose} className="text-slate-500 hover:text-slate-300 p-1 rounded-lg cursor-pointer">
+              <button
+                type="button"
+                onClick={() => m.close()}
+                className="text-slate-500 hover:text-slate-300 p-1 rounded-lg cursor-pointer transition"
+                title="Close modal (Esc)"
+              >
                 <Icon icon="lucide:x" className="w-4 h-4" />
               </button>
             </div>
@@ -229,6 +261,7 @@ export const useSearchModal = (
               <span className="text-slate-500 mr-1">Filter:</span>
               {['all', 'kb', 'issue', 'decision', 'session'].map((t) => (
                 <button
+                  type="button"
                   key={t}
                   onClick={() => {
                     m.activeTypeFilter = t;
@@ -248,7 +281,7 @@ export const useSearchModal = (
             </div>
 
             {/* Results List */}
-            <div className="overflow-y-auto p-3 space-y-2 flex-1">
+            <div className="overflow-y-auto p-3 space-y-2 flex-1 max-h-[55vh]">
               {m.results.map((r) => (
                 <div
                   key={r.id}
@@ -287,10 +320,9 @@ export const useSearchModal = (
               )}
             </div>
           </div>
-        ),
-      }),
+        </Dialog>
+      );
     },
-    view: () => <c.children.Dialog />,
   };
 
   c = useComponent(def, params ?? {});
