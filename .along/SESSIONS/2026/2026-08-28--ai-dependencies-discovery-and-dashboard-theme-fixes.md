@@ -35,3 +35,4 @@ milestone: v2.0.0-along-transition
    - Automated tests in [tests/test_scan_deps.py](file:///d:/Src/my/actdim/public/along/tests/test_scan_deps.py) and [tests/test_skills_and_scripts.py](file:///d:/Src/my/actdim/public/along/tests/test_skills_and_scripts.py) passed (13/13).
    - Dashboard UI built cleanly with `pnpm run build` (zero TypeScript errors).
    - Sanitized typography across all modified files (zero non-ASCII glyphs).
+
