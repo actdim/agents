@@ -1,0 +1,58 @@
+# Along (actdim-along) - Full LLM Reference
+
+> Comprehensive architectural, protocol, skill, and API reference for AI coding agents operating on or using Along.
+
+## 1. Project Purpose & Architecture
+Along is a provider-agnostic agent-context and memory protocol (`ALONG-PROTOCOL v2.0.10`) that gives repositories a durable, versioned context directory (`.along/`) and an executive dashboard suite.
+
+### Host Provider Compatibility
+- **Claude Code**: Reads `CLAUDE.md`, which imports root `AGENTS.md`. Skills located in `~/.claude/skills/`.
+- **Codex**: Reads `AGENTS.md` natively. Skills located in `~/.codex/skills/`.
+- **OpenCode**: Reads `AGENTS.md` natively. Flat command definitions in `~/.config/opencode/commands/`.
+- **Antigravity**: Reads `AGENTS.md` / `GEMINI.md` natively. Skills located in `~/.gemini/config/skills/`.
+
+---
+
+## 2. Dynamic Dashboard & Knowledge Base Engine (`/along-dash`)
+
+### Backend Architecture (`dashboard/`)
+- **FastAPI Application (`dashboard/app.py`)**: REST endpoints and live Server-Sent Events (SSE) stream on `http://127.0.0.1:8765`.
+- **OpenAPI Schema & Swagger UI**: Auto-generated interactive API documentation available at `/docs` and `/openapi.json`.
+- **REST Endpoints**:
+  - `GET /api/data`: Full repository snapshot (metrics, issues, milestones, risks, spikes, sessions, decisions, KB articles, and graph).
+  - `GET /api/kb`: List all Knowledge Base articles with type and tag filters.
+  - `GET /api/kb/search?q={query}&type={type}`: Hybrid search engine across articles, issues, ADRs, and sessions.
+  - `GET /api/kb/graph`: Cross-link connectivity graph.
+  - `GET /api/metrics`: High-level progress percentages and issue distributions.
+  - `GET /api/events`: SSE stream broadcasting file modification events (`reload`).
+
+### Frontend Architecture (`packages/dashboard-ui/`)
+- **Strict Reactive Component Model (`@actdim/dynstruct`)**: All state resides in observable `c.model` (MobX) with structure-first definitions. Zero raw React `useState` or `useEffect`.
+- **Type-Safe Messaging Bus (`@actdim/msgmesh`)**: Inter-component messaging and API queries routed through `dashboardBus` via dynamic adapters (`@actdim/msgmesh/adapters`).
+- **Interactive Visualizations**: Directed Acyclic Graph (DAG) rendered with Cytoscape, Kanban view of issues, sessions journal, and hybrid search modal (`SearchModal`).
+
+---
+
+## 3. Knowledge Base Structure (`.along/KB/`)
+- `INDEX.md`: Central topic index with cross-references (`[[link]]`).
+- `01-architecture.md`: System components, boundaries, protocol layers, and data flows.
+- `02-domain-model.md`: Domain entity schemas (Issue, Milestone, Risk, Spike, Session, ADR) and DAG relationships.
+- `03-setup-and-workflow.md`: Multi-provider setup, standard session workflow, and CLI reference.
+- `04-frontend-frameworks.md`: Dynstruct, MsgMesh, Material UI adapters, and NSwag code generation.
+- `dependencies.md`: Discovered AI guidelines from installed packages (`AGENTS.md`, `llms.txt`).
+
+---
+
+## 4. Skills & Slash Commands Reference
+
+| Skill | Slash Command | Execution | Purpose |
+| :--- | :--- | :--- | :--- |
+| `along-init` | `/along-init` | `along-init` | Scaffolds or refreshes `.along/` and `AGENTS.md`. |
+| `along-dash` | `/along-dash` | `python scripts/along_dash.py -w` | Launches dynamic FastAPI dashboard with OpenAPI docs and UI. |
+| `along-scan-deps` | `/along-scan-deps` | `python skills/along-scan-deps/along_scan_deps.py` | Discovers AI guidelines in declared dependencies. |
+| `along-bump-version` | `/along-bump-version` | `python scripts/along_bump_version.py patch -c` | Increments version across manifests and files. |
+| `along-commit` | `/along-commit` | `python skills/along-commit/along_commit.py` | ASCII sanitizer, pre-commit test gate, and conventional committer. |
+| `along-wrap` | `/along-wrap` | `along-wrap` | Unified session wrap: verification, session log, context, issues reconciliation. |
+| `along-sync-kb` | `/along-sync-kb` | `along-sync-kb` | Synchronizes Knowledge Base articles and topic index. |
+| `along-search-kb` | `/along-search-kb` | `along-search-kb` | Hybrid semantic search across documentation. |
+| `along-check-graph` | `/along-check-graph` | `along-check-graph` | Inspects code-review-graph status, blast radius, and architecture flows. |

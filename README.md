@@ -1,6 +1,6 @@
-# Along (v2.0.10)
+# Along (v2.0.11)
 
-A provider-agnostic **agent-context and memory system** for repositories *(formerly `actdim-agents`)* - the `ALONG-PROTOCOL v2.0.10`
+A provider-agnostic **agent-context and memory system** for repositories *(formerly `actdim-agents`)* - the `ALONG-PROTOCOL v2.0.11`
 plus the skills/commands that scaffold and maintain it. One convention, honored by
 **Claude Code**, **Codex**, **OpenCode**, and **Antigravity**.
 
@@ -45,7 +45,7 @@ directory (`.along/`) that every agent reads and keeps up to date.
   - `GLOSSARY.md` - domain terms.
   - `HISTORY.md` + `SESSIONS/<year>/<date>--<slug>.md` - an index and one log per session (YAML front-matter: `protocol: along`, date, agent, branch, commit, summary).
 
-### Skills & Slash Commands (v2.0.10)
+### Skills & Slash Commands (v2.0.11)
 
 | Skill / Command | Purpose |
 | :--- | :--- |
@@ -97,9 +97,13 @@ directory (`.along/`) that every agent reads and keeps up to date.
 +----------------------------------------------------------------+
 ```
 
-### Dashboard Modes
+### Dashboard Modes & Features
+- **Interactive Local Web Dashboard**: `uv run scripts/along_dash.py --web` (FastAPI backend + Reactive Web UI at `http://127.0.0.1:8765`).
+  - **Dynamic Knowledge Base Search**: Fast hybrid search modal across KB articles, issues, ADR decisions, and sessions.
+  - **OpenAPI & Swagger Documentation**: Auto-generated interactive API docs at `http://127.0.0.1:8765/docs`.
+  - **Cytoscape DAG Graph**: Interactive dependency graph with cycle detection and status indicators.
+  - **Live Auto-Refresh**: Server-Sent Events (SSE) broadcasting file changes in real-time.
 - **CLI Terminal Summary**: `uv run scripts/along_dash.py --cli`
-- **Interactive Local Web Dashboard**: `uv run scripts/along_dash.py --web` (FastAPI + Cytoscape DAG graph at `http://127.0.0.1:8765`)
 - **Static Standalone HTML Export**: `uv run scripts/along_dash.py --export .along/dashboard.html`
 - **Markdown Dashboard Report**: `uv run scripts/along_dash.py --markdown` (`.along/DASHBOARD.md`)
 

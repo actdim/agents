@@ -2,7 +2,7 @@
 
 _Current-state snapshot. Keep SHORT; history goes to SESSIONS/._
 
-- **Status**: Along (ALONG-PROTOCOL v2.0.10) fully released and deployed; root-cause bumper bug resolved, unit test suite (`tests/test_skills_and_scripts.py`), pre-commit test quality gates (`along_commit.py`, `along_bump_version.py`), bundled `/along-dash` engine, and lifecycle suite operational across all 4 providers.
+- **Status**: Along (ALONG-PROTOCOL v2.0.11) fully released and deployed; root-cause bumper bug resolved, unit test suite (`tests/test_skills_and_scripts.py`), pre-commit test quality gates (`along_commit.py`, `along_bump_version.py`), bundled `/along-dash` engine, and lifecycle suite operational across all 4 providers.
 - **Active Focus**:
   - Issue [`feat--external-issue-trackers-sync-and-import`](file://.along/ISSUES/feat--external-issue-trackers-sync-and-import.md) (Jira, Redmine, Linear, GitHub issue import).
   - Issue [`feat--openclaw-and-hermes-agent-integration`](file://.along/ISSUES/feat--openclaw-and-hermes-agent-integration.md) (OpenClaw and Hermes Agent provider support).
