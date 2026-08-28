@@ -114,6 +114,7 @@ install_opencode() {  # generate flat commands + place along-init helper
   [ -f "$src/along-init/migrate_protocol.py" ] && cp -f "$src/along-init/migrate_protocol.py" "$helper/migrate_protocol.py"
   [ -f "$src/along-update/along_update.py" ] && cp -f "$src/along-update/along_update.py" "$helper/along_update.py"
   [ -f "$src/along-dash/along_dash.py" ] && cp -f "$src/along-dash/along_dash.py" "$helper/along_dash.py"
+  [ -f "$src/along-scan-deps/along_scan_deps.py" ] && cp -f "$src/along-scan-deps/along_scan_deps.py" "$helper/along_scan_deps.py"
 
   local d name sk desc out
   for d in "$src"/*/; do

@@ -84,12 +84,20 @@ export const useEntityDrawer = (
         anchor: 'right',
         open: bind(() => Boolean(m.selectedEntityId)),
         onClose: bind(() => m.onClose),
+        sx: {
+          '& .MuiDrawer-paper': {
+            backgroundColor: '#0f172a',
+            color: '#f8fafc',
+            backgroundImage: 'none',
+            borderLeft: '1px solid #1e293b',
+          },
+        },
         children: () => {
           const ent = m.entity;
           if (!ent) return null;
 
           return (
-            <div className="w-full sm:w-[600px] bg-slate-900 text-slate-100 p-6 min-h-screen flex flex-col justify-between">
+            <div className="w-full sm:w-[600px] bg-slate-900 text-slate-100 p-6 min-h-full flex flex-col justify-between">
               <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-start justify-between border-b border-slate-800 pb-4">

@@ -100,3 +100,39 @@
   color: #f1f5f9;
 }
 
+/* MUI Dark Theme Overrides for Drawers, Dialogs, Papers, and Modals */
+.MuiDrawer-paper,
+.MuiDrawer-paperAnchorRight,
+.MuiDrawer-paperAnchorLeft {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  background-image: none !important;
+  border-color: #1e293b !important;
+}
+
+.MuiDialog-paper {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  background-image: none !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 1rem !important;
+  overflow: hidden !important;
+}
+
+.MuiDialogContent-root {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  padding: 0 !important;
+}
+
+.MuiPaper-root {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  background-image: none !important;
+}
+
+.MuiBackdrop-root {
+  background-color: rgba(2, 6, 23, 0.75) !important;
+  backdrop-filter: blur(4px) !important;
+}
+

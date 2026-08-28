@@ -41,6 +41,8 @@ export type DashboardAppStruct = ComponentStruct<
         | 'APP.ENTITY.CLOSE'
         | 'APP.DATA.UPDATED'
         | 'APP.SSE.STATUS'
+        | 'APP.SEARCH.OPEN'
+        | 'APP.SEARCH.CLOSE'
       >;
       publish: DashboardMsgChannels<'API.DASHBOARD.GETFULLDATA'>;
     };
@@ -159,6 +161,20 @@ export const useDashboardApp = (
             },
           },
         },
+        'APP.SEARCH.OPEN': {
+          in: {
+            callback: () => {
+              m.openSearch();
+            },
+          },
+        },
+        'APP.SEARCH.CLOSE': {
+          in: {
+            callback: () => {
+              m.closeSearch();
+            },
+          },
+        },
       },
     },
     events: {
@@ -251,6 +267,7 @@ export const useDashboardApp = (
       searchModal: useSearchModal({
         isOpen: bind(() => m.searchModalOpen),
         onClose: () => m.closeSearch(),
+        data: bind(() => m.data),
       }),
     },
     view: () => {

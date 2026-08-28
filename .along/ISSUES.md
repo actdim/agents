@@ -12,6 +12,7 @@
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [ai-dependencies-discovery-and-scan-deps-skill](file://.along/ISSUES/done/feat--ai-dependencies-discovery-and-scan-deps-skill.md)
 - [x] `(feat)` [dynamic-dashboard-and-kb-engine](file://.along/ISSUES/done/feat--dynamic-dashboard-and-kb-engine.md)
 - [x] `(feat)` [unified-wrap-lifecycle-and-commit-skills](file://.along/ISSUES/done/feat--unified-wrap-lifecycle-and-commit-skills.md)
 - [x] `(feat)` [universal-project-version-bumping-and-along-scripts](file://.along/ISSUES/done/feat--universal-project-version-bumping-and-along-scripts.md)

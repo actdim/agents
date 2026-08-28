@@ -48,6 +48,14 @@ export type DashboardLocalChannels = {
         in: { search?: string; status?: string; type?: string; priority?: string };
         out: void;
     };
+    'APP.SEARCH.OPEN': {
+        in: void;
+        out: void;
+    };
+    'APP.SEARCH.CLOSE': {
+        in: void;
+        out: void;
+    };
     'APP.SSE.STATUS': {
         in: { connected: boolean };
         out: void;

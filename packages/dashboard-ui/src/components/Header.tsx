@@ -9,15 +9,19 @@ import {
 import { useComponent, toReact } from '@actdim/dynstruct/componentModel/react/hooks';
 import { type BaseAppMsgStruct } from '@actdim/dynstruct/appDomain/appContracts';
 import { Icon } from '@iconify/react';
+import { DashboardAppMsgStruct, DashboardMsgChannels } from '../bus';
 
 export type HeaderStruct = ComponentStruct<
-  BaseAppMsgStruct,
+  DashboardAppMsgStruct,
   {
     props: {
       repoName: string;
       scanTimestamp: string;
       sseConnected: boolean;
-      onSearchClick: () => void;
+      onSearchClick?: () => void;
+    };
+    msgScope: {
+      publish: DashboardMsgChannels<'APP.SEARCH.OPEN'>;
     };
   }
 >;
@@ -47,7 +51,7 @@ export const useHeader = (params: ComponentParams<HeaderStruct>): Component<Head
                 <div className="flex items-center gap-2">
                   <h1 className="text-base font-bold text-slate-100 tracking-tight">{m.repoName}</h1>
                   <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800/60 font-semibold">
-                    v2.0.8
+                    v2.0.9
                   </span>
                   <div
                     className={`w-2 h-2 rounded-full ${
@@ -65,9 +69,12 @@ export const useHeader = (params: ComponentParams<HeaderStruct>): Component<Head
             {/* Actions */}
             <div className="flex items-center gap-2">
               <button
-                onClick={m.onSearchClick}
-                className="flex items-center gap-2 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg text-xs text-slate-400 hover:text-slate-200 transition"
-                title="Search Knowledge Base and Entities (Ctrl+K)"
+                onClick={() => {
+                  m.onSearchClick?.();
+                  c.msgBus.send({ channel: 'APP.SEARCH.OPEN' });
+                }}
+                className="flex items-center gap-2 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg text-xs text-slate-400 hover:text-slate-200 transition cursor-pointer"
+                title="Search Knowledge Base and Entities (Ctrl+K or /)"
               >
                 <Icon icon="lucide:search" className="w-4 h-4 text-slate-400" />
                 <span className="hidden sm:inline">Search KB...</span>

@@ -43,3 +43,4 @@ milestone: v2.0.0-along-transition
 - `pnpm run build` compiled with 0 errors in 2.15s.
 - FastAPI backend endpoints verified with TestClient.
 - Typography sanitized (clean ASCII).
+
