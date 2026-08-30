@@ -1,17 +1,26 @@
 ---
 name: along-kb-sync
-description: Synchronize, compile, and reconcile the Knowledge Base in docs/ using LLM-Wiki pipeline. Ingests raw sources, moves originals to .archive/, validates Markdown links, and rebuilds docs/INDEX.md. Use when invoking /along-kb-sync (aliases: /kb-sync, /along-sync-kb, /along-init-kb).
+description: Synchronize, compile, and reconcile the Knowledge Base in docs/ using LLM-Wiki pipeline. Ingests README facts and raw sources, moves originals to .archive/, validates Markdown links, and rebuilds docs/INDEX.md. Use when invoking /along-kb-sync (aliases: /kb-sync, /along-sync-kb, /along-init-kb).
 ---
 
 # Along KB Sync (`/along-kb-sync`, `/kb-sync`) [v2.1.1]
 
-Idempotent LLM-Wiki Knowledge Base synchronization and compilation engine for `docs/`.
+Idempotent LLM-Wiki Knowledge Base synchronization, compilation, and link-linting engine for `docs/`.
 
 ## Capabilities
-1. **Cold-Start Bootstrapping**: If `docs/` is missing or empty, generates `docs/INDEX.md`, `docs/topic--architecture.md`, `docs/topic--domain-model.md`, `docs/topic--setup-and-workflow.md` grounded in codebase facts.
-2. **Ingestion & Archival**: Compiles unmanaged notes or specs into structured Wiki articles and safely moves raw source files into `.archive/`.
-3. **Link & Graph Linting**: Validates all relative links `[Title](./target.md)` and regenerates `docs/INDEX.md`.
-4. **LLM-Wiki Paradigm**: Native pure-Python implementation of the Andrej Karpathy LLM-Wiki methodology with zero external dependencies.
+1. **Cold-Start Bootstrapping**: If `docs/` is missing or empty, generates `docs/INDEX.md`, `docs/topic--architecture.md`, `docs/topic--domain-model.md`, `docs/topic--setup-and-workflow.md` grounded in codebase and `README.md` facts.
+2. **README Ingestion & Streamlining**: Extracts deep technical specifications from monolithic `README.md` files into modular `docs/topic--<slug>.md` articles, leaving `README.md` as an executive overview with direct navigation links.
+3. **Ingestion & Archival**: Compiles unmanaged notes, specs, or drafts (`wiki/`, `kb/`, `docs/`) into structured Wiki articles and safely moves raw source files into `.archive/`.
+4. **Link & Graph Linting**: Validates all relative links `[Title](./topic--<slug>.md)` and regenerates `docs/INDEX.md`.
+5. **LLM-Wiki Paradigm**: Native pure-Python implementation of the Andrej Karpathy LLM-Wiki methodology with zero external dependencies.
+
+## Universal Rendering & Package Registry Portability
+
+All Markdown generated or maintained by `along-kb-sync` MUST strictly adhere to universal rendering standards:
+- **Relative Markdown Links**: Use standard relative paths (`./docs/topic--<name>.md` from root, `./topic--<name>.md` within `docs/`). Never use absolute URLs, local filesystem schemes (`file:///`), or OS-specific backslashes.
+- **Cross-Platform Renderers**: Guarantees 100% clean rendering across **GitHub**, **GitLab**, **GitHub Pages** (Jekyll, Astro, Docusaurus, MkDocs), **npm**, **NuGet**, **PyPI**, and **crates.io**.
+- **Clean ASCII Typography**: Zero non-ASCII typography (no em-dashes U+2014, curly quotes, or ellipsis glyphs).
+- **Explicit Code Fences**: Every code block must declare an explicit language identifier (`bash`, `yaml`, `typescript`, `python`, `powershell`).
 
 ## Execution Strategy: Adaptive Ingestion & Parallel Research
 
