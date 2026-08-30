@@ -147,8 +147,17 @@ function Install-OpenCode {
     if (Test-Path (Join-Path $src 'along-dash\along_dash.py')) {
         Copy-Item -Force (Join-Path $src 'along-dash\along_dash.py')      (Join-Path $helper 'along_dash.py')
     }
-    if (Test-Path (Join-Path $src 'along-scan-deps\along_scan_deps.py')) {
-        Copy-Item -Force (Join-Path $src 'along-scan-deps\along_scan_deps.py') (Join-Path $helper 'along_scan_deps.py')
+    if (Test-Path (Join-Path $src 'along-dep-scan\along_dep_scan.py')) {
+        Copy-Item -Force (Join-Path $src 'along-dep-scan\along_dep_scan.py') (Join-Path $helper 'along_dep_scan.py')
+    }
+    if (Test-Path (Join-Path $src 'along-version-bump\along_bump_version.py')) {
+        Copy-Item -Force (Join-Path $src 'along-version-bump\along_bump_version.py') (Join-Path $helper 'along_bump_version.py')
+    }
+    if (Test-Path (Join-Path $src 'along-kb-sync\along_kb_sync.py')) {
+        Copy-Item -Force (Join-Path $src 'along-kb-sync\along_kb_sync.py') (Join-Path $helper 'along_kb_sync.py')
+    }
+    if (Test-Path (Join-Path $src 'along-kb-search\along_kb_search.py')) {
+        Copy-Item -Force (Join-Path $src 'along-kb-search\along_kb_search.py') (Join-Path $helper 'along_kb_search.py')
     }
 
     foreach ($d in Get-ChildItem -Directory $src) {
@@ -168,6 +177,11 @@ function Install-OpenCode {
         $content = "---`n" + 'description: "' + $desc + '"' + "`n---`n`n" + $note + $body
         Write-Utf8NoBom (Join-Path $cmddir ($d.Name + '.md')) $content
         Write-Host "   command $($d.Name).md"
+        if ($d.Name -like 'along-*') {
+            $shortName = $d.Name.Substring(6)
+            Write-Utf8NoBom (Join-Path $cmddir ($shortName + '.md')) $content
+            Write-Host "   command alias $($shortName).md"
+        }
     }
 }
 

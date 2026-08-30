@@ -142,17 +142,6 @@ def bump_along_dev_repo(repo_root, new_version):
             with open(ctx_md, "w", encoding="utf-8") as f: f.write(u)
             modified_files.append(ctx_md)
 
-    # 8. Update llms.txt and llms-full.txt
-    for llm_file in ["llms.txt", "llms-full.txt"]:
-        llm_path = os.path.join(repo_root, llm_file)
-        if os.path.exists(llm_path):
-            with open(llm_path, "r", encoding="utf-8") as f: c = f.read()
-            u = re.sub(r'ALONG-PROTOCOL v\d+\.\d+\.\d+', f'ALONG-PROTOCOL v{new_version}', c)
-            u = re.sub(r'Along \(v\d+\.\d+\.\d+\)', f'Along (v{new_version})', u)
-            if u != c:
-                with open(llm_path, "w", encoding="utf-8") as f: f.write(u)
-                modified_files.append(llm_path)
-
     return modified_files
 
 def synthesize_script(script_path, content):

@@ -142,5 +142,6 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
      - `along-dep-scan`
      - `along-version-bump`
   4. **Targeted Agent Fast Retrieval**: Protocol requires agents to query `along-kb-search` or `wiki_query` before reading full documentation files into context.
-- Consequences: Cleaner repository layout, universal Markdown rendering on GitHub/npm, reduced agent token usage via targeted retrieval, and a consistent domain-first skill naming convention across all providers.
+  5. **Strict Nearest Subproject & Submodule Localization**: When working in submodules, nested packages, or symlinked component libraries, all entity creation and updates (`ISSUES`, `SESSIONS`, `CONTEXT`, `DECISIONS`, `HISTORY`) MUST strictly occur in the **nearest `.along/`** corresponding to the modified files, preventing workspace root pollution.
+- Consequences: Cleaner repository layout, universal Markdown rendering on GitHub/npm, reduced agent token usage via targeted retrieval, a consistent domain-first skill naming convention across all providers, and strict project boundary isolation for submodules and multi-package workspaces.
 

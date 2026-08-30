@@ -117,7 +117,10 @@ install_opencode() {  # generate flat commands + place along-init helper
   [ -f "$src/along-init/migrate_protocol.py" ] && cp -f "$src/along-init/migrate_protocol.py" "$helper/migrate_protocol.py"
   [ -f "$src/along-update/along_update.py" ] && cp -f "$src/along-update/along_update.py" "$helper/along_update.py"
   [ -f "$src/along-dash/along_dash.py" ] && cp -f "$src/along-dash/along_dash.py" "$helper/along_dash.py"
-  [ -f "$src/along-scan-deps/along_scan_deps.py" ] && cp -f "$src/along-scan-deps/along_scan_deps.py" "$helper/along_scan_deps.py"
+  [ -f "$src/along-dep-scan/along_dep_scan.py" ] && cp -f "$src/along-dep-scan/along_dep_scan.py" "$helper/along_dep_scan.py"
+  [ -f "$src/along-version-bump/along_bump_version.py" ] && cp -f "$src/along-version-bump/along_bump_version.py" "$helper/along_bump_version.py"
+  [ -f "$src/along-kb-sync/along_kb_sync.py" ] && cp -f "$src/along-kb-sync/along_kb_sync.py" "$helper/along_kb_sync.py"
+  [ -f "$src/along-kb-search/along_kb_search.py" ] && cp -f "$src/along-kb-search/along_kb_search.py" "$helper/along_kb_search.py"
 
   local d name sk desc out
   for d in "$src"/*/; do
@@ -136,6 +139,11 @@ install_opencode() {  # generate flat commands + place along-init helper
       awk 'c>=2{print} /^---[[:space:]]*$/{c++}' "$sk"
     } > "$out"
     echo "   command $name.md"
+    if [[ "$name" == along-* ]]; then
+      short="${name#along-}"
+      cp -f "$out" "$cmddir/$short.md"
+      echo "   command alias $short.md"
+    fi
   done
 }
 

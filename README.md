@@ -70,7 +70,7 @@ directory (`.along/`) that every agent reads and keeps up to date.
 
 ### Deployment Best Practices (Why no `along-deploy`?)
 
-`Along` intentionally does **not** provide an `along-deploy` skill. In modern software engineering, production deployment is a security-critical operation that should not be executed ad-hoc by local agents. Following industry best practices, deployments should be handled by automated **CI/CD pipelines** (e.g., GitHub Actions, GitLab CI, ArgoCD) triggered by version release tags (`git push --tags` or `/along-bump-version -cp`) or release webhooks. If a repository requires a custom local deploy script, it can be placed in `.along/scripts/deploy.py` and executed via `python scripts/along_exec.py deploy`.
+`Along` intentionally does **not** provide an `along-deploy` skill. In modern software engineering, production deployment is a security-critical operation that should not be executed ad-hoc by local agents. Following industry best practices, deployments should be handled by automated **CI/CD pipelines** (e.g., GitHub Actions, GitLab CI, ArgoCD) triggered by version release tags (`git push --tags` or `/along-version-bump -cp`) or release webhooks. If a repository requires a custom local deploy script, it can be placed in `.along/scripts/deploy.py` and executed via `python scripts/along_exec.py deploy`.
 
 ---
 

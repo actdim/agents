@@ -3,9 +3,16 @@
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
-## Scope & precedence
-- Any folder may carry its own `AGENTS.md` + `.along/`; they apply to that folder and everything under it. Use the NEAREST ones for the area you're working in; higher-level ones add broader context. On conflict, the more specific wins.
-- Global/user config still applies as defaults (Claude auto-loads `~/.claude/CLAUDE.md`, Codex `~/.codex/AGENTS.md`, Antigravity `~/.gemini/config/GEMINI.md`). Precedence: nearest > higher-level > global.
+## Scope, Precedence & Subproject / Submodule Placement
+- **Nearest Context Boundary**: Any folder may carry its own `AGENTS.md` + `.along/`; they apply to that folder and everything under it. Use the NEAREST ones for the area you're working in; higher-level ones add broader context. On conflict, the more specific wins.
+- **Strict Subproject & Submodule Localization**:
+  - In modular repositories, monorepos, Git submodules, or symlinked folders (e.g. `packages/*`, `libs/*`, `modules/*`, `Common/*`):
+    - **Entity Anchoring**: All entity creation and lifecycle updates (`.along/ISSUES/`, `ISSUES.md`, `SESSIONS/`, `CONTEXT.md`, `DECISIONS.md`, `HISTORY.md`, `docs/`) MUST be created in the **NEAREST `.along/`** directory corresponding to the specific component/subproject being modified.
+    - **Submodule Isolation**: When fixing a bug, refactoring, or adding a feature to a Git submodule or symlinked utility library, the issue (`ISSUES/<type>--<slug>.md`), session log (`SESSIONS/`), ADR (`DECISIONS.md`), and history line (`HISTORY.md`) MUST be recorded directly in that submodule's `.along/`.
+    - **Parent Orchestration**: The root workspace `.along/` is strictly reserved for whole-solution orchestration, top-level integration tasks, and cross-package architectural ADRs. Parent issues may reference subproject issue canonical keys (e.g. `[pkg-auth:feat--token-refresh]`), but MUST NOT absorb subproject internal entity history.
+    - **Anti-Root Pollution Rule**: Agents are STRICTLY FORBIDDEN from blindly dumping subproject or submodule changes into the workspace root `.along/`.
+    - **Uninitialized Subprojects**: If an active subproject has its own package manifest (`package.json`, `Cargo.toml`, `pyproject.toml`, `*.csproj`) or `.git` repo but lacks `.along/`, initialize it with `/along-init` in that folder before recording entities.
+- **Precedence**: Nearest `.along/` > higher-level `.along/` > global config (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.gemini/config/GEMINI.md`).
 
 ## At session start - read these yourself (they are NOT auto-loaded)
 Use the NEAREST `.along/` for the area you're working in (fall back to a higher-level one if the folder has none):

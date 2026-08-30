@@ -134,7 +134,8 @@ def is_dev_repo(repo_root):
     is_along_repo = (
         (os.path.exists(os.path.join(repo_root, "skills", "along-init", "SKILL.md")) or
          os.path.exists(os.path.join(repo_root, "skills", "init-agents", "SKILL.md"))) and
-        (os.path.exists(os.path.join(repo_root, "skills", "along-bump-version", "SKILL.md")) or
+        (os.path.exists(os.path.join(repo_root, "skills", "along-version-bump", "SKILL.md")) or
+         os.path.exists(os.path.join(repo_root, "skills", "along-bump-version", "SKILL.md")) or
          os.path.exists(os.path.join(repo_root, "skills", "bump-version", "SKILL.md")))
     )
     return is_along_repo
