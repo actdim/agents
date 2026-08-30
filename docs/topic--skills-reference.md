@@ -43,6 +43,10 @@ Along ships with **17 Singular Domain-First skills** (`along-<entity>-<action>`)
 ### 1. `along-kb-sync` (`/along-kb-sync`, `/kb-sync`)
 Bootstraps standard articles if `docs/` is empty, verifies YAML front-matter, validates relative Markdown links `[01-architecture.md](./01-architecture.md)`, and regenerates `docs/INDEX.md`.
 
+- **Adaptive Ingestion**:
+  - Direct synthesis for small updates.
+  - Parallel research subagents for large/multi-package source collections.
+
 ```bash
 python skills/along-kb-sync/along_kb_sync.py [REPO_ROOT] [--check]
 ```
