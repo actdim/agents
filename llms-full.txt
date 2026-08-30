@@ -35,11 +35,11 @@ Along is a provider-agnostic agent-context and memory protocol (`ALONG-PROTOCOL 
 
 ## 3. Knowledge Base Structure (`docs/` & `.archive/`)
 - `INDEX.md`: Central topic index with relative Markdown links (`[Title](./target.md)`).
-- `01-architecture.md`: System components, boundaries, protocol layers, and data flows.
-- `02-domain-model.md`: Domain entity schemas (Issue, Milestone, Risk, Spike, Session, ADR) and DAG relationships.
-- `03-setup-and-workflow.md`: Multi-provider setup, standard session workflow, and CLI reference.
-- `04-frontend-frameworks.md`: Dynstruct, MsgMesh, Material UI adapters, and NSwag code generation.
-- `dependencies.md`: Discovered AI guidelines from installed packages (`AGENTS.md`, `llms.txt`).
+- `topic--architecture.md`: System components, boundaries, protocol layers, and data flows.
+- `topic--domain-model.md`: Domain entity schemas (Issue, Milestone, Risk, Spike, Session, ADR) and DAG relationships.
+- `topic--setup-and-workflow.md`: Multi-provider setup, standard session workflow, and CLI reference.
+- `topic--frontend-frameworks.md`: Dynstruct, MsgMesh, Material UI adapters, and NSwag code generation.
+- `topic--dependencies.md`: Discovered AI guidelines from installed packages (`AGENTS.md`, `llms.txt`).
 - `.archive/`: Isolated raw source documents and notes excluded from active search.
 
 ---

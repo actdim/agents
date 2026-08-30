@@ -1,6 +1,6 @@
 ---
 protocol: along
-slug: frontend-frameworks
+slug: topic--frontend-frameworks
 title: Frontend Architecture, Dynstruct, MsgMesh & NSwag Integration
 type: topic
 created: 2026-08-27

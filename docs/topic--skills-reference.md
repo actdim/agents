@@ -33,7 +33,7 @@ Along ships with **17 Singular Domain-First skills** (`along-<entity>-<action>`)
 | `along-decision-sync` | `/along-decision-sync` | `/decision-sync` | `along-decision-sync` | Append ADR entries to nearest `.along/DECISIONS.md`. |
 | `along-history-sync` | `/along-history-sync` | `/history-sync` | `along-history-sync` | Reconstruct `.along/` history, milestones, and sessions from Git. |
 | `along-graph-check` | `/along-graph-check` | `/graph-check` | `along-graph-check` | Inspect `code-review-graph` MCP status, blast radius, and ignore filters. |
-| `along-dep-scan` | `/along-dep-scan` | `/dep-scan` | `python skills/along-dep-scan/along_dep_scan.py` | Scan dependencies for AI instructions and register in `docs/dependencies.md`. |
+| `along-dep-scan` | `/along-dep-scan` | `/dep-scan` | `python skills/along-dep-scan/along_dep_scan.py` | Scan dependencies for AI instructions and register in `docs/topic--dependencies.md`. |
 | `along-version-bump` | `/along-version-bump` | `/version-bump` | `python scripts/along_bump_version.py` | Multi-stack version bump with pre-commit test gate and release commit. |
 
 ---
@@ -41,7 +41,7 @@ Along ships with **17 Singular Domain-First skills** (`along-<entity>-<action>`)
 ## Skill Details & Usage
 
 ### 1. `along-kb-sync` (`/along-kb-sync`, `/kb-sync`)
-Bootstraps standard articles if `docs/` is empty, verifies YAML front-matter, validates relative Markdown links `[01-architecture.md](./01-architecture.md)`, and regenerates `docs/INDEX.md`.
+Bootstraps standard articles if `docs/` is empty, verifies YAML front-matter, validates relative Markdown links `[topic--architecture.md](./topic--architecture.md)`, and regenerates `docs/INDEX.md`.
 
 - **Adaptive Ingestion**:
   - Direct synthesis for small updates.

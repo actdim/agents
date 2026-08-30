@@ -4,7 +4,7 @@ along_scan_deps.py - AI Dependencies Discovery engine for Along protocol.
 
 Scans direct declared project dependencies (Node/pnpm/npm/yarn/bun, Python, Rust/Cargo),
 discovers library AI instructions (AGENTS.md, CLAUDE.md, llms.txt, package.json AI fields),
-and registers them into docs/dependencies.md and docs/INDEX.md.
+and registers them into docs/topic--dependencies.md and docs/INDEX.md.
 """
 
 import os
@@ -378,8 +378,8 @@ def update_kb_index(repo_root: str):
         with open(index_file, "r", encoding="utf-8") as f:
             content = f.read()
 
-        dep_link = "[dependencies.md](./dependencies.md)"
-        if "dependencies.md" not in content:
+        dep_link = "[topic--dependencies.md](./topic--dependencies.md)"
+        if "topic--dependencies.md" not in content:
             # Append entry under articles list
             if "## Articles" in content or "## Topics" in content:
                 content = content.replace(
@@ -404,7 +404,7 @@ def run_scanner(repo_root: str, dry_run: bool = False) -> List[Dict[str, Any]]:
     if not dry_run:
         kb_dir = os.path.join(repo_root, "docs")
         os.makedirs(kb_dir, exist_ok=True)
-        dep_kb_path = os.path.join(kb_dir, "dependencies.md")
+        dep_kb_path = os.path.join(kb_dir, "topic--dependencies.md")
         content = generate_dependencies_kb_content(all_discovered)
         with open(dep_kb_path, "w", encoding="utf-8", newline="\n") as f:
             f.write(content)
@@ -443,7 +443,7 @@ def main():
                     files_str += f" (metadata: {list(item['metadata'].keys())})"
                 print(f"   - {item['package']} ({item['ecosystem']} {item.get('version', '')}): {files_str}")
             if not args.check:
-                print(f"-> Updated registry: docs/dependencies.md")
+                print(f"-> Updated registry: docs/topic--dependencies.md")
         else:
             print("-> No external dependencies with AI instructions detected.")
 

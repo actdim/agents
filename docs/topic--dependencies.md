@@ -1,6 +1,6 @@
 ---
 protocol: along
-slug: dependencies-ai-context
+slug: topic--dependencies
 title: Dependencies AI Documentation and Rules
 type: topic
 created: 2026-08-28

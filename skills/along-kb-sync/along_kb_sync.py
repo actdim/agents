@@ -9,9 +9,9 @@ import argparse
 from datetime import datetime
 
 STANDARD_ARTICLES = [
-    ("01-architecture.md", "System Architecture and Protocol Layers", "architecture", ["architecture", "boundaries", "dataflow"]),
-    ("02-domain-model.md", "Domain Model and Entity Ecosystem", "domain-model", ["domain", "entities", "schemas"]),
-    ("03-setup-and-workflow.md", "Setup, Installation and Development Workflows", "setup-workflow", ["setup", "workflow", "commands"]),
+    ("topic--architecture.md", "System Architecture and Protocol Layers", "architecture", ["architecture", "boundaries", "dataflow"]),
+    ("topic--domain-model.md", "Domain Model and Entity Ecosystem", "domain-model", ["domain", "entities", "schemas"]),
+    ("topic--setup-and-workflow.md", "Setup, Installation and Development Workflows", "setup-workflow", ["setup", "workflow", "commands"]),
 ]
 
 def parse_frontmatter(content):

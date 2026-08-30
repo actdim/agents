@@ -36,7 +36,7 @@ flowchart TD
 - Enforces kebab-case `<type>--<slug>.md` naming for all issue files.
 
 ### `v1.1.0` -> `v1.3.0`: Knowledge Base & Code Graph
-- Scaffolds initial Knowledge Base (`INDEX.md`, `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md`).
+- Scaffolds initial Knowledge Base (`INDEX.md`, `topic--architecture.md`, `topic--domain-model.md`, `topic--setup-and-workflow.md`).
 - Creates `.code-review-graph-ignore` with standard excludes (`node_modules/`, `dist/`, `build/`, `SESSIONS/`).
 
 ### `v1.3.0` -> `v1.5.0`: Entity Ecosystem & Retro-Synthesis

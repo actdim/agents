@@ -87,10 +87,10 @@ To keep `.along/` lean and avoid token bloat:
 
 ## Knowledge Base (KB) Management & LLM-Wiki Integration
 - **Structured Knowledge Base**: Maintain active project documentation in `docs/` with standard articles:
-  - `docs/INDEX.md`: Central cross-linked topic catalog and entry point (`[Title](./01-architecture.md)`).
-  - `docs/01-architecture.md`: System components, boundaries, and data flows.
-  - `docs/02-domain-model.md`: Domain concepts, business logic, and terms.
-  - `docs/03-setup-and-workflow.md`: Build, run, test, and workflow instructions.
+  - `docs/INDEX.md`: Central cross-linked topic catalog and entry point (`[Title](./topic--architecture.md)`).
+  - `docs/topic--architecture.md`: System components, boundaries, and data flows.
+  - `docs/topic--domain-model.md`: Domain concepts, business logic, and terms.
+  - `docs/topic--setup-and-workflow.md`: Build, run, test, and workflow instructions.
   - `docs/topic--<slug>.md`: Specific domain topics and module specifications.
 - **Source Archival (`.archive/`)**: Processed raw sources, unmanaged notes, and drafts are archived into `.archive/` (excluded from active KB search and site generators).
 - **Front-matter Schema**: Every `docs/*.md` article MUST include YAML front-matter: `protocol: along`, `slug`, `title`, `type` (`topic` | `architecture` | `domain-model` | `setup-workflow` | `index`), `created`, `updated`, `tags: []`.

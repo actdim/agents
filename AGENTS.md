@@ -87,10 +87,10 @@ To keep `.along/` lean and avoid token bloat:
 
 ## Knowledge Base (KB) Management & LLM-Wiki Integration
 - **Structured Knowledge Base**: Maintain active project documentation in `docs/` with standard articles:
-  - `docs/INDEX.md`: Central cross-linked topic catalog and entry point (`[Title](./01-architecture.md)`).
-  - `docs/01-architecture.md`: System components, boundaries, and data flows.
-  - `docs/02-domain-model.md`: Domain concepts, business logic, and terms.
-  - `docs/03-setup-and-workflow.md`: Build, run, test, and workflow instructions.
+  - `docs/INDEX.md`: Central cross-linked topic catalog and entry point (`[Title](./topic--architecture.md)`).
+  - `docs/topic--architecture.md`: System components, boundaries, and data flows.
+  - `docs/topic--domain-model.md`: Domain concepts, business logic, and terms.
+  - `docs/topic--setup-and-workflow.md`: Build, run, test, and workflow instructions.
   - `docs/topic--<slug>.md`: Specific domain topics and module specifications.
 - **Source Archival (`.archive/`)**: Processed raw sources, unmanaged notes, and drafts are archived into `.archive/` (excluded from active KB search and site generators).
 - **Front-matter Schema**: Every `docs/*.md` article MUST include YAML front-matter: `protocol: along`, `slug`, `title`, `type` (`topic` | `architecture` | `domain-model` | `setup-workflow` | `index`), `created`, `updated`, `tags: []`.
@@ -156,7 +156,7 @@ This repository is `Along` (`actdim-along`) - the provider-agnostic agent-contex
   - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Target all` (or `install.bat`).
   - Linux / macOS: `bash install.sh`.
 - **Frontend Architecture (`packages/along-dash-ui/`)**:
-  - Full architectural rules in `[docs/04-frontend-frameworks.md](file://docs/04-frontend-frameworks.md)` and `[.along/DECISIONS.md](file://.along/DECISIONS.md#011)`.
+  - Full architectural rules in `[docs/topic--frontend-frameworks.md](file://docs/topic--frontend-frameworks.md)` and `[.along/DECISIONS.md](file://.along/DECISIONS.md#011)`.
   - Strict `@actdim/dynstruct` component architecture with MobX reactive state; zero raw `useState`/`useEffect` hooks.
   - Zero manual API channels or manual `fetch` calls: client generated via NSwag (`pnpm run generate:api`) and wired dynamically using `@actdim/msgmesh/adapters` (`ToMsgChannelPrefix`, `ToMsgStruct`, `registerAdapters`).
   - Strict 100% typing: zero `any`, zero `as ...`, zero global `window` state storage.

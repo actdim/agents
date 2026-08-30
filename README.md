@@ -21,7 +21,7 @@ directory (`.along/`) that every agent reads and keeps up to date.
 - **One protocol for all four agents** - write conventions once, every tool follows them.
 - **Low-friction upkeep** - `along-*` skills/commands scaffold the structure and update it at the end of
   a stage or session (documentation check, session log, context, issues, decisions, history) instead of you doing bookkeeping.
-- **Structured Knowledge Base (KB) & LLM-Wiki** - `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md` maintained in `docs/` with `.archive/` source isolation while keeping `AGENTS.md` lean.
+- **Structured Knowledge Base (KB) & LLM-Wiki** - `topic--architecture.md`, `topic--domain-model.md`, `topic--setup-and-workflow.md` maintained in `docs/` with `.archive/` source isolation while keeping `AGENTS.md` lean.
 - **Travels with the code** - teammates who clone and CI agents get the same context; there is
   no global state to sync.
 
@@ -42,7 +42,7 @@ directory (`.along/`) that every agent reads and keeps up to date.
   - `DECISIONS.md` - append-only ADR log (never rewritten; superseded, not deleted). Kept in a single file rather than multi-file MADR/Nygard format so agents can load all active architectural constraints in a single read at session start.
   - `VISION.md` - scope, non-goals, roadmap.
   - `GLOSSARY.md` - domain terms.
-- `docs/` holds the active Knowledge Base (`INDEX.md`, `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md`, `topic--*.md`), while raw unmanaged sources are safely archived in `.archive/`.
+- `docs/` holds the active Knowledge Base (`INDEX.md`, `topic--architecture.md`, `topic--domain-model.md`, `topic--setup-and-workflow.md`, `topic--*.md`), while raw unmanaged sources are safely archived in `.archive/`.
 
 ---
 
@@ -65,7 +65,7 @@ directory (`.along/`) that every agent reads and keeps up to date.
 | `along-decision-sync` (`/along-decision-sync`) | Append architectural decisions as ADR entries; mark superseded ones. |
 | `along-history-sync` (`/along-history-sync`) | Reconstruct and reconcile `.along/` milestones, issues, and sessions from Git commits. |
 | `along-graph-check` (`/along-graph-check`) | Inspect `code-review-graph` status, impact radius (blast radius), and architecture flows. |
-| `along-dep-scan` (`/along-dep-scan`) | Scan declared dependencies for AI instructions and register in `docs/dependencies.md`. |
+| `along-dep-scan` (`/along-dep-scan`) | Scan declared dependencies for AI instructions and register in `docs/topic--dependencies.md`. |
 | `along-version-bump` (`/along-version-bump`) | Multi-stack version bump (Node, Python, Rust, .NET, or .along/scripts/bump_version.py). |
 
 ### Deployment Best Practices (Why no `along-deploy`?)

@@ -1,11 +1,11 @@
 ---
 name: along-dep-scan
-description: Scan direct declared project dependencies (Node/pnpm/npm, Python, Rust/Cargo), identify AI rules/instructions (AGENTS.md, llms.txt, package.json AI fields), and register them in docs/dependencies.md. Use when invoking /along-dep-scan (aliases: /dep-scan, /along-scan-deps).
+description: Scan direct declared project dependencies (Node/pnpm/npm, Python, Rust/Cargo), identify AI rules/instructions (AGENTS.md, llms.txt, package.json AI fields), and register them in docs/topic--dependencies.md. Use when invoking /along-dep-scan (aliases: /dep-scan, /along-scan-deps).
 ---
 
 # Along Dependency Scan (`/along-dep-scan`, `/dep-scan`) [v2.1.1]
 
-Discovers AI documentation and guidelines shipped inside declared project dependencies and registers them into the Knowledge Base (`docs/dependencies.md`).
+Discovers AI documentation and guidelines shipped inside declared project dependencies and registers them into the Knowledge Base (`docs/topic--dependencies.md`).
 
 ## What it does
 1. **Manifest Inspection**: Detects top-level dependencies declared in:
@@ -15,7 +15,7 @@ Discovers AI documentation and guidelines shipped inside declared project depend
 2. **On-Disk AI Rules Discovery**: Locates installed packages and inspects for:
    - `AGENTS.md`, `CLAUDE.md`, `llms.txt`, `llms-full.txt`, `LLMS.txt`, `LLMS.md`, `.along/`
    - Manifest metadata keys (`ai`, `llms`, `agents`, `along`).
-3. **Idempotent KB Registry**: Builds or refreshes `docs/dependencies.md` and links it in `docs/INDEX.md`.
+3. **Idempotent KB Registry**: Builds or refreshes `docs/topic--dependencies.md` and links it in `docs/INDEX.md`.
 
 ## Execution
 Run the dependency scanner directly via Python:

@@ -145,13 +145,13 @@ def step_migrate_v1_3_kb_scaffolding(repo_root, working_dir):
             "- [[02-domain-model]]: Core domain entities and business rules.\n"
             "- [[03-setup-and-workflow]]: Build, run, test, and contribution workflows.\n"
         ]),
-        "01-architecture.md": ("01-architecture", "System Architecture & Flow", "architecture", [
+        "topic--architecture.md": ("01-architecture", "System Architecture & Flow", "architecture", [
             "# System Architecture & Flow\n\nHigh-level architectural components, module boundaries, and execution models.\n"
         ]),
-        "02-domain-model.md": ("02-domain-model", "Domain Model & Entities", "domain-model", [
+        "topic--domain-model.md": ("02-domain-model", "Domain Model & Entities", "domain-model", [
             "# Domain Model & Entities\n\nCore domain terminology, data models, and schema relationships.\n"
         ]),
-        "03-setup-and-workflow.md": ("03-setup-and-workflow", "Setup & Developer Workflow", "setup-workflow", [
+        "topic--setup-and-workflow.md": ("03-setup-and-workflow", "Setup & Developer Workflow", "setup-workflow", [
             "# Setup & Developer Workflow\n\nBuild instructions, test suites, local development, and skill deployment guidelines.\n"
         ]),
     }

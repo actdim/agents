@@ -117,7 +117,7 @@ class TestAlongScanDeps(unittest.TestCase):
         self.assertEqual(results[0]["ecosystem"], "cargo")
 
     def test_04_run_scanner_and_kb_generation(self):
-        """Test full scanner lifecycle: creates .along/KB/dependencies.md idempotently."""
+        """Test full scanner lifecycle: creates .along/KB/topic--dependencies.md idempotently."""
         pkg_json = {
             "dependencies": {
                 "fast-sdk": "^1.0.0"
@@ -134,8 +134,8 @@ class TestAlongScanDeps(unittest.TestCase):
         results = along_scan_deps.run_scanner(self.test_dir, dry_run=False)
         self.assertEqual(len(results), 1)
 
-        dep_kb = os.path.join(self.test_dir, "docs", "dependencies.md")
-        self.assertTrue(os.path.isfile(dep_kb), "docs/dependencies.md should be created")
+        dep_kb = os.path.join(self.test_dir, "docs", "topic--dependencies.md")
+        self.assertTrue(os.path.isfile(dep_kb), "docs/topic--dependencies.md should be created")
 
         with open(dep_kb, "r", encoding="utf-8") as f:
             content = f.read()
