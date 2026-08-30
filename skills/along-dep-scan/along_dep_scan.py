@@ -4,7 +4,7 @@ along_scan_deps.py - AI Dependencies Discovery engine for Along protocol.
 
 Scans direct declared project dependencies (Node/pnpm/npm/yarn/bun, Python, Rust/Cargo),
 discovers library AI instructions (AGENTS.md, CLAUDE.md, llms.txt, package.json AI fields),
-and registers them into .along/KB/dependencies.md and .along/KB/INDEX.md.
+and registers them into docs/dependencies.md and docs/INDEX.md.
 """
 
 import os
@@ -369,7 +369,7 @@ def generate_dependencies_kb_content(items: List[Dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 def update_kb_index(repo_root: str):
-    kb_dir = os.path.join(repo_root, ".along", "KB")
+    kb_dir = os.path.join(repo_root, "docs")
     index_file = os.path.join(kb_dir, "INDEX.md")
     if not os.path.isfile(index_file):
         return
@@ -378,7 +378,7 @@ def update_kb_index(repo_root: str):
         with open(index_file, "r", encoding="utf-8") as f:
             content = f.read()
 
-        dep_link = "[[dependencies.md]]"
+        dep_link = "[dependencies.md](./dependencies.md)"
         if "dependencies.md" not in content:
             # Append entry under articles list
             if "## Articles" in content or "## Topics" in content:
@@ -402,7 +402,7 @@ def run_scanner(repo_root: str, dry_run: bool = False) -> List[Dict[str, Any]]:
     all_discovered.extend(scan_rust_deps(repo_root))
 
     if not dry_run:
-        kb_dir = os.path.join(repo_root, ".along", "KB")
+        kb_dir = os.path.join(repo_root, "docs")
         os.makedirs(kb_dir, exist_ok=True)
         dep_kb_path = os.path.join(kb_dir, "dependencies.md")
         content = generate_dependencies_kb_content(all_discovered)
@@ -443,7 +443,7 @@ def main():
                     files_str += f" (metadata: {list(item['metadata'].keys())})"
                 print(f"   - {item['package']} ({item['ecosystem']} {item.get('version', '')}): {files_str}")
             if not args.check:
-                print(f"-> Updated registry: .along/KB/dependencies.md")
+                print(f"-> Updated registry: docs/dependencies.md")
         else:
             print("-> No external dependencies with AI instructions detected.")
 

@@ -12,6 +12,7 @@
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [llm-wiki-docs-architecture-and-skill-refactor](file://.along/ISSUES/done/feat--llm-wiki-docs-architecture-and-skill-refactor.md)
 - [x] `(feat)` [ai-dependencies-discovery-and-scan-deps-skill](file://.along/ISSUES/done/feat--ai-dependencies-discovery-and-scan-deps-skill.md)
 - [x] `(feat)` [dynamic-dashboard-and-kb-engine](file://.along/ISSUES/done/feat--dynamic-dashboard-and-kb-engine.md)
 - [x] `(feat)` [unified-wrap-lifecycle-and-commit-skills](file://.along/ISSUES/done/feat--unified-wrap-lifecycle-and-commit-skills.md)

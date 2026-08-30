@@ -167,7 +167,7 @@ class TestAlongSkillsAndScripts(unittest.TestCase):
 
         res = subprocess.run([sys.executable, mig_script, REPO_ROOT], capture_output=True, text=True)
         self.assertEqual(res.returncode, 0, f"migrate_protocol.py failed:\n{res.stderr}")
-        self.assertIn("All Along v2.0.0 migrations & graph validations completed successfully", res.stdout)
+        self.assertIn("migrations & validations completed successfully", res.stdout)
 
     def test_08_along_update_check_only(self):
         """Verify that along_update.py runs in check-only mode cleanly."""

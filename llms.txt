@@ -11,26 +11,27 @@ Along provides repositories with an isolated, durable, and human-readable memory
   - Reactive Web UI (built on `@actdim/dynstruct` and `@actdim/msgmesh`) with dark theme styling.
   - Interactive Directed Acyclic Graph (DAG) visualization of entity dependencies using Cytoscape.
   - Real-time file system change detection and live UI refresh via Server-Sent Events (SSE).
-- **Knowledge Base & Hybrid Search Engine (`/along-search-kb`)**:
-  - Structured documentation articles in `.along/KB/` (`01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md`, `04-frontend-frameworks.md`, `dependencies.md`, `INDEX.md`).
-  - Fast hybrid search across Knowledge Base topics, issues, ADR decisions, and session journals with filtering by entity type.
-- **AI Dependencies Discovery (`/along-scan-deps`)**:
+- **Knowledge Base & Fast Search Engine (`/along-kb-search`, `/along-kb-sync`)**:
+  - Structured documentation articles in `docs/` (`01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md`, `04-frontend-frameworks.md`, `dependencies.md`, `INDEX.md`).
+  - Raw unmanaged sources isolated in `.archive/`.
+  - Fast structured search across Knowledge Base topics, issues, ADR decisions, and session journals with filtering by entity type.
+- **AI Dependencies Discovery (`/along-dep-scan`)**:
   - Automated scanner for Node (`package.json`), Python (`pyproject.toml`, `requirements.txt`), and Rust (`Cargo.toml`).
-  - Detects library AI rules (`AGENTS.md`, `CLAUDE.md`, `llms.txt`, package manifest AI keys) and builds an idempotent catalog in `.along/KB/dependencies.md`.
+  - Detects library AI rules (`AGENTS.md`, `CLAUDE.md`, `llms.txt`, package manifest AI keys) and builds an idempotent catalog in `docs/dependencies.md`.
 - **Entity Ecosystem & Graph Tracking**:
   - Structured YAML frontmatter (`protocol: along`) for Issues (`.along/ISSUES/`), Milestones (`.along/MILESTONES/`), Risks (`.along/RISKS/`), Spikes (`.along/SPIKES/`), and Sessions (`.along/SESSIONS/`).
   - Unidirectional dependency tracking (`blocked_by`, `related`, `parent`) evaluated dynamically without path breakage.
 - **Append-Only Architectural Decision Records (`.along/DECISIONS.md`)**:
   - Single-file ADR log allowing agents to load all active architectural constraints in a single read.
 - **Cross-Provider Skills Suite**:
-  - 18 provider-agnostic skills installed automatically into Claude Code, Codex, OpenCode, and Antigravity.
+  - 17 provider-agnostic skills installed automatically into Claude Code, Codex, OpenCode, and Antigravity.
 
 ## Documentation Links
 - [README.md](README.md): Overview, quick installation, and full skill list.
 - [AGENTS.md](AGENTS.md): Active ALONG-PROTOCOL conventions and instructions.
-- [.along/KB/INDEX.md](.along/KB/INDEX.md): Central Knowledge Base topic map.
-- [.along/KB/01-architecture.md](.along/KB/01-architecture.md): System architecture, boundaries, and data flows.
-- [.along/KB/02-domain-model.md](.along/KB/02-domain-model.md): Domain entities, schema, and DAG relationships.
-- [.along/KB/03-setup-and-workflow.md](.along/KB/03-setup-and-workflow.md): Setup, installation, and agent workflow.
-- [.along/KB/04-frontend-frameworks.md](.along/KB/04-frontend-frameworks.md): Dynstruct, MsgMesh, Material UI adapters, and NSwag API integration.
-- [.along/KB/dependencies.md](.along/KB/dependencies.md): Catalog of external dependency AI guidelines.
+- [docs/INDEX.md](docs/INDEX.md): Central Knowledge Base topic catalog.
+- [docs/01-architecture.md](docs/01-architecture.md): System architecture, boundaries, and data flows.
+- [docs/02-domain-model.md](docs/02-domain-model.md): Domain entities, schema, and DAG relationships.
+- [docs/03-setup-and-workflow.md](docs/03-setup-and-workflow.md): Setup, installation, and agent workflow.
+- [docs/04-frontend-frameworks.md](docs/04-frontend-frameworks.md): Dynstruct, MsgMesh, Material UI adapters, and NSwag API integration.
+- [docs/dependencies.md](docs/dependencies.md): Catalog of external dependency AI guidelines.

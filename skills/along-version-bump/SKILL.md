@@ -1,9 +1,9 @@
 ---
-name: along-bump-version
+name: along-version-bump
 description: Increment project or protocol version (patch by default), sanitize typography, execute wrap-session reconciliation, and create a release git commit. Universal support for Node, Python, Rust, .NET, and custom .along/scripts/bump_version.py hooks.
 ---
 
-# Along Bump Version (`/along-bump-version`) [v2.0.11]
+# Along Bump Version (`/along-bump-version`) [v2.1.1]
 
 Universal project version bumper and release pipeline engine for repositories adopting Along.
 

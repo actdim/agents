@@ -35,7 +35,10 @@ LEGACY_SKILLS = [
     "bump-version", "check-graph", "wrap-session", "wrap-stage",
     "sync-context", "sync-issues", "sync-tasks", "sync-decisions",
     "sync-history", "init-kb", "sync-kb", "sync-wiki", "search-kb", "search-wiki",
-    "along-wrap-session", "along-wrap-stage"
+    "along-wrap-session", "along-wrap-stage",
+    "along-sync-issues", "along-sync-context", "along-sync-decisions", "along-sync-history",
+    "along-check-graph", "along-scan-deps", "along-bump-version",
+    "along-init-kb", "along-sync-kb", "along-search-kb"
 ]
 
 def parse_semver(v_str):

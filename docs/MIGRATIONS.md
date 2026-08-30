@@ -1,3 +1,13 @@
+---
+protocol: along
+title: Protocol & Repository Migrations Guide
+slug: MIGRATIONS
+type: topic
+created: 2026-08-30
+tags: [MIGRATIONS]
+updated: 2026-08-30
+---
+
 # Protocol & Repository Migrations Guide
 
 This guide documents the versioned migration pipeline for the `ALONG-PROTOCOL` (`.along/`).

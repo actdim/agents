@@ -1,6 +1,6 @@
-# Along (v2.0.11)
+# Along (v2.1.1)
 
-A provider-agnostic **agent-context and memory system** for repositories *(formerly `actdim-agents`)* - the `ALONG-PROTOCOL v2.0.11`
+A provider-agnostic **agent-context and memory system** for repositories *(formerly `actdim-agents`)* - the `ALONG-PROTOCOL v2.1.1`
 plus the skills/commands that scaffold and maintain it. One convention, honored by
 **Claude Code**, **Codex**, **OpenCode**, and **Antigravity**.
 
@@ -21,7 +21,7 @@ directory (`.along/`) that every agent reads and keeps up to date.
 - **One protocol for all four agents** - write conventions once, every tool follows them.
 - **Low-friction upkeep** - `along-*` skills/commands scaffold the structure and update it at the end of
   a stage or session (documentation check, session log, context, issues, decisions, history) instead of you doing bookkeeping.
-- **Structured Knowledge Base (KB)** - `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md` maintained in `.along/KB/` while keeping `AGENTS.md` lean.
+- **Structured Knowledge Base (KB) & LLM-Wiki** - `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md` maintained in `docs/` with `.archive/` source isolation while keeping `AGENTS.md` lean.
 - **Travels with the code** - teammates who clone and CI agents get the same context; there is
   no global state to sync.
 
@@ -40,12 +40,13 @@ directory (`.along/`) that every agent reads and keeps up to date.
   - `CONTEXT.md` - short "you are here" snapshot of the current state (read every session).
   - `ISSUES.md` + `ISSUES/<type>--<slug>.md` (+ `ISSUES/done/`) - a compact issue board (`## Active`, `## Backlog`, `## Done`) and one file per typed issue (YAML front-matter: `protocol: along`, `slug`, `type`, `status`, `priority`, `created`, `updated`). Supported types: `feat`, `bug`, `debt`, `task`, `docs`.
   - `DECISIONS.md` - append-only ADR log (never rewritten; superseded, not deleted). Kept in a single file rather than multi-file MADR/Nygard format so agents can load all active architectural constraints in a single read at session start.
-  - `KB/` - structured Knowledge Base articles (`INDEX.md`, `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md`).
   - `VISION.md` - scope, non-goals, roadmap.
   - `GLOSSARY.md` - domain terms.
-  - `HISTORY.md` + `SESSIONS/<year>/<date>--<slug>.md` - an index and one log per session (YAML front-matter: `protocol: along`, date, agent, branch, commit, summary).
+- `docs/` holds the active Knowledge Base (`INDEX.md`, `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md`, `topic--*.md`), while raw unmanaged sources are safely archived in `.archive/`.
 
-### Skills & Slash Commands (v2.0.11)
+---
+
+## Skills Quick Reference (Singular Domain-First)
 
 | Skill / Command | Purpose |
 | :--- | :--- |
@@ -54,18 +55,18 @@ directory (`.along/`) that every agent reads and keeps up to date.
 | `along-dash` (`/along-dash`) | Launch the Along executive dashboard, inspect DAG dependencies, or export reports. |
 | `along-wrap` (`/along-wrap`) | Unified end-of-stage/session update: code review, session log, context, issues, history. |
 | `along-commit` (`/along-commit`) | Smart pre-commit ASCII check and Conventional Commit linked to active issue. |
-| `along-bump-version` (`/along-bump-version`) | Multi-stack version bump (Node, Python, Rust, .NET, or .along/scripts/bump_version.py). |
 | `along-build` (`/along-build`) | Project build lifecycle hook via `.along/scripts/build.py` or auto-detected runner. |
 | `along-test` (`/along-test`) | Automated tests with quiet flags via `.along/scripts/test.py` or auto-detected runner. |
 | `along-dev` (`/along-dev`) | Development / debugging server via `.along/scripts/dev.py` or auto-detected runner. |
-| `along-sync-context` (`/along-sync-context`) | Refresh just the nearest `.along/CONTEXT.md`. |
-| `along-sync-issues` (`/along-sync-issues`) | Reconcile the issue board + per-issue `<type>--<slug>.md` files with the actual work. |
-| `along-sync-decisions` (`/along-sync-decisions`) | Append architectural decisions as ADR entries; mark superseded ones. |
-| `along-sync-history` (`/along-sync-history`) | Reconstruct and reconcile `.along/` milestones, issues, and sessions from Git commits. |
-| `along-init-kb` (`/along-init-kb`) | Bootstrap or refresh structured Knowledge Base articles in `.along/KB/` from docs. |
-| `along-sync-kb` (`/along-sync-kb`) | Reconcile and update Knowledge Base hybrid search indexes. |
-| `along-search-kb` (`/along-search-kb`) | Query project Knowledge Base (`.along/`, `docs/`, `wiki/`, `README.md`) using hybrid search. |
-| `along-check-graph` (`/along-check-graph`) | Inspect `code-review-graph` status, impact radius (blast radius), and architecture flows. |
+| `along-kb-sync` (`/along-kb-sync`) | Synchronize, compile, and reconcile the Knowledge Base in `docs/` using LLM-Wiki pipeline. |
+| `along-kb-search` (`/along-kb-search`) | Fast targeted structured retrieval across `docs/` and project documentation. |
+| `along-issue-sync` (`/along-issue-sync`) | Reconcile the issue board + per-issue `<type>--<slug>.md` files with the actual work. |
+| `along-context-sync` (`/along-context-sync`) | Refresh just the nearest `.along/CONTEXT.md`. |
+| `along-decision-sync` (`/along-decision-sync`) | Append architectural decisions as ADR entries; mark superseded ones. |
+| `along-history-sync` (`/along-history-sync`) | Reconstruct and reconcile `.along/` milestones, issues, and sessions from Git commits. |
+| `along-graph-check` (`/along-graph-check`) | Inspect `code-review-graph` status, impact radius (blast radius), and architecture flows. |
+| `along-dep-scan` (`/along-dep-scan`) | Scan declared dependencies for AI instructions and register in `docs/dependencies.md`. |
+| `along-version-bump` (`/along-version-bump`) | Multi-stack version bump (Node, Python, Rust, .NET, or .along/scripts/bump_version.py). |
 
 ### Deployment Best Practices (Why no `along-deploy`?)
 

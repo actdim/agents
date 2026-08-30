@@ -1,8 +1,8 @@
 ---
-name: along-check-graph
+name: along-graph-check
 description: Debug and inspect code-review-graph status, blast radius, and enforce .code-review-graph-ignore filters to prevent node_modules ballooning. Use when invoking /along-check-graph.
 ---
 
-# Along Check Graph (`/along-check-graph`) [v2.0.11]
+# Along Check Graph (`/along-check-graph`) [v2.1.1]
 
 Inspects and verifies `code-review-graph` MCP server health, graph database status, and exclusion filters.

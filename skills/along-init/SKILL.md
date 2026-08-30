@@ -1,11 +1,11 @@
 ---
 name: along-init
-description: Scaffold or refresh the provider-agnostic agent-context structure in a repository - root AGENTS.md (with a managed block carrying the ALONG-PROTOCOL v2.0.11), a CLAUDE.md that imports it, and the .along/ directory (CONTEXT, ISSUES + ISSUES/, DECISIONS, VISION, GLOSSARY, HISTORY, SESSIONS, KB). Use when the user wants to set up agent context/instructions for a project, initialize the agent structure, or invokes /along-init. Idempotent - re-running refreshes only the managed protocol block and never overwrites existing dynamic state files.
+description: Scaffold or refresh the provider-agnostic agent-context structure in a repository - root AGENTS.md (with a managed block carrying the ALONG-PROTOCOL v2.1.1), a CLAUDE.md that imports it, and the .along/ directory (CONTEXT, ISSUES + ISSUES/, DECISIONS, VISION, GLOSSARY, HISTORY, SESSIONS, KB). Use when the user wants to set up agent context/instructions for a project, initialize the agent structure, or invokes /along-init. Idempotent - re-running refreshes only the managed protocol block and never overwrites existing dynamic state files.
 ---
 
-# Along Init (`/along-init`) [v2.0.11]
+# Along Init (`/along-init`) [v2.1.1]
 
-Scaffold or refresh the provider-agnostic agent-context structure in a repository - root `AGENTS.md` (with a managed block carrying the `ALONG-PROTOCOL v2.0.11`), a `CLAUDE.md` that imports it, and the `.along/` directory (`CONTEXT.md`, `ISSUES.md` + `ISSUES/`, `DECISIONS.md`, `VISION.md`, `GLOSSARY.md`, `HISTORY.md`, `SESSIONS/`, `KB/`).
+Scaffold or refresh the provider-agnostic agent-context structure in a repository - root `AGENTS.md` (with a managed block carrying the `ALONG-PROTOCOL v2.1.1`), a `CLAUDE.md` that imports it, and the `.along/` directory (`CONTEXT.md`, `ISSUES.md` + `ISSUES/`, `DECISIONS.md`, `VISION.md`, `GLOSSARY.md`, `HISTORY.md`, `SESSIONS/`, `KB/`).
 
 ## When to use
 - The user wants to set up agent context or instructions for a project (`/along-init`, "set up agent context", "initialize along").

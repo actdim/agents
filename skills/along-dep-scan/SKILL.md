@@ -1,9 +1,9 @@
 ---
-name: along-scan-deps
+name: along-dep-scan
 description: Scan direct declared project dependencies (Node/pnpm/npm, Python, Rust/Cargo), identify AI rules/instructions (AGENTS.md, llms.txt, package.json AI fields), and register them in .along/KB/dependencies.md. Use when invoking /along-scan-deps.
 ---
 
-# Along Scan Dependencies (`/along-scan-deps`) [v2.0.11]
+# Along Scan Dependencies (`/along-scan-deps`) [v2.1.1]
 
 Discovers AI documentation and guidelines shipped inside declared project dependencies and registers them into the Knowledge Base (`.along/KB/dependencies.md`).
 

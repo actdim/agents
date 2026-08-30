@@ -11,10 +11,10 @@ import tempfile
 import unittest
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCAN_DEPS_MODULE = os.path.join(REPO_ROOT, "skills", "along-scan-deps")
+SCAN_DEPS_MODULE = os.path.join(REPO_ROOT, "skills", "along-dep-scan")
 sys.path.insert(0, SCAN_DEPS_MODULE)
 
-import along_scan_deps
+import along_dep_scan as along_scan_deps
 
 class TestAlongScanDeps(unittest.TestCase):
 
@@ -134,8 +134,8 @@ class TestAlongScanDeps(unittest.TestCase):
         results = along_scan_deps.run_scanner(self.test_dir, dry_run=False)
         self.assertEqual(len(results), 1)
 
-        dep_kb = os.path.join(self.test_dir, ".along", "KB", "dependencies.md")
-        self.assertTrue(os.path.isfile(dep_kb), ".along/KB/dependencies.md should be created")
+        dep_kb = os.path.join(self.test_dir, "docs", "dependencies.md")
+        self.assertTrue(os.path.isfile(dep_kb), "docs/dependencies.md should be created")
 
         with open(dep_kb, "r", encoding="utf-8") as f:
             content = f.read()

@@ -26,7 +26,7 @@ import glob
 import shutil
 from datetime import datetime
 
-CURRENT_PROTOCOL_VERSION = "2.0.11"
+CURRENT_PROTOCOL_VERSION = "2.1.1"
 
 def parse_yaml_frontmatter(content):
     match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n(.*)$", content, re.DOTALL)
@@ -642,6 +642,71 @@ def validate_and_build_entity_graph(along_dir):
     return nodes, edges, errors, warnings
 
 # ----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
+# Step 7: v2.0 -> v2.1 (Knowledge Base -> docs/ & .archive/)
+# ----------------------------------------------------------------------
+def step_migrate_v2_1_docs_wiki_and_archive(repo_root, interactive=True):
+    docs_dir = os.path.join(repo_root, "docs")
+    along_kb_dir = os.path.join(repo_root, ".along", "KB")
+    agents_kb_dir = os.path.join(repo_root, ".agents", "KB")
+    archive_dir = os.path.join(repo_root, ".archive")
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    os.makedirs(docs_dir, exist_ok=True)
+    migrated_count = 0
+    for kb_src in [along_kb_dir, agents_kb_dir]:
+        if os.path.exists(kb_src):
+            for item in os.listdir(kb_src):
+                s = os.path.join(kb_src, item)
+                d = os.path.join(docs_dir, item)
+                if os.path.isfile(s):
+                    shutil.copy2(s, d)
+                    migrated_count += 1
+            shutil.rmtree(kb_src, ignore_errors=True)
+
+    if migrated_count > 0:
+        print(f"   Migrated {migrated_count} Knowledge Base articles from .along/KB/ to docs/.")
+
+    # Interactive prompt for LLM-Wiki compilation
+    should_compile = True
+    if interactive and sys.stdin.isatty():
+        try:
+            ans = input("   [Along Migration] Compile LLM-Wiki in docs/ and archive raw sources to .archive/? [Y/n]: ").strip().lower()
+            if ans in ["n", "no"]:
+                should_compile = False
+        except Exception:
+            should_compile = True
+
+    if should_compile:
+        try:
+            # Sync docs and rebuild INDEX.md
+            articles = [f for f in sorted(os.listdir(docs_dir)) if f.endswith(".md") and f != "INDEX.md"]
+            index_path = os.path.join(docs_dir, "INDEX.md")
+            if not os.path.exists(index_path) and articles:
+                with open(index_path, "w", encoding="utf-8") as f:
+                    f.write(f"""---
+protocol: along
+slug: INDEX
+title: Knowledge Base Topic Index
+type: index
+created: {today}
+updated: {today}
+tags: [index, kb, topics, map]
+---
+
+# Knowledge Base Topic Index
+
+Central entry point and cross-linked topic catalog for project documentation:
+
+## Articles
+""")
+                    for a in articles:
+                        f.write(f"- **[{a}](./{a})**\n")
+            print(f"   Reconciled {len(articles)} articles in docs/.")
+        except Exception as e:
+            print(f"   [WARN] KB sync check: {e}")
+
 # Main Migration Controller
 # ----------------------------------------------------------------------
 def run_migrations(repo_root):
@@ -699,8 +764,12 @@ def run_migrations(repo_root):
 
         if errors:
             print("-> [FAIL] Migration completed with graph validation errors.")
-        else:
-            print("-> [OK] All Along v2.0.0 migrations & graph validations completed successfully!")
+
+    # Step 7: v2.1.0 Docs & LLM-Wiki migration
+    print("-> Step 7 [v2.0 -> v2.1]: Migrating Knowledge Base to docs/ and .archive/...")
+    step_migrate_v2_1_docs_wiki_and_archive(repo_root)
+
+    print("-> [OK] All Along v2.1.0 migrations & validations completed successfully!")
 
 if __name__ == "__main__":
     root = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()

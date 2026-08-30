@@ -338,7 +338,7 @@ class EntityCollector:
             pass
 
     def _collect_kb_articles(self):
-        kb_dirs = [self.agents_dir / "KB", self.repo_root / "docs"]
+        kb_dirs = [self.repo_root / "docs", self.agents_dir / "KB"]
         seen_paths = set()
 
         for kb_dir in kb_dirs:
@@ -346,6 +346,10 @@ class EntityCollector:
                 continue
             for f in kb_dir.rglob("*.md"):
                 if f.name.startswith(".") or str(f) in seen_paths:
+                    continue
+                # Ignore .archive, archive, and raw source subdirectories
+                parts = [p.lower() for p in f.parts]
+                if any(p.startswith(".") or p in ["archive", ".archive", "raw", "sources"] for p in parts[:-1]):
                     continue
                 seen_paths.add(str(f))
                 try:
@@ -360,9 +364,14 @@ class EntityCollector:
                     # Extract headings
                     headings = [h.strip() for h in re.findall(r"^#{1,3}\s+(.*)$", body, re.MULTILINE)]
 
-                    # Extract outgoing links [[link]] or [text](link)
+                    # Extract outgoing links [[link]] and [text](link.md)
                     wiki_links = re.findall(r"\[\[(.*?)\]\]", body)
-                    out_links = list(set(wiki_links))
+                    md_links = [
+                        m[1].split("#")[0].lstrip("./").replace(".md", "")
+                        for m in re.findall(r"\[([^\]]+)\]\(([^)]+\.md(?:#[^)]*)?)\)", body)
+                        if not m[1].startswith("http://") and not m[1].startswith("https://") and not m[1].startswith("file://")
+                    ]
+                    out_links = list(set(wiki_links + md_links))
 
                     tags = fm.get("tags") or []
                     if isinstance(tags, str):
