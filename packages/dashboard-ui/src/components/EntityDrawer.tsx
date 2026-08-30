@@ -30,6 +30,47 @@ export type EntityDrawerStruct = ComponentStruct<
   }
 >;
 
+const MarkdownContent: React.FC<{ html: string }> = ({ html }) => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!containerRef.current) return;
+    const w = window as any;
+    if (!w.mermaid) return;
+
+    const codeBlocks = containerRef.current.querySelectorAll('pre code.language-mermaid');
+    if (codeBlocks.length === 0) return;
+
+    codeBlocks.forEach((codeEl) => {
+      const preEl = codeEl.parentElement;
+      if (!preEl) return;
+      const div = document.createElement('div');
+      div.className = 'mermaid my-4 p-4 bg-slate-950 rounded-xl border border-slate-800 flex justify-center overflow-x-auto text-slate-200';
+      div.textContent = codeEl.textContent;
+      preEl.replaceWith(div);
+    });
+
+    try {
+      const mermaidNodes = containerRef.current.querySelectorAll('.mermaid');
+      if (mermaidNodes.length > 0) {
+        w.mermaid.run({ nodes: mermaidNodes });
+      }
+    } catch (err) {
+      console.warn('Mermaid rendering error:', err);
+    }
+  }, [html]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="markdown-body prose prose-invert max-w-none text-slate-300 text-xs leading-relaxed"
+      dangerouslySetInnerHTML={{
+        __html: html || '<p class="italic text-slate-500">No content provided.</p>',
+      }}
+    />
+  );
+};
+
 export const useEntityDrawer = (
   params?: ComponentParams<EntityDrawerStruct>
 ): Component<EntityDrawerStruct> => {
@@ -108,32 +149,30 @@ export const useEntityDrawer = (
                     <h2 className="text-xl font-bold text-slate-100 mt-2 tracking-tight">
                       {ent.title || ent.slug || ent.id}
                     </h2>
-                    <div className="text-xs text-slate-400 font-mono mt-1">{ent.id}</div>
                   </div>
                   <button
                     onClick={m.onClose}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition"
-                    title="Close drawer"
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition"
                   >
                     <Icon icon="lucide:x" className="w-5 h-5" />
                   </button>
                 </div>
 
-                {/* Metadata Grid */}
-                <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-xs font-mono grid grid-cols-2 gap-3 text-slate-400">
+                {/* Metadata */}
+                <div className="grid grid-cols-2 gap-3 text-xs text-slate-400 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80">
                   {ent.status && (
                     <div>
-                      Status: <span className="text-slate-200 font-bold uppercase">{ent.status}</span>
+                      Status: <span className="text-slate-200 font-bold">{ent.status}</span>
                     </div>
                   )}
                   {ent.priority && (
                     <div>
-                      Priority: <span className="text-slate-200 font-bold uppercase">{ent.priority}</span>
+                      Priority: <span className="text-slate-200 font-bold">{ent.priority}</span>
                     </div>
                   )}
                   {ent.type && (
                     <div>
-                      Type: <span className="text-slate-200 font-bold">{ent.type}</span>
+                      Type: <span className="text-slate-200 font-mono">{ent.type}</span>
                     </div>
                   )}
                   {ent.agent && (
@@ -177,12 +216,7 @@ export const useEntityDrawer = (
                   <h3 className="text-xs font-bold font-mono uppercase text-slate-400 mb-3">
                     Description & Content
                   </h3>
-                  <div
-                    className="markdown-body prose prose-invert max-w-none text-slate-300 text-xs leading-relaxed"
-                    dangerouslySetInnerHTML={{
-                      __html: m.renderedBody || '<p class="italic text-slate-500">No content provided.</p>',
-                    }}
-                  />
+                  <MarkdownContent html={m.renderedBody} />
                 </div>
               </div>
 

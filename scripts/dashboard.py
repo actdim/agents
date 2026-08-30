@@ -751,6 +751,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+    }
+  </script>
   <style>
     #cy { width: 100%; height: 550px; background-color: #0f172a; border-radius: 0.75rem; }
     .tab-btn.active { border-bottom: 2px solid #38bdf8; color: #38bdf8; font-weight: 600; }
@@ -1265,7 +1271,25 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       document.getElementById('drawer-metadata').innerHTML = metaHtml;
 
       const bodyHtml = marked.parse(entity.body || '*No markdown description provided.*');
-      document.getElementById('drawer-body').innerHTML = bodyHtml;
+      const drawerBodyEl = document.getElementById('drawer-body');
+      drawerBodyEl.innerHTML = bodyHtml;
+
+      // Transform language-mermaid code blocks into rendered mermaid diagrams
+      const codeBlocks = drawerBodyEl.querySelectorAll('pre code.language-mermaid');
+      if (codeBlocks.length > 0 && window.mermaid) {
+        codeBlocks.forEach((codeEl) => {
+          const preEl = codeEl.parentElement;
+          const mermaidDiv = document.createElement('div');
+          mermaidDiv.className = 'mermaid my-4 p-4 bg-slate-950 rounded-xl border border-slate-800 flex justify-center overflow-x-auto';
+          mermaidDiv.textContent = codeEl.textContent;
+          preEl.replaceWith(mermaidDiv);
+        });
+        try {
+          mermaid.run({ nodes: drawerBodyEl.querySelectorAll('.mermaid') });
+        } catch (e) {
+          console.warn('Mermaid rendering error:', e);
+        }
+      }
 
       document.getElementById('drawer-backdrop').classList.remove('hidden');
       document.getElementById('entity-drawer').classList.remove('translate-x-full');
