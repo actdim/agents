@@ -246,6 +246,7 @@ def sync_kb(repo_root, check_only=False):
 
     articles = []
     broken_links = []
+    doc_cross_links = {}
 
     for f in sorted(os.listdir(docs_dir)):
         if not f.endswith(".md") or f == "INDEX.md":
@@ -291,6 +292,7 @@ def sync_kb(repo_root, check_only=False):
                     fp.write(new_content)
 
             rel_links = re.findall(r"\[([^\]]+)\]\(([^\)]+)\)", body)
+            doc_cross_links[f] = []
             for link_text, link_target in rel_links:
                 if link_target.startswith("http://") or link_target.startswith("https://") or link_target.startswith("#") or link_target.startswith("file://"):
                     continue
@@ -299,6 +301,8 @@ def sync_kb(repo_root, check_only=False):
                     target_full = os.path.join(docs_dir, clean_target)
                     if not os.path.exists(target_full):
                         broken_links.append((f, link_target))
+                    else:
+                        doc_cross_links[f].append(clean_target)
 
             articles.append({
                 "filename": f,
@@ -321,10 +325,39 @@ def sync_kb(repo_root, check_only=False):
         "tags": ["index", "kb", "topics", "map"],
     }
 
+    # Build Mermaid Knowledge Graph
+    mermaid_lines = [
+        "## Knowledge Graph & Topic Map\n",
+        "```mermaid",
+        "flowchart TD",
+        "    INDEX[\"Knowledge Base (INDEX)\"]",
+    ]
+    
+    node_ids = {}
+    for i, art in enumerate(articles, 1):
+        clean_nid = "T_" + re.sub(r"[^A-Z0-9_]", "_", art['slug'].replace('topic--', '').upper())
+        node_ids[art['filename']] = clean_nid
+        safe_title = art['title'].replace('"', "'")
+        mermaid_lines.append(f'    {clean_nid}["{safe_title}"]')
+        mermaid_lines.append(f'    INDEX --> {clean_nid}')
+
+    for f_name, cross_targets in doc_cross_links.items():
+        src_id = node_ids.get(f_name)
+        if not src_id:
+            continue
+        for tgt in cross_targets:
+            tgt_id = node_ids.get(tgt)
+            if tgt_id and tgt_id != src_id:
+                mermaid_lines.append(f'    {src_id} -.->|references| {tgt_id}')
+
+    mermaid_lines.append("```\n")
+    mermaid_lines.append("---\n")
+    mermaid_lines.append("## Articles\n")
+
     index_body_lines = [
         "# Knowledge Base Topic Index\n",
         "Central entry point and cross-linked topic catalog for project documentation:\n",
-        "## Articles\n",
+        "\n".join(mermaid_lines),
     ]
 
     for art in articles:

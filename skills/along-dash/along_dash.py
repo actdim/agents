@@ -450,6 +450,20 @@ class AgentEntityCollector:
                 "status": r["status"]
             })
 
+        for kb in self.kb_articles:
+            nodes.append({
+                "id": kb["id"],
+                "label": kb["title"],
+                "type": "kb",
+                "status": "active"
+            })
+            rel_links = re.findall(r"\[([^\]]+)\]\(([^)]+)\)", kb.get("body", ""))
+            for _, target in rel_links:
+                clean_t = target.split("#")[0].lstrip("./")
+                if clean_t.startswith("topic--") and clean_t.endswith(".md"):
+                    target_id = f"kb--{clean_t.replace('.md', '')}"
+                    edges.append({"source": kb["id"], "target": target_id, "type": "references", "label": "links"})
+
         for iss in self.issues:
             src = iss["id"]
             for blocker in iss.get("blocked_by", []):

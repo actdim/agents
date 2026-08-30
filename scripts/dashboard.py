@@ -450,36 +450,34 @@ class AgentEntityCollector:
                 "status": r["status"]
             })
 
-        node_map = {n["id"]: n for n in nodes}
+        for kb in self.kb_articles:
+            nodes.append({
+                "id": kb["id"],
+                "label": kb["title"],
+                "type": "kb",
+                "status": "active"
+            })
+            rel_links = re.findall(r"\[([^\]]+)\]\(([^)]+)\)", kb.get("body", ""))
+            for _, target in rel_links:
+                clean_t = target.split("#")[0].lstrip("./")
+                if clean_t.startswith("topic--") and clean_t.endswith(".md"):
+                    target_id = f"kb--{clean_t.replace('.md', '')}"
+                    edges.append({"source": kb["id"], "target": target_id, "type": "references", "label": "links"})
 
         for iss in self.issues:
             src = iss["id"]
             for blocker in iss.get("blocked_by", []):
                 target = blocker if blocker.startswith(("feat--", "bug--", "debt--", "task--", "docs--")) else f"feat--{blocker}"
-                if target not in node_map:
-                    node_map[target] = {"id": target, "label": blocker, "type": "issue", "status": "open", "priority": "medium", "issue_type": "feat"}
                 edges.append({"source": target, "target": src, "type": "blocks", "label": "blocks"})
             for rel in iss.get("related", []):
                 target = rel if rel.startswith(("feat--", "bug--", "debt--", "task--", "docs--", "risk--")) else f"feat--{rel}"
-                if target not in node_map:
-                    node_map[target] = {"id": target, "label": rel, "type": "issue", "status": "open", "priority": "medium", "issue_type": "feat"}
                 edges.append({"source": src, "target": target, "type": "related", "label": "related"})
             if iss.get("milestone"):
-                m_key = f"milestone--{iss['milestone']}"
-                if m_key not in node_map:
-                    node_map[m_key] = {"id": m_key, "label": iss['milestone'], "type": "milestone", "status": "in-progress", "progress_pct": 0}
-                edges.append({"source": src, "target": m_key, "type": "belongs_to", "label": "part of"})
+                edges.append({"source": src, "target": f"milestone--{iss['milestone']}", "type": "belongs_to", "label": "part of"})
             if iss.get("parent"):
-                p_key = iss["parent"]
-                if p_key not in node_map:
-                    node_map[p_key] = {"id": p_key, "label": p_key, "type": "issue", "status": "open", "priority": "medium", "issue_type": "feat"}
-                edges.append({"source": src, "target": p_key, "type": "child_of", "label": "child of"})
+                edges.append({"source": src, "target": iss["parent"], "type": "child_of", "label": "child of"})
 
-        final_nodes = list(node_map.values())
-        valid_node_ids = set(node_map.keys())
-        valid_edges = [e for e in edges if e["source"] in valid_node_ids and e["target"] in valid_node_ids]
-
-        self.graph = {"nodes": final_nodes, "edges": valid_edges}
+        self.graph = {"nodes": nodes, "edges": edges}
 
     def _compute_metrics(self):
         total_issues = len(self.issues)
@@ -1140,7 +1138,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const elements = [];
       const nodes = RAW_DATA.graph.nodes || [];
       const edges = RAW_DATA.graph.edges || [];
-      const nodeIds = new Set();
 
       nodes.forEach(n => {
         let color = '#38bdf8';
@@ -1154,17 +1151,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           color = '#f43f5e';
           shape = 'diamond';
         }
-        nodeIds.add(n.id);
         elements.push({ data: { id: n.id, label: n.label, color: color, shape: shape } });
       });
 
       edges.forEach(e => {
-        if (nodeIds.has(e.source) && nodeIds.has(e.target)) {
-          let edgeColor = '#475569';
-          if (e.type === 'blocks') edgeColor = '#ef4444';
-          if (e.type === 'belongs_to') edgeColor = '#38bdf8';
-          elements.push({ data: { id: `${e.source}->${e.target}`, source: e.source, target: e.target, label: e.label, color: edgeColor } });
-        }
+        let edgeColor = '#475569';
+        if (e.type === 'blocks') edgeColor = '#ef4444';
+        if (e.type === 'belongs_to') edgeColor = '#38bdf8';
+        elements.push({ data: { id: `${e.source}->${e.target}`, source: e.source, target: e.target, label: e.label, color: edgeColor } });
       });
 
       cyInstance = cytoscape({
@@ -1369,15 +1363,11 @@ def main():
 
     agents_dir = find_agents_dir(args.path)
     if not agents_dir.exists():
-        print(f"[Error] No .agents/ directory found in {args.path} or parent directories.", file=sys.stderr)
         print(f"[Error] No .along/ directory found in {args.path} or parent directories.", file=sys.stderr)
         sys.exit(1)
 
     collector = AgentEntityCollector(agents_dir).collect_all()
 
-    if args.markdown:
-        md_path = agents_dir / "DASHBOARD.md"
-        generate_markdown_report(collector, md_path)
     # Always generate fresh markdown and static HTML reports
     md_path = agents_dir / "DASHBOARD.md"
     generate_markdown_report(collector, md_path)
@@ -1385,11 +1375,6 @@ def main():
     export_path = collector.repo_root / ".along" / "dashboard.html"
     export_static_html(collector, export_path)
 
-    if args.export:
-        export_path = Path(args.export)
-        if not export_path.is_absolute():
-            export_path = collector.repo_root / export_path
-        export_static_html(collector, export_path)
     if args.export and args.export != ".along/dashboard.html":
         custom_export = Path(args.export)
         if not custom_export.is_absolute():

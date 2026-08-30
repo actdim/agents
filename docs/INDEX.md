@@ -12,6 +12,32 @@ tags: [index, kb, topics, map]
 
 Central entry point and cross-linked topic catalog for project documentation:
 
+## Knowledge Graph & Topic Map
+
+```mermaid
+flowchart TD
+    INDEX["Knowledge Base (INDEX)"]
+    T_ARCHITECTURE["System Architecture & Flow"]
+    INDEX --> T_ARCHITECTURE
+    T_DEPENDENCIES["Dependencies AI Documentation and Rules"]
+    INDEX --> T_DEPENDENCIES
+    T_DOMAIN_MODEL["Domain Model & Entities"]
+    INDEX --> T_DOMAIN_MODEL
+    T_FRONTEND_FRAMEWORKS["Frontend Architecture, Dynstruct, MsgMesh & NSwag Integration"]
+    INDEX --> T_FRONTEND_FRAMEWORKS
+    T_LLM_WIKI_ARCHITECTURE["LLM-Wiki Knowledge Base Architecture & Paradigm"]
+    INDEX --> T_LLM_WIKI_ARCHITECTURE
+    T_MIGRATIONS["Protocol & Repository Migrations Guide"]
+    INDEX --> T_MIGRATIONS
+    T_SETUP_AND_WORKFLOW["Setup & Developer Workflow"]
+    INDEX --> T_SETUP_AND_WORKFLOW
+    T_SKILLS_REFERENCE["Skills & Slash Commands Technical Reference"]
+    INDEX --> T_SKILLS_REFERENCE
+    T_LLM_WIKI_ARCHITECTURE -.->|references| T_ARCHITECTURE
+```
+
+---
+
 ## Articles
 
 - **[System Architecture & Flow](./topic--architecture.md)** (architecture) `architecture`
