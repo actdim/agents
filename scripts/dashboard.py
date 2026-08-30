@@ -23,10 +23,32 @@ import os
 import sys
 import re
 import json
+import shutil
+import subprocess
 import argparse
 import webbrowser
 from datetime import datetime
 from pathlib import Path
+
+# Auto-bootstrap with `uv run` if dependencies are not available in current interpreter
+if "--no-uv-reentry" not in sys.argv:
+    try:
+        import yaml
+        import rich
+        import jinja2
+        import fastapi
+        import uvicorn
+    except ImportError:
+        uv_bin = shutil.which("uv")
+        if uv_bin:
+            cmd = [uv_bin, "run", str(Path(__file__).resolve())] + sys.argv[1:] + ["--no-uv-reentry"]
+            try:
+                sys.exit(subprocess.call(cmd))
+            except KeyboardInterrupt:
+                sys.exit(0)
+
+if "--no-uv-reentry" in sys.argv:
+    sys.argv.remove("--no-uv-reentry")
 
 # External dependencies (FastAPI, Uvicorn, Jinja2, PyYAML, Rich)
 try:

@@ -19,9 +19,28 @@ Runs the dynamic Along Dashboard, OpenAPI service, and Knowledge Base search eng
 """
 
 import sys
+import shutil
+import subprocess
 from pathlib import Path
 
-# Add repo root to sys.path to enable dashboard module imports
+# Auto-bootstrap with `uv run` if dependencies are not available in current interpreter
+if "--no-uv-reentry" not in sys.argv:
+    try:
+        import fastapi
+        import uvicorn
+        import pydantic
+    except ImportError:
+        uv_bin = shutil.which("uv")
+        if uv_bin:
+            cmd = [uv_bin, "run", str(Path(__file__).resolve())] + sys.argv[1:] + ["--no-uv-reentry"]
+            try:
+                sys.exit(subprocess.call(cmd))
+            except KeyboardInterrupt:
+                sys.exit(0)
+
+if "--no-uv-reentry" in sys.argv:
+    sys.argv.remove("--no-uv-reentry")
+
 repo_root = Path(__file__).resolve().parent.parent
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
