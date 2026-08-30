@@ -1,11 +1,11 @@
 ---
 name: along-init
-description: Scaffold or refresh the provider-agnostic agent-context structure in a repository - root AGENTS.md (with a managed block carrying the ALONG-PROTOCOL v2.1.2), a CLAUDE.md that imports it, and the .along/ directory (CONTEXT, ISSUES + ISSUES/, DECISIONS, VISION, GLOSSARY, HISTORY, SESSIONS, KB). Use when the user wants to set up agent context/instructions for a project, initialize the agent structure, or invokes /along-init. Idempotent - re-running refreshes only the managed protocol block and never overwrites existing dynamic state files.
+description: Scaffold or refresh the provider-agnostic agent-context structure in a repository - root AGENTS.md (with a managed block carrying the ALONG-PROTOCOL v2.1.3), a CLAUDE.md that imports it, and the .along/ directory (CONTEXT, ISSUES + ISSUES/, DECISIONS, VISION, GLOSSARY, HISTORY, SESSIONS, docs/). Use when the user wants to set up agent context/instructions for a project, initialize the agent structure, or invokes /along-init. Idempotent - re-running refreshes only the managed protocol block and never overwrites existing dynamic state files.
 ---
 
-# Along Init (`/along-init`) [v2.1.2]
+# Along Init (`/along-init`) [v2.1.3]
 
-Scaffold or refresh the provider-agnostic agent-context structure in a repository - root `AGENTS.md` (with a managed block carrying the `ALONG-PROTOCOL v2.1.2`), a `CLAUDE.md` that imports it, and the `.along/` directory (`CONTEXT.md`, `ISSUES.md` + `ISSUES/`, `DECISIONS.md`, `VISION.md`, `GLOSSARY.md`, `HISTORY.md`, `SESSIONS/`, `KB/`).
+Scaffold or refresh the provider-agnostic agent-context structure in a repository - root `AGENTS.md` (with a managed block carrying the `ALONG-PROTOCOL v2.1.3`), a `CLAUDE.md` that imports it, and the `.along/` directory (`CONTEXT.md`, `ISSUES.md` + `ISSUES/`, `DECISIONS.md`, `VISION.md`, `GLOSSARY.md`, `HISTORY.md`, `SESSIONS/`, `docs/`).
 
 ## When to use
 - The user wants to set up agent context or instructions for a project (`/along-init`, "set up agent context", "initialize along").
@@ -43,3 +43,13 @@ Execute the migration engine against the target folder to validate front-matter 
 ```bash
 python scripts/migrate_protocol.py <target_root>
 ```
+
+### Step 5: Propose Onboarding & Repository Synchronization Operations
+Upon completing initialization, agents and tools MUST present a clear onboarding proposal to the user with the following optional operations:
+
+| Proposed Skill / Operation | Command | Purpose & Impact |
+| :--- | :--- | :--- |
+| **Knowledge Base Ingestion & Sync** | `/along-kb-sync` | Ingests `README.md` and raw notes into structured `docs/topic--*.md`, cross-links `docs/INDEX.md`, and archives originals into `.archive/`. *(Notice: Moves unmanaged source docs to `.archive/`)* |
+| **Dependencies & Submodules AI Scan** | `/along-dep-scan` | Recursively inspects package manifests (`package.json`, `pyproject.toml`, `*.csproj`, `Cargo.toml`), Git submodules, and symlinks for AI rules and updates `docs/topic--dependencies.md`. |
+| **Git History & Entities Reconcile** | `/along-history-sync` | Analyzes commit history, tags, and PRs to retroactively synthesize `.along/ISSUES/done/`, `.along/SESSIONS/`, and `HISTORY.md`. *(Recommended for existing repositories)* |
+| **Executive Dashboard & Health** | `/along-dash` | Launches the interactive dashboard to inspect repository KPI metrics, Knowledge Base, and Cytoscape DAG graph. |

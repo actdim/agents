@@ -19,7 +19,7 @@ flowchart TD
     INDEX["Knowledge Base (INDEX)"]
     T_ARCHITECTURE["System Architecture & Flow"]
     INDEX --> T_ARCHITECTURE
-    T_DEPENDENCIES["Dependencies AI Documentation and Rules"]
+    T_DEPENDENCIES["Dependencies & Submodules AI Documentation and Rules"]
     INDEX --> T_DEPENDENCIES
     T_DOMAIN_MODEL["Domain Model & Entities"]
     INDEX --> T_DOMAIN_MODEL
@@ -41,7 +41,7 @@ flowchart TD
 ## Articles
 
 - **[System Architecture & Flow](./topic--architecture.md)** (architecture) `architecture`
-- **[Dependencies AI Documentation and Rules](./topic--dependencies.md)** (topic) `dependencies`, `ai-context`, `vendor`, `rules`
+- **[Dependencies & Submodules AI Documentation and Rules](./topic--dependencies.md)** (topic) `dependencies`, `ai-context`, `submodules`, `vendor`, `rules`
 - **[Domain Model & Entities](./topic--domain-model.md)** (domain-model) `domain-model`
 - **[Frontend Architecture, Dynstruct, MsgMesh & NSwag Integration](./topic--frontend-frameworks.md)** (topic) `dynstruct`, `dynstruct-mui`, `msgmesh`, `utico`, `react`, `mui`, `nswag`, `openapi`, `architecture`
 - **[LLM-Wiki Knowledge Base Architecture & Paradigm](./topic--llm-wiki-architecture.md)** (topic) `llm-wiki`, `architecture`, `knowledge-base`, `token-efficiency`, `indexing`, `methodology`

@@ -8,6 +8,7 @@ Recursively discovers and updates existing agent contexts in repository root and
   3. Walks repository tree from root to find all folders that contain AGENTS.md, .along/, or .agents/.
   4. Selectively refreshes protocol blocks and runs migration engine only where contexts are already present.
   5. Leaves clean directories untouched (anti-pollution guarantee).
+  6. Optionally executes or proposes post-update sync engines (/along-kb-sync, /along-dep-scan, /along-history-sync).
 
 Usage:
     python scripts/along_update.py [TARGET_REPO_ROOT] [OPTIONS]
@@ -16,6 +17,10 @@ Usage:
       --dry-run         Simulate updates and migrations without writing files.
       --force           Force reinstall/refresh even if versions match.
       --local-only      Skip remote GitHub check, use only local global installation.
+      --kb-sync         Run Knowledge Base sync after updating protocol.
+      --dep-scan        Run AI dependencies and submodules scan after updating protocol.
+      --history-sync    Run Git history reconciliation after updating protocol.
+      --all-sync        Run all three post-update sync operations (kb-sync, dep-scan, history-sync).
 """
 
 import os
@@ -25,6 +30,7 @@ import shutil
 import urllib.request
 import subprocess
 from datetime import datetime
+from typing import Optional
 
 REMOTE_GIT_URL = "https://github.com/actdim/along.git"
 REMOTE_RAW_URL = "https://raw.githubusercontent.com/actdim/along/main/AGENTS.md"
@@ -178,7 +184,6 @@ def update_global_from_git(dry_run=False):
                 shutil.rmtree(cache_dir, ignore_errors=True)
             subprocess.run(["git", "clone", "--depth", "1", REMOTE_GIT_URL, cache_dir], check=True, timeout=20)
 
-        # Run installation script from cached clone
         if sys.platform == "win32":
             ps1_script = os.path.join(cache_dir, "install.ps1")
             cmd = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ps1_script, "-Target", "all"]
@@ -214,15 +219,10 @@ def install_global_from_local(repo_root, dry_run=False):
         return False
 
 def find_existing_agent_contexts(repo_root):
-    """
-    Recursively discovers all directories containing AGENTS.md, .along/, or legacy .agents/.
-    Skips ignored build/cache/dependency directories.
-    Returns list of absolute directory paths sorted by depth (root first).
-    """
     contexts = []
     ignored = {
         '.git', 'node_modules', 'dist', 'build', '.venv', 'venv',
-        'bin', 'obj', '.cache', 'target', 'vendor', '.gemini', '.claude', '.codex'
+        'bin', 'obj', '.cache', 'target', 'vendor', '.gemini', '.claude', '.codex', '.archive'
     }
 
     for root, dirs, files in os.walk(repo_root):
@@ -248,7 +248,6 @@ def apply_migration_to_context(ctx_dir, protocol_text, migrate_script, is_root=T
         print(f"   [DRY-RUN] Would refresh protocol block and run migration engine on {ctx_dir}.")
         return True
 
-    # 1. Prepare managed protocol block for AGENTS.md
     agents_md = os.path.join(ctx_dir, "AGENTS.md")
 
     if is_root or not ancestor_root:
@@ -268,7 +267,6 @@ def apply_migration_to_context(ctx_dir, protocol_text, migrate_script, is_root=T
             f"{end_marker}"
         )
 
-    # 2. Update AGENTS.md if it exists (or if this is the root context)
     if os.path.exists(agents_md):
         with open(agents_md, "r", encoding="utf-8", errors="ignore") as f:
             existing = f.read()
@@ -288,7 +286,6 @@ def apply_migration_to_context(ctx_dir, protocol_text, migrate_script, is_root=T
             f.write(block + "\n\n## Project specifics\n\n- Add project conventions here.\n")
         print("   [OK] Created root AGENTS.md with managed protocol block.")
 
-    # 3. Run migrate_protocol.py if .along/ or .agents/ exists in this context
     along_dir = os.path.join(ctx_dir, ".along")
     agents_dir = os.path.join(ctx_dir, ".agents")
     if os.path.isdir(along_dir) or os.path.isdir(agents_dir):
@@ -302,7 +299,43 @@ def apply_migration_to_context(ctx_dir, protocol_text, migrate_script, is_root=T
 
     return True
 
-def run_update(repo_root, check_only=False, dry_run=False, force=False, local_only=False):
+def locate_skill_script(repo_root: str, skill_folder: str, script_name: str) -> Optional[str]:
+    local_p = os.path.join(repo_root, "skills", skill_folder, script_name)
+    if os.path.isfile(local_p):
+        return local_p
+    
+    user_home = os.path.expanduser("~")
+    cand_paths = [
+        os.path.join(user_home, ".gemini", "config", "skills", skill_folder, script_name),
+        os.path.join(user_home, ".claude", "skills", skill_folder, script_name),
+        os.path.join(user_home, ".codex", "skills", skill_folder, script_name),
+    ]
+    for cp in cand_paths:
+        if os.path.isfile(cp):
+            return cp
+    return None
+
+def execute_post_update_syncs(repo_root: str, do_kb: bool, do_dep: bool, do_hist: bool):
+    if do_kb:
+        kb_script = locate_skill_script(repo_root, "along-kb-sync", "along_kb_sync.py")
+        if kb_script:
+            print(f"\n-> Running Knowledge Base sync (/along-kb-sync)...")
+            subprocess.run([sys.executable, kb_script, repo_root])
+
+    if do_dep:
+        dep_script = locate_skill_script(repo_root, "along-dep-scan", "along_dep_scan.py")
+        if dep_script:
+            print(f"\n-> Running Dependencies & Submodules scan (/along-dep-scan)...")
+            subprocess.run([sys.executable, dep_script, "--root", repo_root])
+
+    if do_hist:
+        hist_script = locate_skill_script(repo_root, "along-history-sync", "along_history_sync.py")
+        if hist_script:
+            print(f"\n-> Running Git History reconciliation (/along-history-sync)...")
+            subprocess.run([sys.executable, hist_script, repo_root, "--synthesize"])
+
+def run_update(repo_root, check_only=False, dry_run=False, force=False, local_only=False,
+               do_kb_sync=False, do_dep_scan=False, do_history_sync=False):
     repo_root = os.path.abspath(repo_root)
     print("==================================================")
     print("-> ALONG One-Liner Updater (/along-update)")
@@ -328,7 +361,6 @@ def run_update(repo_root, check_only=False, dry_run=False, force=False, local_on
 
     is_dev = is_dev_repo(repo_root)
 
-    # Determine highest available target version
     if is_dev:
         print("-> [Dev Repo Detected] Working inside along repository.")
         install_global_from_local(repo_root, dry_run=dry_run)
@@ -348,7 +380,6 @@ def run_update(repo_root, check_only=False, dry_run=False, force=False, local_on
                 print("   [ERROR] No global installation and remote is unreachable.")
                 return
 
-    # Locate protocol.md source
     protocol_src = None
     local_proto = os.path.join(repo_root, "skills", "along-init", "protocol.md")
     if not os.path.exists(local_proto):
@@ -369,7 +400,6 @@ def run_update(repo_root, check_only=False, dry_run=False, force=False, local_on
     with open(protocol_src, "r", encoding="utf-8") as f:
         protocol_text = f.read().strip()
 
-    # Locate migrate_protocol.py
     migrate_script = None
     local_mig = os.path.join(repo_root, "scripts", "migrate_protocol.py")
     if os.path.exists(local_mig):
@@ -387,7 +417,6 @@ def run_update(repo_root, check_only=False, dry_run=False, force=False, local_on
                 migrate_script = c
                 break
 
-    # Discover all existing agent contexts in the repository
     print("-> Discovering active agent contexts in repository...")
     contexts = find_existing_agent_contexts(repo_root)
 
@@ -415,8 +444,18 @@ def run_update(repo_root, check_only=False, dry_run=False, force=False, local_on
             dry_run=dry_run
         )
 
-    print("==================================================")
-    print(f"-> [OK] Successfully updated {len(contexts)} agent context(s) across repository!")
+    if do_kb_sync or do_dep_scan or do_history_sync:
+        execute_post_update_syncs(repo_root, do_kb_sync, do_dep_scan, do_history_sync)
+    else:
+        print("\n==================================================")
+        print("-> Recommended Next Steps (Optional Onboarding & Sync):")
+        print("   1. /along-kb-sync      : Ingest & compile Knowledge Base in docs/ (archives raw sources to .archive/)")
+        print("   2. /along-dep-scan     : Discover multi-project AI guidelines into docs/topic--dependencies.md")
+        print("   3. /along-history-sync : Reconcile unmapped Git commit history into .along/ entities")
+        print("   4. /along-dash         : Launch executive dashboard & dependency graph")
+        print("==================================================")
+
+    print(f"-> [OK] Successfully updated {len(contexts)} agent context(s) across repository!\n")
 
 if __name__ == "__main__":
     target = os.getcwd()
@@ -424,6 +463,11 @@ if __name__ == "__main__":
     dry_run_flag = "--dry-run" in sys.argv
     force_flag = "--force" in sys.argv
     local_only_flag = "--local-only" in sys.argv
+    
+    all_sync_flag = "--all-sync" in sys.argv
+    kb_sync_flag = "--kb-sync" in sys.argv or all_sync_flag
+    dep_scan_flag = "--dep-scan" in sys.argv or all_sync_flag
+    history_sync_flag = "--history-sync" in sys.argv or all_sync_flag
 
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if args:
@@ -434,6 +478,8 @@ if __name__ == "__main__":
         check_only=check_only_flag,
         dry_run=dry_run_flag,
         force=force_flag,
-        local_only=local_only_flag
+        local_only=local_only_flag,
+        do_kb_sync=kb_sync_flag,
+        do_dep_scan=dep_scan_flag,
+        do_history_sync=history_sync_flag
     )
-

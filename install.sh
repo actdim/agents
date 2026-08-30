@@ -121,6 +121,7 @@ install_opencode() {  # generate flat commands + place along-init helper
   [ -f "$src/along-version-bump/along_version_bump.py" ] && cp -f "$src/along-version-bump/along_version_bump.py" "$helper/along_version_bump.py"
   [ -f "$src/along-kb-sync/along_kb_sync.py" ] && cp -f "$src/along-kb-sync/along_kb_sync.py" "$helper/along_kb_sync.py"
   [ -f "$src/along-kb-search/along_kb_search.py" ] && cp -f "$src/along-kb-search/along_kb_search.py" "$helper/along_kb_search.py"
+  [ -f "$src/along-history-sync/along_history_sync.py" ] && cp -f "$src/along-history-sync/along_history_sync.py" "$helper/along_history_sync.py"
 
   local d name sk desc out
   for d in "$src"/*/; do

@@ -296,13 +296,15 @@ def sync_kb(repo_root, check_only=False):
             for link_text, link_target in rel_links:
                 if link_target.startswith("http://") or link_target.startswith("https://") or link_target.startswith("#") or link_target.startswith("file://"):
                     continue
-                clean_target = link_target.split("#")[0].lstrip("./")
-                if clean_target and clean_target.endswith(".md"):
-                    target_full = os.path.join(docs_dir, clean_target)
-                    if not os.path.exists(target_full):
-                        broken_links.append((f, link_target))
-                    else:
-                        doc_cross_links[f].append(clean_target)
+                target_no_hash = link_target.split("#")[0]
+                if not target_no_hash:
+                    continue
+                target_full = os.path.normpath(os.path.join(docs_dir, target_no_hash))
+                if not os.path.exists(target_full):
+                    broken_links.append((f, link_target))
+                else:
+                    if target_full.startswith(docs_dir) and target_no_hash.endswith(".md"):
+                        doc_cross_links[f].append(os.path.basename(target_full))
 
             articles.append({
                 "filename": f,

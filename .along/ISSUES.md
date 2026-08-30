@@ -6,12 +6,13 @@
 - [ ] `(feat)` [automated-ui-screenshots-and-visual-verification](file://.along/ISSUES/feat--automated-ui-screenshots-and-visual-verification.md)
 - [ ] `(feat)` [lsif-scip-lsp-mcp-integration](file://.along/ISSUES/feat--lsif-scip-lsp-mcp-integration.md)
 - [ ] `(feat)` [knowledge-base-management-and-init-kb-skill](file://.along/ISSUES/feat--knowledge-base-management-and-init-kb-skill.md)
-- [ ] `(feat)` [agentic-goals-and-mandatory-checklists](file://.along/ISSUES/feat--agentic-goals-and-mandatory-checklists.md)
 - [ ] `(feat)` [token-efficiency-and-context-optimization-skills](file://.along/ISSUES/feat--token-efficiency-and-context-optimization-skills.md)
 
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [agentic-goals-and-mandatory-checklists](file://.along/ISSUES/done/feat--agentic-goals-and-mandatory-checklists.md)
+- [x] `(feat)` [hierarchical-dep-scan-and-wiki-integration](file://.along/ISSUES/done/feat--hierarchical-dep-scan-and-wiki-integration.md)
 - [x] `(feat)` [llm-wiki-docs-architecture-and-skill-refactor](file://.along/ISSUES/done/feat--llm-wiki-docs-architecture-and-skill-refactor.md)
 - [x] `(feat)` [ai-dependencies-discovery-and-scan-deps-skill](file://.along/ISSUES/done/feat--ai-dependencies-discovery-and-scan-deps-skill.md)
 - [x] `(feat)` [dynamic-dashboard-and-kb-engine](file://.along/ISSUES/done/feat--dynamic-dashboard-and-kb-engine.md)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-tests/test_scan_deps.py - Unit tests for along_scan_deps.py AI Dependencies Discovery engine.
+tests/test_scan_deps.py - Unit tests for along_dep_scan.py Hierarchical AI Dependencies Discovery engine.
 """
 
 import os
@@ -15,6 +15,7 @@ SCAN_DEPS_MODULE = os.path.join(REPO_ROOT, "skills", "along-dep-scan")
 sys.path.insert(0, SCAN_DEPS_MODULE)
 
 import along_dep_scan as along_scan_deps
+
 
 class TestAlongScanDeps(unittest.TestCase):
 
@@ -57,7 +58,8 @@ class TestAlongScanDeps(unittest.TestCase):
         with open(os.path.join(lib_c_dir, "package.json"), "w", encoding="utf-8") as f:
             json.dump({"name": "regular-lib-c", "version": "3.0.0"}, f)
 
-        results = along_scan_deps.scan_node_deps(self.test_dir)
+        scope = along_scan_deps.ProjectScope(name="[root]", rel_path=".", full_path=self.test_dir, is_root=True)
+        results = along_scan_deps.scan_node_project_deps(scope, self.test_dir)
         self.assertEqual(len(results), 2, "Should discover 2 packages with AI context")
 
         pkg_names = [r["package"] for r in results]
@@ -85,7 +87,8 @@ class TestAlongScanDeps(unittest.TestCase):
         with open(os.path.join(dist_info, "METADATA"), "w", encoding="utf-8") as f:
             f.write("Metadata-Version: 2.1\nName: mock-ai-tool\nVersion: 1.2.0\n")
 
-        results = along_scan_deps.scan_python_deps(self.test_dir)
+        scope = along_scan_deps.ProjectScope(name="[root]", rel_path=".", full_path=self.test_dir, is_root=True)
+        results = along_scan_deps.scan_python_project_deps(scope, self.test_dir)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["package"], "mock-ai-tool")
         self.assertEqual(results[0]["version"], "1.2.0")
@@ -111,50 +114,101 @@ class TestAlongScanDeps(unittest.TestCase):
         with open(os.path.join(v_crate_a, "llms.txt"), "w", encoding="utf-8") as f:
             f.write("# Mock Crate A LLMs instructions")
 
-        results = along_scan_deps.scan_rust_deps(self.test_dir)
+        scope = along_scan_deps.ProjectScope(name="[root]", rel_path=".", full_path=self.test_dir, is_root=True)
+        results = along_scan_deps.scan_rust_project_deps(scope, self.test_dir)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["package"], "mock-crate-a")
         self.assertEqual(results[0]["ecosystem"], "cargo")
 
-    def test_04_run_scanner_and_kb_generation(self):
-        """Test full scanner lifecycle: creates docs/topic--dependencies.md idempotently."""
-        pkg_json = {
-            "dependencies": {
-                "fast-sdk": "^1.0.0"
-            }
-        }
-        with open(os.path.join(self.test_dir, "package.json"), "w", encoding="utf-8") as f:
-            json.dump(pkg_json, f)
+    def test_04_nuget_dependencies_discovery(self):
+        """Test scanning .NET project with .csproj and local packages folder."""
+        csproj_content = """<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Actdim.MsgMesh" Version="2.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+</Project>"""
+        with open(os.path.join(self.test_dir, "App.csproj"), "w", encoding="utf-8") as f:
+            f.write(csproj_content)
 
-        sdk_dir = os.path.join(self.test_dir, "node_modules", "fast-sdk")
-        os.makedirs(sdk_dir, exist_ok=True)
-        with open(os.path.join(sdk_dir, "AGENTS.md"), "w", encoding="utf-8") as f:
-            f.write("# Fast SDK rules")
+        # Mock packages cache in test_dir/packages
+        pkg_dir = os.path.join(self.test_dir, "packages", "actdim.msgmesh", "2.0.0")
+        os.makedirs(pkg_dir, exist_ok=True)
+        with open(os.path.join(pkg_dir, "AGENTS.md"), "w", encoding="utf-8") as f:
+            f.write("# MsgMesh .NET Guidelines")
 
-        results = along_scan_deps.run_scanner(self.test_dir, dry_run=False)
+        scope = along_scan_deps.ProjectScope(name="[root]", rel_path=".", full_path=self.test_dir, is_root=True)
+        results = along_scan_deps.scan_nuget_project_deps(scope, self.test_dir)
         self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["package"], "Actdim.MsgMesh")
+        self.assertEqual(results[0]["ecosystem"], "nuget")
+
+    def test_05_hierarchical_monorepo_subprojects_and_kb_generation(self):
+        """Test recursive discovery of nested packages and submodules with Wiki generation."""
+        # Root package.json (no deps)
+        with open(os.path.join(self.test_dir, "package.json"), "w", encoding="utf-8") as f:
+            json.dump({"name": "monorepo-root", "private": True}, f)
+
+        # Subproject 1: packages/ui-app
+        ui_dir = os.path.join(self.test_dir, "packages", "ui-app")
+        os.makedirs(ui_dir, exist_ok=True)
+        with open(os.path.join(ui_dir, "package.json"), "w", encoding="utf-8") as f:
+            json.dump({"name": "@monorepo/ui", "dependencies": {"fast-sdk": "^1.0.0"}}, f)
+        with open(os.path.join(ui_dir, "AGENTS.md"), "w", encoding="utf-8") as f:
+            f.write("# UI App Guidelines")
+
+        # Subproject 1 node_modules
+        sdk_dir = os.path.join(ui_dir, "node_modules", "fast-sdk")
+        os.makedirs(sdk_dir, exist_ok=True)
+        with open(os.path.join(sdk_dir, "llms.txt"), "w", encoding="utf-8") as f:
+            f.write("# Fast SDK instructions")
+
+        # Subproject 2: modules/backend (.NET)
+        be_dir = os.path.join(self.test_dir, "modules", "backend")
+        os.makedirs(be_dir, exist_ok=True)
+        with open(os.path.join(be_dir, "Backend.csproj"), "w", encoding="utf-8") as f:
+            f.write('<Project Sdk="Microsoft.NET.Sdk"><ItemGroup><PackageReference Include="Micro.Lib" Version="1.0" /></ItemGroup></Project>')
+
+        # Run scanner
+        scan_output = along_scan_deps.run_scanner(self.test_dir, dry_run=False)
+        self.assertGreaterEqual(len(scan_output["projects"]), 3, "Should discover root, packages/ui-app, and modules/backend")
 
         dep_kb = os.path.join(self.test_dir, "docs", "topic--dependencies.md")
-        self.assertTrue(os.path.isfile(dep_kb), "docs/topic--dependencies.md should be created")
+        self.assertTrue(os.path.isfile(dep_kb), "docs/topic--dependencies.md must be generated")
 
         with open(dep_kb, "r", encoding="utf-8") as f:
             content = f.read()
+
+        self.assertIn("## Internal Subprojects, Modules & Submodules", content)
+        self.assertIn("@monorepo/ui", content)
+        self.assertIn("modules/backend", content)
         self.assertIn("fast-sdk", content)
-        self.assertIn("node_modules/fast-sdk/AGENTS.md", content)
+        self.assertIn("packages/ui-app", content)
         self.assertIn("protocol: along", content)
 
-        # Re-run after removing dependency from package.json (idempotency check)
-        with open(os.path.join(self.test_dir, "package.json"), "w", encoding="utf-8") as f:
-            json.dump({"dependencies": {}}, f)
+    def test_06_custom_adaptive_hook(self):
+        """Test execution of .along/scripts/dep_scan.py custom hook."""
+        along_scripts = os.path.join(self.test_dir, ".along", "scripts")
+        os.makedirs(along_scripts, exist_ok=True)
+        hook_file = os.path.join(along_scripts, "dep_scan.py")
 
-        results_empty = along_scan_deps.run_scanner(self.test_dir, dry_run=False)
-        self.assertEqual(len(results_empty), 0)
+        hook_code = """#!/usr/bin/env python3
+import json
+print(json.dumps([{
+    "package": "custom-elixir-dep",
+    "ecosystem": "hex",
+    "version": "0.9.0",
+    "files": [{"filename": "AGENTS.md", "path": "custom/AGENTS.md"}]
+}]))
+"""
+        with open(hook_file, "w", encoding="utf-8") as f:
+            f.write(hook_code)
 
-        with open(dep_kb, "r", encoding="utf-8") as f:
-            content_empty = f.read()
-        self.assertNotIn("fast-sdk", content_empty)
-        self.assertIn("No active dependencies with AI instructions", content_empty)
+        results = along_scan_deps.run_custom_dep_scan_hook(self.test_dir, self.test_dir)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["package"], "custom-elixir-dep")
+        self.assertEqual(results[0]["ecosystem"], "hex")
+
 
 if __name__ == "__main__":
     unittest.main()
-

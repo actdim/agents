@@ -166,6 +166,9 @@ function Install-OpenCode {
     if (Test-Path (Join-Path $src 'along-kb-search\along_kb_search.py')) {
         Copy-Item -Force (Join-Path $src 'along-kb-search\along_kb_search.py') (Join-Path $helper 'along_kb_search.py')
     }
+    if (Test-Path (Join-Path $src 'along-history-sync\along_history_sync.py')) {
+        Copy-Item -Force (Join-Path $src 'along-history-sync\along_history_sync.py') (Join-Path $helper 'along_history_sync.py')
+    }
 
     foreach ($d in Get-ChildItem -Directory $src) {
         $raw = (Get-Content -Raw -Encoding UTF8 (Join-Path $d.FullName 'SKILL.md')) -replace "`r`n", "`n"
