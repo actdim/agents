@@ -11,7 +11,7 @@ Idempotent LLM-Wiki Knowledge Base synchronization and compilation engine for `d
 1. **Cold-Start Bootstrapping**: If `docs/` is missing or empty, generates `docs/INDEX.md`, `docs/topic--architecture.md`, `docs/topic--domain-model.md`, `docs/topic--setup-and-workflow.md` grounded in codebase facts.
 2. **Ingestion & Archival**: Compiles unmanaged notes or specs into structured Wiki articles and safely moves raw source files into `.archive/`.
 3. **Link & Graph Linting**: Validates all relative links `[Title](./target.md)` and regenerates `docs/INDEX.md`.
-4. **LLM-Wiki Engine Integration**: Compatible with `nvk/llm-wiki` MCP server (`wiki_ingest`, `wiki_lint`).
+4. **LLM-Wiki Paradigm**: Native pure-Python implementation of the Andrej Karpathy LLM-Wiki methodology with zero external dependencies.
 
 ## Execution Strategy: Adaptive Ingestion & Parallel Research
 
