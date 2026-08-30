@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# along_kb_sync.py - Idempotent LLM-Wiki Knowledge Base synchronization and compilation engine.
+# along_kb_sync.py - Idempotent LLM-Wiki Knowledge Base synchronization, link linting, and index compiler.
 
 import os
 import re
@@ -9,10 +9,19 @@ import argparse
 from datetime import datetime
 
 STANDARD_ARTICLES = [
-    ("topic--architecture.md", "System Architecture and Protocol Layers", "architecture", ["architecture", "boundaries", "dataflow"]),
-    ("topic--domain-model.md", "Domain Model and Entity Ecosystem", "domain-model", ["domain", "entities", "schemas"]),
-    ("topic--setup-and-workflow.md", "Setup, Installation and Development Workflows", "setup-workflow", ["setup", "workflow", "commands"]),
+    ("topic--architecture.md", "System Architecture & Flow", "architecture", ["architecture", "boundaries", "providers", "mcp", "dashboard"]),
+    ("topic--domain-model.md", "Domain Model & Entity Ecosystem", "domain-model", ["domain-model", "entities", "schemas", "dag", "metadata"]),
+    ("topic--setup-and-workflow.md", "Setup, Installation & Agent Workflows", "setup-workflow", ["setup", "workflow", "installation", "lifecycle", "quality-gates"]),
 ]
+
+LEGACY_FILE_MAPPING = {
+    "01-architecture.md": "topic--architecture.md",
+    "02-domain-model.md": "topic--domain-model.md",
+    "03-setup-and-workflow.md": "topic--setup-and-workflow.md",
+    "04-frontend-frameworks.md": "topic--frontend-frameworks.md",
+    "dependencies.md": "topic--dependencies.md",
+    "MIGRATIONS.md": "topic--migrations.md",
+}
 
 def parse_frontmatter(content):
     match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n(.*)$", content, re.DOTALL)
@@ -41,12 +50,68 @@ def dump_frontmatter(fm, body):
         if k == "protocol":
             continue
         if isinstance(v, list):
-            items_str = ", ".join(f'"{x}"' if " " in str(x) else str(x) for x in v)
+            items_str = ", ".join(f'"{x}"' if " " in x else x for x in v)
             lines.append(f"{k}: [{items_str}]")
         else:
             lines.append(f"{k}: {v}")
     lines.append("---")
-    return "\n".join(lines) + "\n\n" + body.lstrip()
+    return "\n".join(lines) + "\n\n" + body.strip() + "\n"
+
+def ensure_archive_structure(repo_root, dry_run=False):
+    archive_dir = os.path.join(repo_root, ".archive")
+    if not dry_run:
+        os.makedirs(archive_dir, exist_ok=True)
+        gitkeep = os.path.join(archive_dir, ".gitkeep")
+        if not os.path.exists(gitkeep):
+            with open(gitkeep, "w", encoding="utf-8") as f:
+                f.write("")
+        readme = os.path.join(archive_dir, "README.md")
+        if not os.path.exists(readme):
+            with open(readme, "w", encoding="utf-8") as f:
+                f.write("# Archived Raw Sources (.archive/)\n\nThis directory holds processed raw notes, external documentation dumps, drafts, and unstructured source files that have been synthesized into structured Knowledge Base articles in `docs/`.\n")
+    return archive_dir
+
+def normalize_and_archive_sources(repo_root, docs_dir, archive_dir, dry_run=False):
+    normalized = 0
+    archived = 0
+
+    # 1. Normalize legacy files in docs/
+    if os.path.exists(docs_dir):
+        for item in list(os.listdir(docs_dir)):
+            if item == "INDEX.md" or not item.endswith(".md"):
+                continue
+            target_name = LEGACY_FILE_MAPPING.get(item, item)
+            if not target_name.startswith("topic--") and target_name != "INDEX.md":
+                target_name = f"topic--{target_name}"
+            if target_name != item:
+                src_p = os.path.join(docs_dir, item)
+                dst_p = os.path.join(docs_dir, target_name)
+                if not dry_run:
+                    with open(src_p, "r", encoding="utf-8", errors="replace") as fp:
+                        content = fp.read()
+                    slug = target_name.replace(".md", "")
+                    content = re.sub(r"^slug:\s*[^\n]+", f"slug: {slug}", content, flags=re.MULTILINE)
+                    with open(dst_p, "w", encoding="utf-8") as fp:
+                        fp.write(content)
+                    os.remove(src_p)
+                print(f"   Normalized legacy doc: docs/{item} -> docs/{target_name}")
+                normalized += 1
+
+    # 2. Archive raw unmanaged source folders
+    raw_dirs = [os.path.join(repo_root, "docs_raw"), os.path.join(docs_dir, "raw")]
+    for rdir in raw_dirs:
+        if os.path.exists(rdir):
+            for item in os.listdir(rdir):
+                s = os.path.join(rdir, item)
+                d = os.path.join(archive_dir, item)
+                if not dry_run:
+                    shutil.move(s, d)
+                archived += 1
+            if not dry_run:
+                shutil.rmtree(rdir, ignore_errors=True)
+            print(f"   Archived raw directory: {rdir} -> .archive/")
+
+    return normalized, archived
 
 def bootstrap_docs_if_empty(docs_dir, repo_root, dry_run=False):
     today = datetime.now().strftime("%Y-%m-%d")
@@ -79,10 +144,12 @@ def bootstrap_docs_if_empty(docs_dir, repo_root, dry_run=False):
 def sync_kb(repo_root, check_only=False):
     repo_root = os.path.abspath(repo_root)
     docs_dir = os.path.join(repo_root, "docs")
-    archive_dir = os.path.join(repo_root, ".archive")
     today = datetime.now().strftime("%Y-%m-%d")
 
     print(f"-> Synchronizing Knowledge Base in {docs_dir}...")
+    archive_dir = ensure_archive_structure(repo_root, dry_run=check_only)
+    normalize_and_archive_sources(repo_root, docs_dir, archive_dir, dry_run=check_only)
+
     if not os.path.exists(docs_dir) or not os.listdir(docs_dir):
         print("   docs/ is missing or empty. Bootstrapping standard articles...")
         bootstrapped = bootstrap_docs_if_empty(docs_dir, repo_root, dry_run=check_only)
@@ -125,7 +192,7 @@ def sync_kb(repo_root, check_only=False):
                 fm["created"] = today
                 needs_update = True
             if not fm.get("tags"):
-                fm["tags"] = [slug]
+                fm["tags"] = [slug.replace("topic--", "")]
                 needs_update = True
 
             if needs_update and not check_only:
@@ -179,30 +246,30 @@ def sync_kb(repo_root, check_only=False):
     index_body_lines.append("- [AGENTS.md](file://AGENTS.md): Active protocol conventions and rules.")
     index_body_lines.append("- [.along/DECISIONS.md](file://.along/DECISIONS.md): Architectural Decision Records.")
     index_body_lines.append("- [.along/ISSUES.md](file://.along/ISSUES.md): Active issue tracking board.")
-    index_body_lines.append("- [.along/CONTEXT.md](file://.along/CONTEXT.md): Current session snapshot.\n")
-
-    index_content = dump_frontmatter(index_fm, "\n".join(index_body_lines))
+    index_body_lines.append("- [.along/CONTEXT.md](file://.along/CONTEXT.md): Current session snapshot.")
 
     if not check_only:
-        with open(index_path, "w", encoding="utf-8") as f:
-            f.write(index_content)
+        full_index = dump_frontmatter(index_fm, "\n".join(index_body_lines))
+        with open(index_path, "w", encoding="utf-8") as fp:
+            fp.write(full_index)
         print(f"   -> Rebuilt docs/INDEX.md ({len(articles)} articles indexed).")
 
     if broken_links:
         print(f"   [WARN] Detected {len(broken_links)} dangling or unverified Markdown link(s):")
-        for source_file, target in broken_links:
-            print(f"      - In {source_file}: target '{target}' not found.")
+        for src, target in broken_links:
+            print(f"      - In {src}: target '{target}' not found.")
     else:
         print("   [OK] All internal Markdown links verified.")
 
-    print(f"-> Knowledge Base sync complete. Total active articles: {len(articles) + 1}")
-    return len(articles)
+    print(f"-> Knowledge Base sync complete. Total active articles: {len(articles) + (1 if os.path.exists(index_path) else 0)}\n")
+    return len(articles), len(broken_links)
 
 def main():
-    parser = argparse.ArgumentParser(description="Along Knowledge Base Sync and Compiler")
-    parser.add_argument("repo_root", nargs="?", default=".", help="Target repository root")
-    parser.add_argument("--check", action="store_true", help="Check and lint without writing changes")
+    parser = argparse.ArgumentParser(description="Along Knowledge Base Compiler & Linter")
+    parser.add_argument("repo_root", nargs="?", default=".", help="Target repository root directory")
+    parser.add_argument("--check", action="store_true", help="Check links and structure without modifying files")
     args = parser.parse_args()
+
     sync_kb(args.repo_root, check_only=args.check)
 
 if __name__ == "__main__":

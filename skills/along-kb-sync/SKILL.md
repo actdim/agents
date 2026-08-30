@@ -8,7 +8,7 @@ description: Synchronize, compile, and reconcile the Knowledge Base in docs/ usi
 Idempotent LLM-Wiki Knowledge Base synchronization and compilation engine for `docs/`.
 
 ## Capabilities
-1. **Cold-Start Bootstrapping**: If `docs/` is missing or empty, generates `docs/INDEX.md`, `docs/01-architecture.md`, `docs/02-domain-model.md`, `docs/03-setup-and-workflow.md` grounded in codebase facts.
+1. **Cold-Start Bootstrapping**: If `docs/` is missing or empty, generates `docs/INDEX.md`, `docs/topic--architecture.md`, `docs/topic--domain-model.md`, `docs/topic--setup-and-workflow.md` grounded in codebase facts.
 2. **Ingestion & Archival**: Compiles unmanaged notes or specs into structured Wiki articles and safely moves raw source files into `.archive/`.
 3. **Link & Graph Linting**: Validates all relative links `[Title](./target.md)` and regenerates `docs/INDEX.md`.
 4. **LLM-Wiki Engine Integration**: Compatible with `nvk/llm-wiki` MCP server (`wiki_ingest`, `wiki_lint`).

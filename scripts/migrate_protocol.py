@@ -141,17 +141,17 @@ def step_migrate_v1_3_kb_scaffolding(repo_root, working_dir):
     standard_kb_articles = {
         "INDEX.md": ("INDEX", "Knowledge Base Index", "index", [
             "# Knowledge Base Index\n\nCentral topic map for project documentation.\n\n"
-            "- [[01-architecture]]: System architecture and data flows.\n"
-            "- [[02-domain-model]]: Core domain entities and business rules.\n"
-            "- [[03-setup-and-workflow]]: Build, run, test, and contribution workflows.\n"
+            "- [[topic--architecture]]: System architecture and data flows.\n"
+            "- [[topic--domain-model]]: Core domain entities and business rules.\n"
+            "- [[topic--setup-and-workflow]]: Build, run, test, and contribution workflows.\n"
         ]),
-        "topic--architecture.md": ("01-architecture", "System Architecture & Flow", "architecture", [
+        "topic--architecture.md": ("topic--architecture", "System Architecture & Flow", "architecture", [
             "# System Architecture & Flow\n\nHigh-level architectural components, module boundaries, and execution models.\n"
         ]),
-        "topic--domain-model.md": ("02-domain-model", "Domain Model & Entities", "domain-model", [
+        "topic--domain-model.md": ("topic--domain-model", "Domain Model & Entities", "domain-model", [
             "# Domain Model & Entities\n\nCore domain terminology, data models, and schema relationships.\n"
         ]),
-        "topic--setup-and-workflow.md": ("03-setup-and-workflow", "Setup & Developer Workflow", "setup-workflow", [
+        "topic--setup-and-workflow.md": ("topic--setup-and-workflow", "Setup & Developer Workflow", "setup-workflow", [
             "# Setup & Developer Workflow\n\nBuild instructions, test suites, local development, and skill deployment guidelines.\n"
         ]),
     }
@@ -644,6 +644,7 @@ def validate_and_build_entity_graph(along_dir):
 # ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # Step 7: v2.0 -> v2.1 (Knowledge Base -> docs/ & .archive/)
 # ----------------------------------------------------------------------
 def step_migrate_v2_1_docs_wiki_and_archive(repo_root, interactive=True):
@@ -654,38 +655,102 @@ def step_migrate_v2_1_docs_wiki_and_archive(repo_root, interactive=True):
     today = datetime.now().strftime("%Y-%m-%d")
 
     os.makedirs(docs_dir, exist_ok=True)
+    os.makedirs(archive_dir, exist_ok=True)
+
+    # 1. Scaffolding .archive/
+    gitkeep = os.path.join(archive_dir, ".gitkeep")
+    if not os.path.exists(gitkeep):
+        with open(gitkeep, "w", encoding="utf-8") as f:
+            f.write("")
+    arch_readme = os.path.join(archive_dir, "README.md")
+    if not os.path.exists(arch_readme):
+        with open(arch_readme, "w", encoding="utf-8") as f:
+            f.write("# Archived Raw Sources (.archive/)\n\nThis directory holds processed raw notes, drafts, and unstructured source files that have been synthesized into structured Knowledge Base articles in docs/.\n")
+
+    # 2. Legacy filename mapping
+    legacy_file_mapping = {
+        "01-architecture.md": "topic--architecture.md",
+        "02-domain-model.md": "topic--domain-model.md",
+        "03-setup-and-workflow.md": "topic--setup-and-workflow.md",
+        "04-frontend-frameworks.md": "topic--frontend-frameworks.md",
+        "dependencies.md": "topic--dependencies.md",
+        "MIGRATIONS.md": "topic--migrations.md",
+    }
+
     migrated_count = 0
+
+    # 3. Move and rename from legacy .along/KB/ and .agents/KB/
     for kb_src in [along_kb_dir, agents_kb_dir]:
         if os.path.exists(kb_src):
             for item in os.listdir(kb_src):
                 s = os.path.join(kb_src, item)
-                d = os.path.join(docs_dir, item)
-                if os.path.isfile(s):
-                    shutil.copy2(s, d)
-                    migrated_count += 1
+                if not os.path.isfile(s):
+                    continue
+                target_name = legacy_file_mapping.get(item, item)
+                if not target_name.startswith("topic--") and target_name != "INDEX.md":
+                    target_name = f"topic--{target_name}"
+                d = os.path.join(docs_dir, target_name)
+                with open(s, "r", encoding="utf-8", errors="replace") as fp:
+                    content = fp.read()
+                slug = target_name.replace(".md", "")
+                content = re.sub(r"^slug:\s*[^\n]+", f"slug: {slug}", content, flags=re.MULTILINE)
+                with open(d, "w", encoding="utf-8") as fp:
+                    fp.write(content)
+                migrated_count += 1
             shutil.rmtree(kb_src, ignore_errors=True)
 
-    if migrated_count > 0:
-        print(f"   Migrated {migrated_count} Knowledge Base articles from .along/KB/ to docs/.")
+    # 4. Standardize existing files in docs/
+    for item in list(os.listdir(docs_dir)):
+        if item == "INDEX.md" or not item.endswith(".md"):
+            continue
+        target_name = legacy_file_mapping.get(item, item)
+        if not target_name.startswith("topic--"):
+            target_name = f"topic--{target_name}"
+        if target_name != item:
+            s = os.path.join(docs_dir, item)
+            d = os.path.join(docs_dir, target_name)
+            with open(s, "r", encoding="utf-8", errors="replace") as fp:
+                content = fp.read()
+            slug = target_name.replace(".md", "")
+            content = re.sub(r"^slug:\s*[^\n]+", f"slug: {slug}", content, flags=re.MULTILINE)
+            with open(d, "w", encoding="utf-8") as fp:
+                fp.write(content)
+            os.remove(s)
+            migrated_count += 1
 
-    # Interactive prompt for LLM-Wiki compilation
-    should_compile = True
-    if interactive and sys.stdin.isatty():
+    # 5. Archive raw sources
+    raw_dirs = [os.path.join(repo_root, "docs_raw"), os.path.join(docs_dir, "raw")]
+    archived_count = 0
+    for rdir in raw_dirs:
+        if os.path.exists(rdir):
+            for item in os.listdir(rdir):
+                s = os.path.join(rdir, item)
+                d = os.path.join(archive_dir, item)
+                shutil.move(s, d)
+                archived_count += 1
+            shutil.rmtree(rdir, ignore_errors=True)
+    if archived_count > 0:
+        print(f"   Archived {archived_count} raw source file(s) into .archive/.")
+
+    # 6. Rebuild docs/INDEX.md
+    articles = []
+    for f in sorted(os.listdir(docs_dir)):
+        if not f.endswith(".md") or f == "INDEX.md":
+            continue
+        title = f.replace("topic--", "").replace(".md", "").replace("-", " ").title()
         try:
-            ans = input("   [Along Migration] Compile LLM-Wiki in docs/ and archive raw sources to .archive/? [Y/n]: ").strip().lower()
-            if ans in ["n", "no"]:
-                should_compile = False
+            with open(os.path.join(docs_dir, f), "r", encoding="utf-8", errors="replace") as fp:
+                raw_c = fp.read()
+            m = re.search(r"^title:\s*[\"']?(.*?)[\"']?$", raw_c, re.MULTILINE)
+            if m:
+                title = m.group(1).strip()
         except Exception:
-            should_compile = True
+            pass
+        articles.append((f, title))
 
-    if should_compile:
-        try:
-            # Sync docs and rebuild INDEX.md
-            articles = [f for f in sorted(os.listdir(docs_dir)) if f.endswith(".md") and f != "INDEX.md"]
-            index_path = os.path.join(docs_dir, "INDEX.md")
-            if not os.path.exists(index_path) and articles:
-                with open(index_path, "w", encoding="utf-8") as f:
-                    f.write(f"""---
+    index_path = os.path.join(docs_dir, "INDEX.md")
+    with open(index_path, "w", encoding="utf-8") as f:
+        f.write(f'''---
 protocol: along
 slug: INDEX
 title: Knowledge Base Topic Index
@@ -700,12 +765,19 @@ tags: [index, kb, topics, map]
 Central entry point and cross-linked topic catalog for project documentation:
 
 ## Articles
-""")
-                    for a in articles:
-                        f.write(f"- **[{a}](./{a})**\n")
-            print(f"   Reconciled {len(articles)} articles in docs/.")
-        except Exception as e:
-            print(f"   [WARN] KB sync check: {e}")
+''')
+        for a_file, a_title in articles:
+            f.write(f"- **[{a_title}](./{a_file})**\n")
+        f.write('''\n---\n\n## Related Context\n
+- [AGENTS.md](file://AGENTS.md): Active protocol conventions and rules.
+- [.along/DECISIONS.md](file://.along/DECISIONS.md): Architectural Decision Records.
+- [.along/ISSUES.md](file://.along/ISSUES.md): Active issue tracking board.
+- [.along/CONTEXT.md](file://.along/CONTEXT.md): Current session snapshot.
+''')
+
+    if migrated_count > 0:
+        print(f"   Standardized & migrated {migrated_count} Knowledge Base articles to docs/topic--*.md.")
+    print(f"   Reconciled {len(articles)} articles in docs/.")
 
 # Main Migration Controller
 # ----------------------------------------------------------------------

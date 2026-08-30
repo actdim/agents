@@ -13,7 +13,7 @@ Inspect, visualize, and analyze repository status across all `.along/` entities 
 
 1. The user asks for a dashboard, status report, project analytics, or DAG dependency graph (e.g., "покажи дашборд", "запусти дашборд", "generate repo report", `/along-dash`).
 2. Reviewing milestone progress, active blockers, risk mitigation status, and completed accomplishments.
-3. Searching the structured Knowledge Base (`.along/KB/`, `docs/`, `DECISIONS.md`) interactively.
+3. Searching the structured Knowledge Base (`docs/`, `DECISIONS.md`) interactively.
 
 ---
 

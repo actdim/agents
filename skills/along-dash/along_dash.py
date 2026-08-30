@@ -628,7 +628,7 @@ def generate_markdown_report(collector: AgentEntityCollector, output_path: Path)
     lines.append(f"| **Active Risks** | `{m['active_risks_count']}` active | `{m['critical_risks_count']}` critical/high |")
     lines.append(f"| **Milestones Tracked** | `{m['total_milestones']}` | Stage releases |")
     lines.append(f"| **Session Logs / ADRs** | `{m['total_sessions']}` sessions / `{m['total_decisions']}` ADRs | Architectural record |")
-    lines.append(f"| **Knowledge Base** | `{m['total_kb_articles']}` articles | `.along/KB/` documentation |")
+    lines.append(f"| **Knowledge Base** | `{m['total_kb_articles']}` articles | `docs/` documentation |")
     lines.append(f"| **Context Footprint** | `{m['context_lines']}` lines | `.along/CONTEXT.md` |")
     lines.append("")
 

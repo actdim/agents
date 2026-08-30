@@ -1,6 +1,6 @@
 ---
 protocol: along
-slug: 01-architecture
+slug: topic--architecture
 title: System Architecture & Flow
 type: architecture
 created: 2026-08-30

@@ -1,6 +1,6 @@
 ---
 protocol: along
-slug: 02-domain-model
+slug: topic--domain-model
 title: Domain Model & Entities
 type: domain-model
 created: 2026-08-30

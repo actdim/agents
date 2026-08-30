@@ -6,7 +6,7 @@ Modular language-specific and platform-specific engineering standards for `Along
 
 ## Overview
 
-Rule packs provide strict, pragmatic engineering standards for both programming languages and software application archetypes. When running `/along-init` in a repository, the agent inspects project descriptors (`package.json`, `pyproject.toml`, `*.csproj`, `tauri.conf.json`, `pnpm-workspace.yaml`, `Directory.Packages.props`, etc.) and attaches matching guidelines to `## Project specifics` in `AGENTS.md` and `.along/KB/03-setup-and-workflow.md`.
+Rule packs provide strict, pragmatic engineering standards for both programming languages and software application archetypes. When running `/along-init` in a repository, the agent inspects project descriptors (`package.json`, `pyproject.toml`, `*.csproj`, `tauri.conf.json`, `pnpm-workspace.yaml`, `Directory.Packages.props`, etc.) and attaches matching guidelines to `## Project specifics` in `AGENTS.md` and `docs/topic--setup-and-workflow.md`.
 
 ---
 
@@ -59,4 +59,4 @@ When `/along-init` scaffolds or refreshes a project:
    - The agent inspects project descriptors and adds matching rules to `AGENTS.md`.
 2. **Manual Reference**:
    - Reference in `AGENTS.md`: `See rules/platforms/monorepo.md, rules/platforms/web.md and rules/languages/typescript.md for engineering guidelines.`
-   - Or include as Knowledge Base articles in `.along/KB/`.
+   - Or include as Knowledge Base articles in `docs/`.

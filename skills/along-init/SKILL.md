@@ -31,7 +31,7 @@ Create the directory structure if missing:
 - `.along/CONTEXT.md`: Short current snapshot (< 20 lines).
 - `.along/ISSUES.md` + `.along/ISSUES/` + `.along/ISSUES/done/`: Issue tracking board and typed issue files (`protocol: along`).
 - `.along/DECISIONS.md`: Append-only ADR log.
-- `.along/KB/`: Knowledge base articles (`INDEX.md`, `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md`).
+- `docs/`: Knowledge base articles (`INDEX.md`, `topic--architecture.md`, `topic--domain-model.md`, `topic--setup-and-workflow.md`).
 - `.along/MILESTONES/`: Milestone tracking files.
 - `.along/RISKS/`: Risk & blocker registry.
 - `.along/SPIKES/`: R&D experiment logs.

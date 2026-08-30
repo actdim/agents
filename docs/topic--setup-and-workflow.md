@@ -1,6 +1,6 @@
 ---
 protocol: along
-slug: 03-setup-and-workflow
+slug: topic--setup-and-workflow
 title: Setup & Developer Workflow
 type: setup-workflow
 created: 2026-08-30
