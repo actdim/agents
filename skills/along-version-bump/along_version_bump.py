@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-along_bump_version.py - Universal Project Version Bumper & Release Pipeline for Along.
+along_version_bump.py - Universal Project Version Bumper & Release Pipeline for Along.
 
 Supports:
 - Execution of project-specific `.along/scripts/bump_version.py` (if present)
@@ -395,7 +395,7 @@ def main():
     bump_arg = sys.argv[1] if len(sys.argv) > 1 else "patch"
     
     if bump_arg in ["-h", "--help"]:
-        print("Usage: python along_bump_version.py [patch|minor|major|<version>] [-c|--commit] [-p|--push]")
+        print("Usage: python along_version_bump.py [patch|minor|major|<version>] [-c|--commit] [-p|--push]")
         sys.exit(0)
 
     flags = [a for a in sys.argv[1:] if a.startswith("-")]

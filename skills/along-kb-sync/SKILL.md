@@ -1,9 +1,9 @@
 ---
 name: along-kb-sync
-description: Synchronize, compile, and reconcile the Knowledge Base in docs/ using LLM-Wiki pipeline. Ingests README facts and raw sources, moves originals to .archive/, validates Markdown links, and rebuilds docs/INDEX.md. Use when invoking /along-kb-sync (aliases: /kb-sync, /along-sync-kb, /along-init-kb).
+description: Synchronize, compile, and reconcile the Knowledge Base in docs/ using LLM-Wiki pipeline. Ingests README facts and raw sources, moves originals to .archive/, validates Markdown links, and rebuilds docs/INDEX.md. Use when invoking /along-kb-sync.
 ---
 
-# Along KB Sync (`/along-kb-sync`, `/kb-sync`) [v2.1.1]
+# Along KB Sync  [v2.1.1]
 
 Idempotent LLM-Wiki Knowledge Base synchronization, compilation, and link-linting engine for `docs/`.
 
@@ -37,4 +37,4 @@ When executing `/along-kb-sync`:
 python skills/along-kb-sync/along_kb_sync.py [REPO_ROOT] [--check]
 ```
 
-- Command: `/along-kb-sync` (aliases: `/kb-sync`, `/along-sync-kb`, `/along-init-kb`)
+- Command: `/along-kb-sync`

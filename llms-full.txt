@@ -54,7 +54,7 @@ Along is a provider-agnostic agent-context and memory protocol (`ALONG-PROTOCOL 
 | `along-kb-sync` | `/along-kb-sync` | `python skills/along-kb-sync/along_kb_sync.py` | Idempotent LLM-Wiki Knowledge Base compiler. |
 | `along-kb-search` | `/along-kb-search` | `python skills/along-kb-search/along_kb_search.py` | Fast targeted structured retrieval across docs. |
 | `along-dep-scan` | `/along-dep-scan` | `python skills/along-dep-scan/along_dep_scan.py` | Discovers AI guidelines in declared dependencies. |
-| `along-version-bump` | `/along-version-bump` | `python scripts/along_bump_version.py patch -c` | Increments version across manifests and files. |
+| `along-version-bump` | `/along-version-bump` | `python scripts/along_version_bump.py patch -c` | Increments version across manifests and files. |
 | `along-commit` | `/along-commit` | `python skills/along-commit/along_commit.py` | ASCII sanitizer, pre-commit test gate, and conventional committer. |
 | `along-wrap` | `/along-wrap` | `along-wrap` | Unified session wrap: verification, session log, context, issues reconciliation. |
 | `along-graph-check` | `/along-graph-check` | `along-graph-check` | Inspects code-review-graph status, blast radius, and architecture flows. |

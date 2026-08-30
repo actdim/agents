@@ -5,62 +5,56 @@ title: Skills & Slash Commands Technical Reference
 type: topic
 created: 2026-08-30
 updated: 2026-08-30
-tags: [skills, commands, reference, aliases, runners]
+tags: [skills, commands, reference, runners, lifecycle]
 ---
 
 # Skills & Slash Commands Technical Reference
 
-Along ships with **17 Singular Domain-First skills** (`along-<entity>-<action>`), providing automated lifecycle management across Claude Code, Codex, OpenCode, and Antigravity.
+Along provides a complete suite of **17 singular automation skills** operating across Claude Code, OpenAI Codex, OpenCode, and Google Antigravity.
 
 ---
 
-## Skills Catalog
+## 1. Complete Skills & Slash Commands Catalog
 
-| Skill Name | Primary Command | Short Alias | Execution Runner | Purpose |
-| :--- | :--- | :--- | :--- | :--- |
-| `along-init` | `/along-init` | `/init` | `along-init` | Scaffold or refresh `AGENTS.md` and `.along/` in any folder. |
-| `along-update` | `/along-update` | `/update` | `python scripts/along_update.py` | Sync local repo and global skills with latest upstream GitHub release. |
-| `along-dash` | `/along-dash` | `/dash` | `python scripts/along_dash.py -w` | Launch dynamic FastAPI executive dashboard and Cytoscape DAG UI. |
-| `along-wrap` | `/along-wrap` | `/wrap` | `along-wrap` | Unified session finalization: verification, session log, context, history. |
-| `along-commit` | `/along-commit` | `/commit` | `python skills/along-commit/along_commit.py` | Clean ASCII check, pre-commit test gate, and issue-linked commit. |
-| `along-build` | `/along-build` | `/build` | `.along/scripts/build.py` / auto | Project build lifecycle hook via auto-detected build runner. |
-| `along-test` | `/along-test` | `/test` | `.along/scripts/test.py` / auto | Automated unit tests with quiet flags. |
-| `along-dev` | `/along-dev` | `/dev` | `.along/scripts/dev.py` / auto | Development and debugging server runner. |
-| `along-kb-sync` | `/along-kb-sync` | `/kb-sync` | `python skills/along-kb-sync/along_kb_sync.py` | Idempotent LLM-Wiki Knowledge Base compiler in `docs/`. |
-| `along-kb-search` | `/along-kb-search` | `/kb-search` | `python skills/along-kb-search/along_kb_search.py` | Fast targeted structured retrieval across `docs/` and project documentation. |
-| `along-issue-sync` | `/along-issue-sync` | `/issue-sync` | `along-issue-sync` | Reconcile nearest `.along/ISSUES.md` and per-issue files. |
-| `along-context-sync` | `/along-context-sync` | `/context-sync` | `along-context-sync` | Refresh nearest `.along/CONTEXT.md` snapshot (< 20 lines). |
-| `along-decision-sync` | `/along-decision-sync` | `/decision-sync` | `along-decision-sync` | Append ADR entries to nearest `.along/DECISIONS.md`. |
-| `along-history-sync` | `/along-history-sync` | `/history-sync` | `along-history-sync` | Reconstruct `.along/` history, milestones, and sessions from Git. |
-| `along-graph-check` | `/along-graph-check` | `/graph-check` | `along-graph-check` | Inspect `code-review-graph` MCP status, blast radius, and ignore filters. |
-| `along-dep-scan` | `/along-dep-scan` | `/dep-scan` | `python skills/along-dep-scan/along_dep_scan.py` | Scan dependencies for AI instructions and register in `docs/topic--dependencies.md`. |
-| `along-version-bump` | `/along-version-bump` | `/version-bump` | `python scripts/along_bump_version.py` | Multi-stack version bump with pre-commit test gate and release commit. |
+| Skill Name | Canonical Command | Invocation Script | Purpose |
+| :--- | :--- | :--- | :--- |
+| `along-init` | `/along-init` | `python skills/along-init/along_init.py` | Scaffold or refresh `AGENTS.md` and `.along/` in a directory. |
+| `along-update` | `/along-update` | `python skills/along-update/along_update.py` | One-liner update of repository context and global skills from GitHub. |
+| `along-dash` | `/along-dash` | `python scripts/along_dash.py -w` | Launch dynamic FastAPI executive dashboard and Cytoscape DAG UI. |
+| `along-wrap` | `/along-wrap` | `along-wrap` | Unified session finalization: verification, session log, context, issues, history. |
+| `along-commit` | `/along-commit` | `along-commit -i <slug>` | ASCII cleanliness check and Conventional Commit linked to active issue. |
+| `along-build` | `/along-build` | `python skills/along-build/along_build.py` | Universal build lifecycle runner (.along/scripts/build.py, npm, cargo, dotnet). |
+| `along-test` | `/along-test` | `python skills/along-test/along_test.py` | Automated test suite runner with quiet flags (pytest, npm, cargo, dotnet). |
+| `along-dev` | `/along-dev` | `python skills/along-dev/along_dev.py` | Local development and debugging server runner. |
+| `along-kb-sync` | `/along-kb-sync` | `python skills/along-kb-sync/along_kb_sync.py` | Idempotent LLM-Wiki Knowledge Base compiler in `docs/`. |
+| `along-kb-search` | `/along-kb-search` | `python skills/along-kb-search/along_kb_search.py` | Fast unified search across `docs/` and `.along/` project memory. |
+| `along-issue-sync` | `/along-issue-sync` | `python skills/along-issue-sync/along_issue_sync.py` | Reconcile active issue board and `<type>--<slug>.md` entity files. |
+| `along-context-sync` | `/along-context-sync` | `python skills/along-context-sync/along_context_sync.py` | Refresh and compact the nearest `.along/CONTEXT.md` (<20 lines). |
+| `along-decision-sync` | `/along-decision-sync` | `python skills/along-decision-sync/along_decision_sync.py` | Append numbered ADR entries in `.along/DECISIONS.md`. |
+| `along-history-sync` | `/along-history-sync` | `python skills/along-history-sync/along_history_sync.py` | Reconstruct `.along/` entities and milestones from Git commit history. |
+| `along-graph-check` | `/along-graph-check` | `python skills/along-graph-check/along_graph_check.py` | Evaluate `code-review-graph` AST impact radius and blast radius. |
+| `along-dep-scan` | `/along-dep-scan` | `python skills/along-dep-scan/along_dep_scan.py` | Scan declared dependencies for AI instructions into `docs/topic--dependencies.md`. |
+| `along-version-bump` | `/along-version-bump` | `python scripts/along_version_bump.py` | Multi-stack version bump with pre-commit test gate and release commit. |
 
 ---
 
-## Skill Details & Usage
+## 2. Adaptive Ingestion in `along-kb-sync`
 
-### 1. `along-kb-sync` (`/along-kb-sync`, `/kb-sync`)
-Bootstraps standard articles if `docs/` is empty, verifies YAML front-matter, validates relative Markdown links `[topic--architecture.md](./topic--architecture.md)`, and regenerates `docs/INDEX.md`.
+`along-kb-sync` operates adaptively without needing multiple fragmented skills:
+- **Direct Mode**: For incremental updates (1-3 files), the agent compiles articles and runs `along_kb_sync.py` directly.
+- **Parallel Mode**: When handling massive external documentation dumps or multi-package monorepos, the agent decomposes extraction into discrete domain vectors, spawns parallel research subagents, and reconciles all generated articles into `docs/` with automated link linting.
 
-- **Adaptive Ingestion**:
-  - Direct synthesis for small updates.
-  - Parallel research subagents for large/multi-package source collections.
+---
 
-```bash
-python skills/along-kb-sync/along_kb_sync.py [REPO_ROOT] [--check]
-```
-
-### 2. `along-kb-search` (`/along-kb-search`, `/kb-search`)
-Performs token-efficient snippet search across `docs/`, scoring matches in titles, tags, and body text.
+## 3. Version Bump & Release Commands (`along-version-bump`)
 
 ```bash
-python skills/along-kb-search/along_kb_search.py "<query>" [--limit 5] [--tag <tag>]
-```
+# Bump patch version with automated test execution and git commit
+python scripts/along_version_bump.py patch -c
 
-### 3. `along-version-bump` (`/along-version-bump`, `/version-bump`)
-Universal version incrementer supporting Node (`package.json`), Python (`pyproject.toml`), Rust (`Cargo.toml`), .NET, or custom `.along/scripts/bump_version.py`.
+# Bump minor version with commit and push
+python scripts/along_version_bump.py minor -c -p
 
-```bash
-python scripts/along_bump_version.py patch -c -p
+# Bump to explicit target version
+python scripts/along_version_bump.py 2.2.0 -cp
 ```

@@ -1,9 +1,9 @@
 ---
 name: along-kb-search
-description: Fast unified retrieval engine across Knowledge Base (docs/) and living project memory (.along/ISSUES, DECISIONS.md, MILESTONES, RISKS, SESSIONS). Minimizes agent context tokens during research, blast radius analysis, and decision-making. Use when invoking /along-kb-search (aliases: /kb-search, /along-search-kb).
+description: Fast unified retrieval engine across Knowledge Base (docs/) and living project memory (.along/ISSUES, DECISIONS.md, MILESTONES, RISKS, SESSIONS). Minimizes agent context tokens during research, blast radius analysis, and decision-making. Use when invoking /along-kb-search.
 ---
 
-# Along KB Search (`/along-kb-search`, `/kb-search`) [v2.1.1]
+# Along KB Search  [v2.1.1]
 
 Unified Multi-Scope Knowledge & Memory Retrieval Engine for AI coding agents and developers.
 
@@ -24,4 +24,4 @@ Instead of reading thousands of tokens of project files into prompt context duri
 python skills/along-kb-search/along_kb_search.py "<query>" [--category all|kb|issue|decision|milestone|risk|spike|session] [--limit 8] [--tag <tag>]
 ```
 
-- Command: `/along-kb-search` (aliases: `/kb-search`, `/along-search-kb`)
+- Command: `/along-kb-search`

@@ -264,27 +264,28 @@ def search_knowledge_base(query, repo_root=".", limit=5, category=None, filter_t
         # Category boost for active items
         if e.get("status") in ["open", "in-progress", "active"]:
             score += 2.0
-            snippet = ""
-            if query_terms:
-                pos = body_lower.find(query_terms[0])
-                if pos != -1:
-                    start = max(0, pos - 80)
-                    end = min(len(e["body"]), pos + 150)
-                    snippet = e["body"][start:end].replace("\n", " ").strip()
-            if not snippet:
-                snippet = e["body"][:180].replace("\n", " ").strip()
 
-            results.append({
-                "category": e["category"],
-                "category_label": e["category_label"],
-                "title": e["title"],
-                "slug": e["slug"],
-                "status": e.get("status", "active"),
-                "file_path": e["file_path"],
-                "tags": e["tags"],
-                "score": score,
-                "snippet": snippet
-            })
+        snippet = ""
+        if query_terms:
+            pos = body_lower.find(query_terms[0])
+            if pos != -1:
+                start = max(0, pos - 80)
+                end = min(len(e["body"]), pos + 150)
+                snippet = e["body"][start:end].replace("\n", " ").strip()
+        if not snippet:
+            snippet = e["body"][:180].replace("\n", " ").strip()
+
+        results.append({
+            "category": e["category"],
+            "category_label": e["category_label"],
+            "title": e["title"],
+            "slug": e["slug"],
+            "status": e.get("status", "active"),
+            "file_path": e["file_path"],
+            "tags": e["tags"],
+            "score": score,
+            "snippet": snippet
+        })
 
     results.sort(key=lambda r: r["score"], reverse=True)
     return results[:limit]
@@ -303,7 +304,6 @@ def main():
     for i, r in enumerate(results, 1):
         tags_str = ", ".join(r["tags"]) if r["tags"] else "none"
         print(f"{i}. [{r['category_label']}] {r['title']} (./{r['file_path']})")
-        print(f"   Status: {r['status']} | Tags: {tags_str} | Score: {r['score']}")
         print(f"   \"{r['snippet']}...\"\n")
 
 if __name__ == "__main__":

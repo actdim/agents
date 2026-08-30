@@ -124,7 +124,7 @@ function Install-OpenCode {
     New-Item -ItemType Directory -Force -Path $cmddir | Out-Null
     New-Item -ItemType Directory -Force -Path $helper | Out-Null
 
-    # Clean legacy OpenCode files
+    # Clean legacy OpenCode files & unnamespaced aliases
     if (Test-Path $oldHelper) {
         Remove-Item -Recurse -Force $oldHelper -ErrorAction SilentlyContinue
     }
@@ -132,6 +132,13 @@ function Install-OpenCode {
         $legacyCmd = Join-Path $cmddir "$legacy.md"
         if (Test-Path $legacyCmd) {
             Remove-Item -Force $legacyCmd -ErrorAction SilentlyContinue
+        }
+    }
+    $shortAliases = @('build', 'commit', 'context-sync', 'dash', 'decision-sync', 'dep-scan', 'dev', 'graph-check', 'history-sync', 'init', 'issue-sync', 'kb-search', 'kb-sync', 'test', 'update', 'version-bump', 'wrap')
+    foreach ($short in $shortAliases) {
+        $shortCmd = Join-Path $cmddir "$short.md"
+        if (Test-Path $shortCmd) {
+            Remove-Item -Force $shortCmd -ErrorAction SilentlyContinue
         }
     }
 
@@ -150,8 +157,8 @@ function Install-OpenCode {
     if (Test-Path (Join-Path $src 'along-dep-scan\along_dep_scan.py')) {
         Copy-Item -Force (Join-Path $src 'along-dep-scan\along_dep_scan.py') (Join-Path $helper 'along_dep_scan.py')
     }
-    if (Test-Path (Join-Path $src 'along-version-bump\along_bump_version.py')) {
-        Copy-Item -Force (Join-Path $src 'along-version-bump\along_bump_version.py') (Join-Path $helper 'along_bump_version.py')
+    if (Test-Path (Join-Path $src 'along-version-bump\along_version_bump.py')) {
+        Copy-Item -Force (Join-Path $src 'along-version-bump\along_version_bump.py') (Join-Path $helper 'along_version_bump.py')
     }
     if (Test-Path (Join-Path $src 'along-kb-sync\along_kb_sync.py')) {
         Copy-Item -Force (Join-Path $src 'along-kb-sync\along_kb_sync.py') (Join-Path $helper 'along_kb_sync.py')
@@ -177,11 +184,7 @@ function Install-OpenCode {
         $content = "---`n" + 'description: "' + $desc + '"' + "`n---`n`n" + $note + $body
         Write-Utf8NoBom (Join-Path $cmddir ($d.Name + '.md')) $content
         Write-Host "   command $($d.Name).md"
-        if ($d.Name -like 'along-*') {
-            $shortName = $d.Name.Substring(6)
-            Write-Utf8NoBom (Join-Path $cmddir ($shortName + '.md')) $content
-            Write-Host "   command alias $($shortName).md"
-        }
+
     }
 }
 
