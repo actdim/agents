@@ -2,7 +2,7 @@
 
 _Current-state snapshot. Keep SHORT; history goes to SESSIONS/._
 
-- **Status**: Along (ALONG-PROTOCOL v2.1.1) operational across Claude Code, Codex, OpenCode, and Antigravity. Knowledge Base migrated to top-level `docs/` with `.archive/` raw source isolation, `along-kb-sync` compiler, `along-kb-search` token-efficient snippet search, and all 17 skills standardized to Singular Domain-First (`along-<entity>-<action>`).
+- **Status**: Along (ALONG-PROTOCOL v2.1.2) operational across Claude Code, Codex, OpenCode, and Antigravity. Knowledge Base migrated to top-level `docs/` with `.archive/` raw source isolation, `along-kb-sync` compiler, `along-kb-search` token-efficient snippet search, and all 17 skills standardized to Singular Domain-First (`along-<entity>-<action>`).
 - **Active Focus**:
   - Issue [`feat--external-issue-trackers-sync-and-import`](file://.along/ISSUES/feat--external-issue-trackers-sync-and-import.md) (Jira, Redmine, Linear, GitHub issue import).
   - Issue [`feat--openclaw-and-hermes-agent-integration`](file://.along/ISSUES/feat--openclaw-and-hermes-agent-integration.md) (OpenClaw and Hermes Agent provider support).
