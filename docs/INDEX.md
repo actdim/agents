@@ -13,13 +13,14 @@ tags: [index, kb, topics, map]
 Central entry point and cross-linked topic catalog for project documentation:
 
 ## Articles
-- **[System Architecture & Flow](./topic--architecture.md)**
-- **[Dependencies AI Documentation and Rules](./topic--dependencies.md)**
-- **[Domain Model & Entities](./topic--domain-model.md)**
-- **[Frontend Architecture, Dynstruct, MsgMesh & NSwag Integration](./topic--frontend-frameworks.md)**
-- **[Protocol & Repository Migrations Guide](./topic--migrations.md)**
-- **[Setup & Developer Workflow](./topic--setup-and-workflow.md)**
-- **[Skills & Slash Commands Technical Reference](./topic--skills-reference.md)**
+
+- **[System Architecture & Flow](./topic--architecture.md)** (architecture) `architecture`
+- **[Dependencies AI Documentation and Rules](./topic--dependencies.md)** (topic) `dependencies`, `ai-context`, `vendor`, `rules`
+- **[Domain Model & Entities](./topic--domain-model.md)** (domain-model) `domain-model`
+- **[Frontend Architecture, Dynstruct, MsgMesh & NSwag Integration](./topic--frontend-frameworks.md)** (topic) `dynstruct`, `dynstruct-mui`, `msgmesh`, `utico`, `react`, `mui`, `nswag`, `openapi`, `architecture`
+- **[Protocol & Repository Migrations Guide](./topic--migrations.md)** (topic) `migrations`, `upgrade`, `protocol`, `changelog`, `versioning`
+- **[Setup & Developer Workflow](./topic--setup-and-workflow.md)** (setup-workflow) `setup-workflow`
+- **[Skills & Slash Commands Technical Reference](./topic--skills-reference.md)** (topic) `skills`, `commands`, `reference`, `aliases`, `runners`
 
 ---
 

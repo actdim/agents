@@ -57,6 +57,11 @@ def dump_frontmatter(fm, body):
     lines.append("---")
     return "\n".join(lines) + "\n\n" + body.strip() + "\n"
 
+def is_along_wiki_article(content):
+    """Checks if a file is already a compiled Along Wiki article (has protocol: along)."""
+    fm, _ = parse_frontmatter(content)
+    return fm.get("protocol") == "along"
+
 def ensure_archive_structure(repo_root, dry_run=False):
     archive_dir = os.path.join(repo_root, ".archive")
     if not dry_run:
@@ -71,45 +76,129 @@ def ensure_archive_structure(repo_root, dry_run=False):
                 f.write("# Archived Raw Sources (.archive/)\n\nThis directory holds processed raw notes, external documentation dumps, drafts, and unstructured source files that have been synthesized into structured Knowledge Base articles in `docs/`.\n")
     return archive_dir
 
-def normalize_and_archive_sources(repo_root, docs_dir, archive_dir, dry_run=False):
+def ingest_and_archive_sources(repo_root, docs_dir, archive_dir, dry_run=False):
+    """
+    Inspects allowed source locations: docs/, wiki/, kb/, and legacy .along/KB/, .agents/KB/.
+    - If file is already a compiled Wiki article (protocol: along): standardizes topic-- naming in docs/.
+    - If file is a raw unmanaged document (no protocol: along): synthesizes a topic article and moves original to .archive/.
+    """
+    today = datetime.now().strftime("%Y-%m-%d")
     normalized = 0
     archived = 0
 
-    # 1. Normalize legacy files in docs/
+    os.makedirs(docs_dir, exist_ok=True)
+
+    # 1. Ingest external source directories: wiki/, kb/, .along/KB/, .agents/KB/
+    external_sources = [
+        os.path.join(repo_root, "wiki"),
+        os.path.join(repo_root, "kb"),
+        os.path.join(repo_root, ".along", "KB"),
+        os.path.join(repo_root, ".agents", "KB"),
+    ]
+
+    for src_dir in external_sources:
+        if not os.path.exists(src_dir):
+            continue
+        for item in list(os.listdir(src_dir)):
+            if item == "INDEX.md" or not item.endswith(".md"):
+                continue
+            s_path = os.path.join(src_dir, item)
+            if not os.path.isfile(s_path):
+                continue
+            with open(s_path, "r", encoding="utf-8", errors="replace") as fp:
+                raw = fp.read()
+            
+            target_name = LEGACY_FILE_MAPPING.get(item, item)
+            if not target_name.startswith("topic--"):
+                target_name = f"topic--{target_name}"
+            d_path = os.path.join(docs_dir, target_name)
+
+            if is_along_wiki_article(raw):
+                # Already a compiled wiki article -> move directly to docs/
+                if not dry_run:
+                    fm, body = parse_frontmatter(raw)
+                    slug = target_name.replace(".md", "")
+                    fm["slug"] = slug
+                    with open(d_path, "w", encoding="utf-8") as fp:
+                        fp.write(dump_frontmatter(fm, body))
+                print(f"   Migrated article: {src_dir}/{item} -> docs/{target_name}")
+                normalized += 1
+            else:
+                # Raw source -> synthesize Wiki article and move original to .archive/
+                if not dry_run:
+                    h1_m = re.search(r"^#\s+(.*)$", raw, re.MULTILINE)
+                    title = h1_m.group(1).strip() if h1_m else item.replace(".md", "").replace("-", " ").title()
+                    slug = target_name.replace(".md", "")
+                    fm = {
+                        "protocol": "along",
+                        "slug": slug,
+                        "title": title,
+                        "type": "topic",
+                        "created": today,
+                        "updated": today,
+                        "tags": [slug.replace("topic--", "")],
+                    }
+                    with open(d_path, "w", encoding="utf-8") as fp:
+                        fp.write(dump_frontmatter(fm, raw))
+                    # Move original raw file to .archive/
+                    arch_path = os.path.join(archive_dir, f"{os.path.basename(src_dir)}--{item}")
+                    shutil.copy2(s_path, arch_path)
+                print(f"   Compiled & Archived raw source: {src_dir}/{item} -> docs/{target_name} (original -> .archive/)")
+                archived += 1
+
+        # Clean up legacy .along/KB/ or .agents/KB/
+        if src_dir.endswith("KB") and not dry_run:
+            shutil.rmtree(src_dir, ignore_errors=True)
+
+    # 2. Inspect docs/ for raw sources vs compiled articles
     if os.path.exists(docs_dir):
         for item in list(os.listdir(docs_dir)):
             if item == "INDEX.md" or not item.endswith(".md"):
                 continue
-            target_name = LEGACY_FILE_MAPPING.get(item, item)
-            if not target_name.startswith("topic--") and target_name != "INDEX.md":
-                target_name = f"topic--{target_name}"
-            if target_name != item:
-                src_p = os.path.join(docs_dir, item)
-                dst_p = os.path.join(docs_dir, target_name)
-                if not dry_run:
-                    with open(src_p, "r", encoding="utf-8", errors="replace") as fp:
-                        content = fp.read()
-                    slug = target_name.replace(".md", "")
-                    content = re.sub(r"^slug:\s*[^\n]+", f"slug: {slug}", content, flags=re.MULTILINE)
-                    with open(dst_p, "w", encoding="utf-8") as fp:
-                        fp.write(content)
-                    os.remove(src_p)
-                print(f"   Normalized legacy doc: docs/{item} -> docs/{target_name}")
-                normalized += 1
+            f_path = os.path.join(docs_dir, item)
+            if not os.path.isfile(f_path):
+                continue
+            with open(f_path, "r", encoding="utf-8", errors="replace") as fp:
+                raw = fp.read()
 
-    # 2. Archive raw unmanaged source folders
-    raw_dirs = [os.path.join(repo_root, "docs_raw"), os.path.join(docs_dir, "raw")]
-    for rdir in raw_dirs:
-        if os.path.exists(rdir):
-            for item in os.listdir(rdir):
-                s = os.path.join(rdir, item)
-                d = os.path.join(archive_dir, item)
+            target_name = LEGACY_FILE_MAPPING.get(item, item)
+            if not target_name.startswith("topic--"):
+                target_name = f"topic--{target_name}"
+
+            if is_along_wiki_article(raw):
+                # It's an Along Wiki article: ensure standardized topic-- filename
+                if target_name != item and not dry_run:
+                    dst_path = os.path.join(docs_dir, target_name)
+                    fm, body = parse_frontmatter(raw)
+                    fm["slug"] = target_name.replace(".md", "")
+                    with open(dst_path, "w", encoding="utf-8") as fp:
+                        fp.write(dump_frontmatter(fm, body))
+                    os.remove(f_path)
+                    print(f"   Normalized wiki article name: docs/{item} -> docs/{target_name}")
+                    normalized += 1
+            else:
+                # Raw document in docs/ -> synthesize topic article and archive original
                 if not dry_run:
-                    shutil.move(s, d)
+                    h1_m = re.search(r"^#\s+(.*)$", raw, re.MULTILINE)
+                    title = h1_m.group(1).strip() if h1_m else item.replace(".md", "").replace("-", " ").title()
+                    slug = target_name.replace(".md", "")
+                    fm = {
+                        "protocol": "along",
+                        "slug": slug,
+                        "title": title,
+                        "type": "topic",
+                        "created": today,
+                        "updated": today,
+                        "tags": [slug.replace("topic--", "")],
+                    }
+                    dst_path = os.path.join(docs_dir, target_name)
+                    with open(dst_path, "w", encoding="utf-8") as fp:
+                        fp.write(dump_frontmatter(fm, raw))
+                    # Move original raw file to .archive/
+                    arch_path = os.path.join(archive_dir, f"raw--{item}")
+                    shutil.move(f_path, arch_path)
+                print(f"   Compiled & Archived raw document: docs/{item} -> docs/{target_name} (original -> .archive/)")
                 archived += 1
-            if not dry_run:
-                shutil.rmtree(rdir, ignore_errors=True)
-            print(f"   Archived raw directory: {rdir} -> .archive/")
 
     return normalized, archived
 
@@ -148,7 +237,7 @@ def sync_kb(repo_root, check_only=False):
 
     print(f"-> Synchronizing Knowledge Base in {docs_dir}...")
     archive_dir = ensure_archive_structure(repo_root, dry_run=check_only)
-    normalize_and_archive_sources(repo_root, docs_dir, archive_dir, dry_run=check_only)
+    ingest_and_archive_sources(repo_root, docs_dir, archive_dir, dry_run=check_only)
 
     if not os.path.exists(docs_dir) or not os.listdir(docs_dir):
         print("   docs/ is missing or empty. Bootstrapping standard articles...")
@@ -175,7 +264,7 @@ def sync_kb(repo_root, check_only=False):
             title = fm.get("title")
             if not title:
                 h1_m = re.search(r"^#\s+(.*)$", body, re.MULTILINE)
-                title = h1_m.group(1).strip() if h1_m else slug
+                title = h1_m.group(1).strip() if h1_m else slug.replace("topic--", "").replace("-", " ").title()
                 fm["title"] = title
                 needs_update = True
 
