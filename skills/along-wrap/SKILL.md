@@ -3,7 +3,7 @@ name: along-wrap
 description: Wrap up the current coding session or completed work stage by updating the repo's .along/ state - execute code review checklist, write a session log file, synchronize ISSUES.md projection, move completed issues to ISSUES/done/, append a HISTORY line, and record decisions/glossary terms. Use when ending work, wrapping up, or when invoking /along-wrap.
 ---
 
-# Along Wrap  [v2.2.4]
+# Along Wrap  [v2.2.5]
 
 Universal finalization and memory synchronization protocol for sessions, tasks, and milestone stages.
 
@@ -26,7 +26,7 @@ Universal finalization and memory synchronization protocol for sessions, tasks, 
    - Update related `.along/MILESTONES/` progress percentages.
    - Resolve mitigated `.along/RISKS/` (`status: resolved` / `mitigated`).
    - Conclude active `.along/SPIKES/` and log any resulting ADR in `.along/DECISIONS.md`.
-4. [ ] **Documentation Check**: Update `README.md`, `AGENTS.md` (project specifics), or `docs/` if code interfaces or architecture changed, and run `/along-kb-sync`.
+4. [ ] **Documentation Check & Link Integrity Gate**: Update `README.md`, `AGENTS.md` (project specifics), or `docs/` if code interfaces or architecture changed, run `/along-kb-sync`, and verify that all relative Markdown links in all repository `.md` files resolve to physically existing files on disk without 404 broken links.
 5. [ ] **Session Log**: Write `.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` in the nearest `.along/` with complete front-matter (`protocol: along`, `issues_advanced`, `issues_completed`, `decisions`, `risks_logged`, `spikes_conducted`) and a concise Code Review & Impact summary.
 6. [ ] **ISSUES Board Projection**: Run `/along-issue-sync` (or update nearest `.along/ISSUES.md`).
 7. [ ] **HISTORY**: Append one line to nearest `.along/HISTORY.md`: `<YYYY-MM-DD> - <slug> - <agent> - <summary> - <link>`.

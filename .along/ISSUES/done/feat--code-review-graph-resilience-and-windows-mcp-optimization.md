@@ -23,3 +23,4 @@ Eliminate MCP subprocess deadlocks on Windows by switching MCP server execution 
 - [x] Updated `.code-review-graph-ignore` to exclude `.archive/` and `.along/.session/`.
 - [x] Verified `code-review-graph` rebuild and status across 52 repository files (357 nodes, 5110 edges).
 - [x] 100% unit tests pass with zero failures.
+

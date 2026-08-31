@@ -1,5 +1,6 @@
 ---
 protocol: along
+protocol_version: "2.2.5"
 slug: INDEX
 title: Knowledge Base Topic Index
 type: index

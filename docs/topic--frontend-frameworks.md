@@ -1,10 +1,11 @@
 ---
 protocol: along
+protocol_version: "2.2.4"
 slug: topic--frontend-frameworks
 title: Frontend Architecture, Dynstruct, MsgMesh & NSwag Integration
 type: topic
 created: 2026-08-27
-updated: 2026-08-28
+updated: 2026-08-31
 tags: [dynstruct, dynstruct-mui, msgmesh, utico, react, mui, nswag, openapi, architecture]
 ---
 
@@ -26,7 +27,7 @@ The Along Dashboard UI (`packages/dashboard-ui/`) is built strictly on the ActDi
    - **Pattern**: Material UI components adapted as Dynstruct hook-constructors (`useButton`, `useDrawer`, `useCard`, `useTabs`, `useChip`, `useTextField`, `useDialog`, `useTable`, etc.).
 
 3. **`@actdim/msgmesh`**
-   - **Guide**: [msgmesh/AGENTS.md](file:///d:/Src/my/actdim/public/msgmesh/AGENTS.md) | [msgmesh/docs/04-advanced-patterns.md](file:///d:/Src/my/actdim/public/msgmesh/docs/04-advanced-patterns.md)
+   - **Guide**: [msgmesh/AGENTS.md](file:///d:/Src/my/actdim/public/msgmesh/AGENTS.md) | [msgmesh/README.md](file:///d:/Src/my/actdim/public/msgmesh/README.md)
    - **Pattern**: Type-safe async messaging mesh for API communication and inter-component signaling.
 
 4. **`@actdim/utico`**

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# along_kb_sync.py - Idempotent LLM-Wiki Knowledge Base synchronization, link linting, and index compiler.
+# along_kb_sync.py - Idempotent LLM-Wiki Knowledge Base synchronization, link rewriting, and link integrity gate.
 
 import os
 import re
@@ -7,6 +7,8 @@ import sys
 import shutil
 import argparse
 from datetime import datetime
+
+CURRENT_PROTOCOL_VERSION = "2.2.5"
 
 STANDARD_ARTICLES = [
     ("topic--architecture.md", "System Architecture & Flow", "architecture", ["architecture", "boundaries", "providers", "mcp", "dashboard"]),
@@ -21,6 +23,16 @@ LEGACY_FILE_MAPPING = {
     "04-frontend-frameworks.md": "topic--frontend-frameworks.md",
     "dependencies.md": "topic--dependencies.md",
     "MIGRATIONS.md": "topic--migrations.md",
+}
+
+IGNORED_DIRS = {
+    '.git', 'node_modules', 'dist', 'build', '.venv', 'venv',
+    'bin', 'obj', '.cache', 'target', 'vendor', '.gemini', '.claude', '.codex', '.archive'
+}
+
+ILLUSTRATIVE_PLACEHOLDERS = {
+    './target.md', 'target.md', './topic--<slug>.md', './topic--<name>.md',
+    './topic--architecture.md', './topic--setup-and-workflow.md'
 }
 
 def parse_frontmatter(content):
@@ -46,11 +58,13 @@ def parse_frontmatter(content):
 def dump_frontmatter(fm, body):
     lines = ["---"]
     lines.append("protocol: along")
+    proto_ver = fm.get("protocol_version", CURRENT_PROTOCOL_VERSION)
+    lines.append(f'protocol_version: "{proto_ver}"')
     for k, v in fm.items():
-        if k == "protocol":
+        if k in ("protocol", "protocol_version"):
             continue
         if isinstance(v, list):
-            items_str = ", ".join(f'"{x}"' if " " in x else x for x in v)
+            items_str = ", ".join(f'"{x}"' if " " in str(x) else str(x) for x in v)
             lines.append(f"{k}: [{items_str}]")
         else:
             lines.append(f"{k}: {v}")
@@ -119,6 +133,7 @@ def ingest_and_archive_sources(repo_root, docs_dir, archive_dir, dry_run=False):
                     fm, body = parse_frontmatter(raw)
                     slug = target_name.replace(".md", "")
                     fm["slug"] = slug
+                    fm["protocol_version"] = fm.get("protocol_version", CURRENT_PROTOCOL_VERSION)
                     with open(d_path, "w", encoding="utf-8") as fp:
                         fp.write(dump_frontmatter(fm, body))
                 print(f"   Migrated article: {src_dir}/{item} -> docs/{target_name}")
@@ -131,6 +146,7 @@ def ingest_and_archive_sources(repo_root, docs_dir, archive_dir, dry_run=False):
                     slug = target_name.replace(".md", "")
                     fm = {
                         "protocol": "along",
+                        "protocol_version": CURRENT_PROTOCOL_VERSION,
                         "slug": slug,
                         "title": title,
                         "type": "topic",
@@ -145,10 +161,6 @@ def ingest_and_archive_sources(repo_root, docs_dir, archive_dir, dry_run=False):
                     shutil.copy2(s_path, arch_path)
                 print(f"   Compiled & Archived raw source: {src_dir}/{item} -> docs/{target_name} (original -> .archive/)")
                 archived += 1
-
-        # Clean up legacy .along/KB/ or .agents/KB/
-        if src_dir.endswith("KB") and not dry_run:
-            shutil.rmtree(src_dir, ignore_errors=True)
 
     # 2. Inspect docs/ for raw sources vs compiled articles
     if os.path.exists(docs_dir):
@@ -171,6 +183,7 @@ def ingest_and_archive_sources(repo_root, docs_dir, archive_dir, dry_run=False):
                     dst_path = os.path.join(docs_dir, target_name)
                     fm, body = parse_frontmatter(raw)
                     fm["slug"] = target_name.replace(".md", "")
+                    fm["protocol_version"] = fm.get("protocol_version", CURRENT_PROTOCOL_VERSION)
                     with open(dst_path, "w", encoding="utf-8") as fp:
                         fp.write(dump_frontmatter(fm, body))
                     os.remove(f_path)
@@ -184,6 +197,7 @@ def ingest_and_archive_sources(repo_root, docs_dir, archive_dir, dry_run=False):
                     slug = target_name.replace(".md", "")
                     fm = {
                         "protocol": "along",
+                        "protocol_version": CURRENT_PROTOCOL_VERSION,
                         "slug": slug,
                         "title": title,
                         "type": "topic",
@@ -214,6 +228,7 @@ def bootstrap_docs_if_empty(docs_dir, repo_root, dry_run=False):
             slug = filename.replace(".md", "")
             fm = {
                 "protocol": "along",
+                "protocol_version": CURRENT_PROTOCOL_VERSION,
                 "slug": slug,
                 "title": title,
                 "type": art_type,
@@ -230,7 +245,190 @@ def bootstrap_docs_if_empty(docs_dir, repo_root, dry_run=False):
             created += 1
     return created
 
-def sync_kb(repo_root, check_only=False):
+def rewrite_inbound_links(repo_root, dry_run=False):
+    """
+    Recursively scans all Markdown files across the entire repository tree (monorepo packages,
+    subprojects, apps, root README.md, docs) and rewrites inbound links pointing to legacy
+    storage locations (.along/KB/, .agents/KB/, wiki/, kb/, or legacy article names)
+    to standard canonical paths in docs/.
+    """
+    repo_root = os.path.abspath(repo_root)
+    root_docs_dir = os.path.join(repo_root, "docs")
+    rewritten_files = 0
+    total_rewrites = 0
+
+    link_pattern = re.compile(r"(\[([^\]]+)\]\()([^\)]+)(\))")
+
+    for root, dirs, files in os.walk(repo_root):
+        dirs[:] = [d for d in dirs if d not in IGNORED_DIRS and not d.startswith('.')]
+        for f in files:
+            if not f.endswith(".md"):
+                continue
+            fpath = os.path.join(root, f)
+            file_dir = os.path.dirname(fpath)
+
+            try:
+                with open(fpath, "r", encoding="utf-8", errors="replace") as fp:
+                    content = fp.read()
+            except Exception:
+                continue
+
+            file_rewrites = 0
+
+            def replace_link(match):
+                nonlocal file_rewrites
+                prefix = match.group(1)
+                link_text = match.group(2)
+                target = match.group(3).strip()
+                suffix = match.group(4)
+
+                if (target.startswith("http://") or target.startswith("https://") or
+                    target.startswith("mailto:") or target.startswith("#") or target.startswith("data:")):
+                    return match.group(0)
+
+                is_file_uri = target.startswith("file://")
+                clean_target = target[7:] if is_file_uri else target
+
+                target_base, anchor = (clean_target.split("#", 1)[0], "#" + clean_target.split("#", 1)[1]) if "#" in clean_target else (clean_target, "")
+                target_base = target_base.replace('\\', '/')
+
+                is_legacy = False
+                orig_filename = os.path.basename(target_base)
+
+                if any(k in target_base for k in [".along/KB/", ".agents/KB/", "/KB/", "along/KB/", "agents/KB/", "/kb/", "/wiki/", "kb/", "wiki/"]):
+                    is_legacy = True
+                elif orig_filename in LEGACY_FILE_MAPPING:
+                    is_legacy = True
+
+                if not is_legacy:
+                    return match.group(0)
+
+                new_filename = LEGACY_FILE_MAPPING.get(orig_filename, orig_filename)
+                if not new_filename.startswith("topic--") and new_filename != "INDEX.md" and new_filename.endswith(".md"):
+                    new_filename = f"topic--{new_filename}"
+
+                # Determine target docs directory (nearest subproject docs if present, else root docs)
+                target_docs = root_docs_dir
+                if os.path.exists(os.path.join(file_dir, "docs", new_filename)):
+                    target_docs = os.path.join(file_dir, "docs")
+
+                target_abs = os.path.join(target_docs, new_filename)
+                try:
+                    new_rel = os.path.relpath(target_abs, file_dir).replace('\\', '/')
+                except Exception:
+                    new_rel = target_base
+
+                if not new_rel.startswith('.') and not new_rel.startswith('/'):
+                    new_rel = f"./{new_rel}"
+
+                new_target = f"{new_rel}{anchor}"
+                if is_file_uri and target.startswith("file://."):
+                    new_target = f"file://{new_rel.lstrip('./')}{anchor}"
+
+                if new_target != target:
+                    file_rewrites += 1
+                    return f"{prefix}{new_target}{suffix}"
+                return match.group(0)
+
+            new_content = link_pattern.sub(replace_link, content)
+            if file_rewrites > 0:
+                if not dry_run:
+                    with open(fpath, "w", encoding="utf-8") as fp:
+                        fp.write(new_content)
+                rel_disp = os.path.relpath(fpath, repo_root).replace('\\', '/')
+                print(f"   [REWRITE] {rel_disp}: updated {file_rewrites} legacy KB link(s).")
+                rewritten_files += 1
+                total_rewrites += file_rewrites
+
+    return rewritten_files, total_rewrites
+
+def validate_repo_link_integrity(repo_root):
+    """
+    Recursively scans all Markdown files across the repository tree and verifies that every
+    relative link [text](target) physically resolves to an existing file on disk.
+    """
+    repo_root = os.path.abspath(repo_root)
+    broken_links = []
+    total_checked = 0
+
+    link_pattern = re.compile(r"\[([^\]]+)\]\(([^\)]+)\)")
+
+    for root, dirs, files in os.walk(repo_root):
+        dirs[:] = [d for d in dirs if d not in IGNORED_DIRS and not d.startswith('.')]
+        for f in files:
+            if not f.endswith(".md"):
+                continue
+            fpath = os.path.join(root, f)
+            file_dir = os.path.dirname(fpath)
+            rel_file = os.path.relpath(fpath, repo_root).replace('\\', '/')
+
+            try:
+                with open(fpath, "r", encoding="utf-8", errors="replace") as fp:
+                    lines = fp.readlines()
+            except Exception:
+                continue
+
+            for line_idx, line in enumerate(lines, 1):
+                for match in link_pattern.finditer(line):
+                    link_text = match.group(1)
+                    target = match.group(2).strip()
+
+                    # Ignore web URLs, emails, anchors, data URIs
+                    if (target.startswith("http://") or target.startswith("https://") or
+                        target.startswith("mailto:") or target.startswith("ftp://") or
+                        target.startswith("data:") or target.startswith("#")):
+                        continue
+
+                    # Ignore template variables and illustrative placeholders
+                    if target.startswith("{{") or target.startswith("<") or "<" in target or ">" in target:
+                        continue
+                    if target in ILLUSTRATIVE_PLACEHOLDERS:
+                        continue
+
+                    clean_target = target
+                    target_base = clean_target.split("#")[0].strip()
+                    if not target_base:
+                        continue
+
+                    total_checked += 1
+
+                    try:
+                        if target_base.startswith("file:///"):
+                            p = target_base[8:]
+                            if len(p) > 2 and p[1] == ':': # Windows drive letter e.g. d:/...
+                                resolved_path = os.path.normpath(p)
+                            else:
+                                resolved_path = os.path.normpath("/" + p)
+                        elif target_base.startswith("file://"):
+                            rel_p = target_base[7:].lstrip("/")
+                            if len(rel_p) > 2 and rel_p[1] == ':': # Windows drive letter
+                                resolved_path = os.path.normpath(rel_p)
+                            else:
+                                resolved_path = os.path.normpath(os.path.join(repo_root, rel_p))
+                        else:
+                            resolved_path = os.path.normpath(os.path.join(file_dir, target_base))
+
+                        if not os.path.exists(resolved_path):
+                            # Check if it's an external absolute repo reference that exists outside workspace
+                            broken_links.append({
+                                "file": rel_file,
+                                "line": line_idx,
+                                "text": link_text,
+                                "target": target,
+                                "resolved": resolved_path,
+                            })
+                    except Exception:
+                        broken_links.append({
+                            "file": rel_file,
+                            "line": line_idx,
+                            "text": link_text,
+                            "target": target,
+                            "resolved": "invalid_path",
+                        })
+
+    return broken_links, total_checked
+
+def sync_kb(repo_root, check_only=False, strict=False):
     repo_root = os.path.abspath(repo_root)
     docs_dir = os.path.join(repo_root, "docs")
     today = datetime.now().strftime("%Y-%m-%d")
@@ -245,7 +443,6 @@ def sync_kb(repo_root, check_only=False):
         print(f"   Bootstrapped {bootstrapped} core Knowledge Base articles.")
 
     articles = []
-    broken_links = []
     doc_cross_links = {}
 
     for f in sorted(os.listdir(docs_dir)):
@@ -271,6 +468,9 @@ def sync_kb(repo_root, check_only=False):
 
             if fm.get("protocol") != "along":
                 fm["protocol"] = "along"
+                needs_update = True
+            if not fm.get("protocol_version"):
+                fm["protocol_version"] = CURRENT_PROTOCOL_VERSION
                 needs_update = True
             if not fm.get("slug"):
                 fm["slug"] = slug
@@ -300,9 +500,7 @@ def sync_kb(repo_root, check_only=False):
                 if not target_no_hash:
                     continue
                 target_full = os.path.normpath(os.path.join(docs_dir, target_no_hash))
-                if not os.path.exists(target_full):
-                    broken_links.append((f, link_target))
-                else:
+                if os.path.exists(target_full):
                     if target_full.startswith(docs_dir) and target_no_hash.endswith(".md"):
                         doc_cross_links[f].append(os.path.basename(target_full))
 
@@ -319,6 +517,7 @@ def sync_kb(repo_root, check_only=False):
     index_path = os.path.join(docs_dir, "INDEX.md")
     index_fm = {
         "protocol": "along",
+        "protocol_version": CURRENT_PROTOCOL_VERSION,
         "slug": "INDEX",
         "title": "Knowledge Base Topic Index",
         "type": "index",
@@ -378,7 +577,16 @@ def sync_kb(repo_root, check_only=False):
             fp.write(full_index)
         print(f"   -> Rebuilt docs/INDEX.md ({len(articles)} articles indexed).")
 
-        # Cleanup obsolete files/dirs
+    # Step: Inbound Link Rewriting across the entire repository
+    print("-> Scanning repository for inbound legacy links (Link Rewriting Engine)...")
+    rewritten_files, total_rewrites = rewrite_inbound_links(repo_root, dry_run=check_only)
+    if total_rewrites > 0:
+        print(f"   [OK] Rewrote {total_rewrites} legacy link(s) across {rewritten_files} file(s).")
+    else:
+        print("   [OK] Inbound links are clean and up to date.")
+
+    # Cleanup obsolete files/dirs only after rewriting inbound links
+    if not check_only:
         ctx_file = os.path.join(repo_root, ".along", "CONTEXT.md")
         if os.path.exists(ctx_file):
             try:
@@ -389,23 +597,30 @@ def sync_kb(repo_root, check_only=False):
             if os.path.exists(old_kb):
                 shutil.rmtree(old_kb, ignore_errors=True)
 
+    # Step: Repository-wide Link Integrity Gate
+    print("-> Executing Global Link Integrity Gate across all repository Markdown files...")
+    broken_links, total_checked = validate_repo_link_integrity(repo_root)
     if broken_links:
-        print(f"   [WARN] Detected {len(broken_links)} dangling or unverified Markdown link(s):")
-        for src, target in broken_links:
-            print(f"      - In {src}: target '{target}' not found.")
+        print(f"   [WARN] Link Integrity Gate detected {len(broken_links)} broken relative link(s) (checked {total_checked}):")
+        for bl in broken_links:
+            print(f"      - {bl['file']}:{bl['line']} -> [{bl['text']}]({bl['target']}) (target missing on disk)")
+        if strict:
+            print("   [FAIL] Link Integrity Gate failed in strict mode.")
+            sys.exit(1)
     else:
-        print("   [OK] All internal Markdown links verified.")
+        print(f"   [OK] All {total_checked} relative Markdown link(s) verified on disk.")
 
     print(f"-> Knowledge Base sync complete. Total active articles: {len(articles) + (1 if os.path.exists(index_path) else 0)}\n")
     return len(articles), len(broken_links)
 
 def main():
-    parser = argparse.ArgumentParser(description="Along Knowledge Base Compiler & Linter")
+    parser = argparse.ArgumentParser(description="Along Knowledge Base Compiler, Link Rewriter & Integrity Gate")
     parser.add_argument("repo_root", nargs="?", default=".", help="Target repository root directory")
     parser.add_argument("--check", action="store_true", help="Check links and structure without modifying files")
+    parser.add_argument("--strict", action="store_true", help="Fail with non-zero exit code if broken links are found")
     args = parser.parse_args()
 
-    sync_kb(args.repo_root, check_only=args.check)
+    sync_kb(args.repo_root, check_only=args.check, strict=args.strict)
 
 if __name__ == "__main__":
     main()

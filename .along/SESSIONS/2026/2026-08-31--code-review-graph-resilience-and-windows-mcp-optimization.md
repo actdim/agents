@@ -35,3 +35,4 @@ Diagnosed and resolved MCP task freezing caused by Windows stdio buffering and m
 - **Blast Radius**: Zero breaking changes to public APIs. MCP config is stabilized for Windows environments.
 - **Typographic Cleanliness**: Verified clean ASCII formatting across all modified files.
 - **Tests**: 100% test pass rate across suite.
+

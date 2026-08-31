@@ -1,10 +1,11 @@
 ---
 protocol: along
+protocol_version: "2.2.4"
 slug: topic--migrations
 title: Protocol & Repository Migrations Guide
 type: topic
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-08-31
 tags: [migrations, upgrade, protocol, changelog, versioning]
 ---
 

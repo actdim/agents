@@ -386,7 +386,119 @@ class TestAlongSkillsAndScripts(unittest.TestCase):
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
 
+    def test_16_inbound_link_rewriter(self):
+        """Verify that along_kb_sync rewrites legacy KB links across monorepo packages to canonical docs/ paths."""
+        temp_dir = tempfile.mkdtemp(prefix="along_link_rewrite_")
+        try:
+            # Root context
+            docs_dir = os.path.join(temp_dir, "docs")
+            along_dir = os.path.join(temp_dir, ".along")
+            kb_dir = os.path.join(along_dir, "KB")
+            os.makedirs(kb_dir, exist_ok=True)
+            os.makedirs(docs_dir, exist_ok=True)
+
+            with open(os.path.join(temp_dir, "AGENTS.md"), "w", encoding="utf-8") as f:
+                f.write("<!-- BEGIN ALONG-PROTOCOL root -->\n# ALONG-PROTOCOL v2.2.4\n<!-- END ALONG-PROTOCOL -->\n")
+
+            with open(os.path.join(kb_dir, "03-setup-and-workflow.md"), "w", encoding="utf-8") as f:
+                f.write("# Setup & Workflows\nGuide.\n")
+
+            with open(os.path.join(kb_dir, "01-architecture.md"), "w", encoding="utf-8") as f:
+                f.write("# Architecture\nArch.\n")
+
+            # Root README referencing legacy paths
+            root_readme = os.path.join(temp_dir, "README.md")
+            with open(root_readme, "w", encoding="utf-8") as f:
+                f.write("# Root Project\n\nSee [Setup](./.along/KB/03-setup-and-workflow.md) and [Arch](.along/KB/01-architecture.md).\n")
+
+            # Monorepo subproject README referencing legacy paths with relative navigation
+            sub_pkg_dir = os.path.join(temp_dir, "packages", "sub-lib")
+            os.makedirs(sub_pkg_dir, exist_ok=True)
+            sub_readme = os.path.join(sub_pkg_dir, "README.md")
+            with open(sub_readme, "w", encoding="utf-8") as f:
+                f.write("# Sub Library\n\nRefer to [Setup Guide](../../.along/KB/03-setup-and-workflow.md#cli-setup) for instructions.\n")
+
+            # Run along_kb_sync
+            kb_script = os.path.join(REPO_ROOT, "scripts", "along_kb_sync.py")
+            res = subprocess.run([sys.executable, kb_script, temp_dir], capture_output=True, text=True)
+            self.assertEqual(res.returncode, 0, f"along_kb_sync failed:\n{res.stderr}\nSTDOUT:\n{res.stdout}")
+
+            # Verify root README was rewritten
+            with open(root_readme, "r", encoding="utf-8") as f:
+                root_c = f.read()
+            self.assertIn("./docs/topic--setup-and-workflow.md", root_c, "Root README should have rewritten setup link")
+            self.assertIn("./docs/topic--architecture.md", root_c, "Root README should have rewritten arch link")
+            self.assertNotIn(".along/KB/", root_c, "Root README should not contain legacy .along/KB/ paths")
+
+            # Verify subproject README was rewritten with proper relative path and anchor
+            with open(sub_readme, "r", encoding="utf-8") as f:
+                sub_c = f.read()
+            self.assertIn("../../docs/topic--setup-and-workflow.md#cli-setup", sub_c, "Subproject README should rewrite relative link to ../../docs/ preserving anchor")
+            self.assertNotIn(".along/KB/", sub_c, "Subproject README should not contain legacy .along/KB/ paths")
+
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+    def test_17_link_integrity_gate(self):
+        """Verify that validate_repo_link_integrity detects broken links and passes valid relative links."""
+        scripts_dir = os.path.join(REPO_ROOT, "scripts")
+        if scripts_dir not in sys.path:
+            sys.path.insert(0, scripts_dir)
+        import along_kb_sync
+
+        temp_dir = tempfile.mkdtemp(prefix="along_link_integrity_")
+        try:
+            os.makedirs(os.path.join(temp_dir, "docs"), exist_ok=True)
+            with open(os.path.join(temp_dir, "docs", "topic--test.md"), "w", encoding="utf-8") as f:
+                f.write("# Test Topic\nContent.\n")
+
+            test_md = os.path.join(temp_dir, "README.md")
+            with open(test_md, "w", encoding="utf-8") as f:
+                f.write("# Overview\n\nValid: [Test](./docs/topic--test.md#anchor)\nInvalid: [Missing](./docs/topic--missing.md)\n")
+
+            broken_links, total_checked = along_kb_sync.validate_repo_link_integrity(temp_dir)
+            self.assertEqual(total_checked, 2, "Should check exactly 2 links")
+            self.assertEqual(len(broken_links), 1, "Should find exactly 1 broken link")
+            self.assertEqual(broken_links[0]["target"], "./docs/topic--missing.md")
+            self.assertEqual(broken_links[0]["line"], 4)
+
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+    def test_18_header_deduplication(self):
+        """Verify that along_update.py collapses duplicate BEGIN/END protocol comment markers in AGENTS.md."""
+        temp_dir = tempfile.mkdtemp(prefix="along_header_dedup_")
+        try:
+            agents_md = os.path.join(temp_dir, "AGENTS.md")
+            # Create AGENTS.md with duplicate comment headers
+            with open(agents_md, "w", encoding="utf-8") as f:
+                f.write(
+                    "<!-- BEGIN ALONG-PROTOCOL root (managed by along-init - do not edit by hand) -->\n"
+                    "<!-- BEGIN ALONG-PROTOCOL root (managed by along-init - do not edit by hand) -->\n"
+                    "# ALONG-PROTOCOL v2.0.0\n"
+                    "<!-- END ALONG-PROTOCOL -->\n"
+                    "<!-- END ALONG-PROTOCOL -->\n\n"
+                    "## Project specifics\n\n- Custom rule\n"
+                )
+
+            update_script = os.path.join(REPO_ROOT, "scripts", "along_update.py")
+            res = subprocess.run([sys.executable, update_script, temp_dir, "--local-only"], capture_output=True, text=True)
+            self.assertEqual(res.returncode, 0, f"along_update failed:\n{res.stderr}\nSTDOUT:\n{res.stdout}")
+
+            with open(agents_md, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            begin_count = content.count("<!-- BEGIN ALONG-PROTOCOL")
+            end_count = content.count("<!-- END ALONG-PROTOCOL -->")
+            self.assertEqual(begin_count, 1, f"AGENTS.md should have exactly 1 BEGIN marker, found {begin_count}")
+            self.assertEqual(end_count, 1, f"AGENTS.md should have exactly 1 END marker, found {end_count}")
+            self.assertIn("## Project specifics", content, "Custom project specifics must be preserved")
+
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
 

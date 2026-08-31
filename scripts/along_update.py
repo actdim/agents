@@ -256,10 +256,14 @@ def apply_migration_to_context(ctx_dir, protocol_text, migrate_script, is_root=T
 
     agents_md = os.path.join(ctx_dir, "AGENTS.md")
 
+    # Sanitize protocol_text by stripping existing wrapper markers to prevent duplication
+    clean_proto = re.sub(r"^<!-- BEGIN (?:ALONG-PROTOCOL|ACTDIM-AGENTS-PROTOCOL).*?-->\r?\n?", "", protocol_text.strip())
+    clean_proto = re.sub(r"\r?\n?<!-- END (?:ALONG-PROTOCOL|ACTDIM-AGENTS-PROTOCOL) -->$", "", clean_proto.strip())
+
     if is_root or not ancestor_root:
         begin_marker = "<!-- BEGIN ALONG-PROTOCOL root (managed by along-init - do not edit by hand) -->"
         end_marker = "<!-- END ALONG-PROTOCOL -->"
-        block = f"{begin_marker}\n{protocol_text}\n{end_marker}"
+        block = f"{begin_marker}\n{clean_proto}\n{end_marker}"
     else:
         rel_path = safe_relpath(os.path.join(ancestor_root, "AGENTS.md"), ctx_dir).replace('\\', '/')
         begin_marker = f"<!-- BEGIN ALONG-PROTOCOL ref={rel_path} (managed by along-init - do not edit by hand) -->"
@@ -277,7 +281,7 @@ def apply_migration_to_context(ctx_dir, protocol_text, migrate_script, is_root=T
         with open(agents_md, "r", encoding="utf-8", errors="ignore") as f:
             existing = f.read()
         pattern = re.compile(
-            r"<!-- BEGIN (?:ALONG-PROTOCOL|ACTDIM-AGENTS-PROTOCOL).*?-->.*?<!-- END (?:ALONG-PROTOCOL|ACTDIM-AGENTS-PROTOCOL) -->",
+            r"(?:<!-- BEGIN (?:ALONG-PROTOCOL|ACTDIM-AGENTS-PROTOCOL).*?-->\s*)+.*?(?:<!-- END (?:ALONG-PROTOCOL|ACTDIM-AGENTS-PROTOCOL) -->\s*)+",
             re.DOTALL
         )
         if pattern.search(existing):

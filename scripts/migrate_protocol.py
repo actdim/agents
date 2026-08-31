@@ -27,7 +27,7 @@ import shutil
 import subprocess
 from datetime import datetime
 
-CURRENT_PROTOCOL_VERSION = "2.2.4"
+CURRENT_PROTOCOL_VERSION = "2.2.5"
 
 def parse_yaml_frontmatter(content):
     match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n(.*)$", content, re.DOTALL)
@@ -420,13 +420,15 @@ def step_migrate_v2_0_along_directory(repo_root):
         with open(amd, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
         
-        # Replace markers
+        # Replace markers and deduplicate
         content = re.sub(
             r"<!-- BEGIN ACTDIM-AGENTS-PROTOCOL (.*?) -->",
             r"<!-- BEGIN ALONG-PROTOCOL \1 -->",
             content
         )
         content = re.sub(r"<!-- END ACTDIM-AGENTS-PROTOCOL -->", r"<!-- END ALONG-PROTOCOL -->", content)
+        content = re.sub(r"(?:<!-- BEGIN ALONG-PROTOCOL (.*?) -->\s*)+", r"<!-- BEGIN ALONG-PROTOCOL \1 -->\n", content)
+        content = re.sub(r"(?:<!-- END ALONG-PROTOCOL -->\s*)+", r"<!-- END ALONG-PROTOCOL -->\n", content)
         content = re.sub(r"# ACTDIM-AGENTS-PROTOCOL v\d+\.\d+\.\d+", f"# ALONG-PROTOCOL v{CURRENT_PROTOCOL_VERSION}", content)
         content = re.sub(r"# ALONG-PROTOCOL v\d+\.\d+\.\d+", f"# ALONG-PROTOCOL v{CURRENT_PROTOCOL_VERSION}", content)
         

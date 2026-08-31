@@ -1,5 +1,5 @@
 <!-- BEGIN ALONG-PROTOCOL root (managed by along-init - do not edit by hand) -->
-# ALONG-PROTOCOL v2.2.4
+# ALONG-PROTOCOL v2.2.5
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
@@ -53,6 +53,7 @@ All entities are designed for zero-friction auto-parsing by dashboards and tools
 - **Placement**: Nearest `.along/ISSUES/`. Types: `feat`, `bug`, `debt`, `task`, `docs`.
 - **Front-matter**:
   - `protocol`: `along` (mandatory protocol marker).
+  - `protocol_version`: optional protocol version at creation (e.g. `"2.2.4"`).
   - `slug`: lowercase kebab-case slug (2-5 words).
   - `type`: `feat` | `bug` | `debt` | `task` | `docs`.
   - `status`: `open` | `in-progress` | `blocked` | `done`.
@@ -80,19 +81,19 @@ All entities are designed for zero-friction auto-parsing by dashboards and tools
 
 ### 3. Milestones & Releases (`.along/MILESTONES/<slug>.md`)
 - Group multiple issues into a release target, stage, or sprint.
-- **Front-matter**: `protocol: along`, `slug`, `title`, `status` (`open` | `in-progress` | `completed`), `due_date`, `created`, `target_issues: []`, `progress_pct`.
+- **Front-matter**: `protocol: along`, `protocol_version`, `slug`, `title`, `status` (`open` | `in-progress` | `completed`), `due_date`, `created`, `target_issues: []`, `progress_pct`.
 
 ### 4. Risks & Blockers (`.along/RISKS/<slug>.md`)
 - Track external dependencies, API limits, blocking ambiguities, and security flags.
-- **Front-matter**: `protocol: along`, `slug`, `title`, `severity` (`critical` | `high` | `medium` | `low`), `status` (`active` | `mitigated` | `resolved`), `owner` (`agent` | `user`), `mitigation`, `created`, `updated`.
+- **Front-matter**: `protocol: along`, `protocol_version`, `slug`, `title`, `severity` (`critical` | `high` | `medium` | `low`), `status` (`active` | `mitigated` | `resolved`), `owner` (`agent` | `user`), `mitigation`, `created`, `updated`.
 
 ### 5. Spikes & R&D Experiments (`.along/SPIKES/<slug>.md`)
 - Exploratory spikes, benchmark experiments, and library evaluations before implementation.
-- **Front-matter**: `protocol: along`, `slug`, `title`, `status` (`hypothesis` | `evaluating` | `concluded`), `hypothesis`, `outcome`, `resulting_adr`, `created`.
+- **Front-matter**: `protocol: along`, `protocol_version`, `slug`, `title`, `status` (`hypothesis` | `evaluating` | `concluded`), `hypothesis`, `outcome`, `resulting_adr`, `created`.
 
 ### 6. Checklists & Verification (`.along/CHECKLISTS/<slug>.md`)
 - Reusable verification checklists for quality gates, pre-commit, and security audits.
-- **Front-matter**: `protocol: along`, `slug`, `title`, `category` (`pre-commit` | `stage-completion` | `release` | `security`), `items: [{ id, text, verified: bool }]`.
+- **Front-matter**: `protocol: along`, `protocol_version`, `slug`, `title`, `category` (`pre-commit` | `stage-completion` | `release` | `security`), `items: [{ id, text, verified: bool }]`.
 
 ### 7. Sessions (`.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<slug>.md`)
 - Comprehensive work session log.
@@ -123,7 +124,10 @@ To keep `.along/` lean and avoid token bloat:
   - `docs/topic--setup-and-workflow.md`: Build, run, test, and workflow instructions.
   - `docs/topic--<slug>.md`: Specific domain topics and module specifications.
 - **Source Archival (`.archive/`)**: Processed raw sources, unmanaged notes, and drafts are archived into `.archive/` (excluded from active KB search and site generators).
-- **Front-matter Schema**: Every `docs/*.md` article MUST include YAML front-matter: `protocol: along`, `slug`, `title`, `type` (`topic` | `architecture` | `domain-model` | `setup-workflow` | `index`), `created`, `updated`, `tags: []`.
+- **Front-matter Schema**: Every `docs/*.md` article MUST include YAML front-matter: `protocol: along`, `protocol_version: "2.2.4"`, `slug`, `title`, `type` (`topic` | `architecture` | `domain-model` | `setup-workflow` | `index`), `created`, `updated`, `tags: []`.
+- **Stable Entry Point Rule**: Direct linking from external files or `README.md` into internal service folders (`.along/KB/`, `.along/KB/`) is strictly forbidden. All public entry points must reference stable canonical paths in `docs/` (`docs/INDEX.md` or `docs/topic--<slug>.md`).
+- **Inbound Link Rewriting Engine & Migration Invariance**: Whenever documentation schemas change, migration engines (`/along-update`, `/along-kb-sync`) MUST recursively rewrite legacy path references across all repository Markdown files before deleting legacy directories.
+- **Monorepo Scope Rule**: Knowledge Base synchronization, link rewriting, and link verification operate recursively across all subprojects, packages (`packages/*`, `apps/*`), and directories.
 - **Portable Markdown Links**: All internal cross-references MUST use standard relative Markdown links (`[Title](./target.md)`) for universal rendering across GitHub, GitHub Pages, IDEs, and npm.
 - **Idempotent Synchronization**: Use `/along-kb-sync` to bootstrap, compile, and validate links in `docs/` and archive raw sources.
 - **Strict Fact Grounding Requirement**: Agents MUST extract facts strictly from actual `README.md`, `docs/`, `package.json`, and codebase symbols. Generating generic LLM placeholders is strictly prohibited.
@@ -150,7 +154,7 @@ When a Stage or session completes, agents MUST execute this verification checkli
    - Update related `.along/MILESTONES/` progress percentages.
    - Resolve mitigated `.along/RISKS/` (`status: resolved` / `mitigated`).
    - Conclude active `.along/SPIKES/` and log any resulting ADR in `.along/DECISIONS.md`.
-5. [ ] **Documentation Check**: Update `README.md`, `AGENTS.md` (project specifics), or `docs/` if code interfaces or architecture changed, and run `/along-kb-sync`.
+5. [ ] **Documentation Check & Link Integrity Gate**: Update `README.md`, `AGENTS.md` (project specifics), or `docs/` if code interfaces or architecture changed, run `/along-kb-sync`, and verify that all relative Markdown links in all repository `.md` files resolve to physically existing files on disk without 404 broken links.
 6. [ ] **Session Log**: Write `.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` with complete front-matter (`protocol: along`, `issues_advanced`, `issues_completed`, `decisions`, `risks_logged`, `spikes_conducted`) and a concise Code Review & Impact summary.
 7. [ ] **ISSUES Board Projection**: Run `/along-issue-sync` (or update `.along/ISSUES.md`).
 8. [ ] **HISTORY**: Append one line to `.along/HISTORY.md`: `<YYYY-MM-DD> - <slug> - <agent> - <summary> - <link>`.
@@ -177,7 +181,6 @@ When a Stage or session completes, agents MUST execute this verification checkli
 - Keep `ISSUES.md` compact - it costs context every session.
 - Never write secrets/credentials/tokens/keys into these files; they are committed.
 <!-- END ALONG-PROTOCOL -->
-
 ## Project specifics
 
 This repository is `Along` (`actdim-along`) - the provider-agnostic agent-context protocol and skills suite for Claude Code, Codex, OpenCode, and Antigravity.

@@ -1,5 +1,6 @@
 ---
 protocol: along
+protocol_version: "2.2.4"
 slug: topic--architecture
 title: System Architecture & Flow
 type: architecture

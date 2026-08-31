@@ -1,5 +1,6 @@
 ---
 protocol: along
+protocol_version: "2.2.4"
 slug: topic--domain-model
 title: Domain Model & Entities
 type: domain-model

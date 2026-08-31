@@ -113,9 +113,11 @@ def bump_along_dev_repo(repo_root, new_version):
             with open(readme_md, "w", encoding="utf-8") as f: f.write(u)
             modified_files.append(readme_md)
 
-    # 5. Update scripts/migrate_protocol.py
+    # 5. Update scripts/migrate_protocol.py and scripts/along_kb_sync.py
     for mp_path in [os.path.join(repo_root, "scripts", "migrate_protocol.py"),
-                    os.path.join(repo_root, "skills", "along-init", "migrate_protocol.py")]:
+                    os.path.join(repo_root, "skills", "along-init", "migrate_protocol.py"),
+                    os.path.join(repo_root, "scripts", "along_kb_sync.py"),
+                    os.path.join(repo_root, "skills", "along-kb-sync", "along_kb_sync.py")]:
         if os.path.exists(mp_path):
             with open(mp_path, "r", encoding="utf-8") as f: c = f.read()
             u = re.sub(r'CURRENT_PROTOCOL_VERSION = "\d+\.\d+\.\d+"', f'CURRENT_PROTOCOL_VERSION = "{new_version}"', c)

@@ -12,6 +12,7 @@
 <!-- Planned or deferred issues -->
 
 ## Done (recent)
+- [x] `(feat)` [link-rewriting-and-integrity-gate](file://.along/ISSUES/done/feat--link-rewriting-and-integrity-gate.md)
 - [x] `(feat)` [version-bump-automation-and-release-hardening](file://.along/ISSUES/done/feat--version-bump-automation-and-release-hardening.md)
 - [x] `(feat)` [update-agents-skill-and-automation](file://.along/ISSUES/done/feat--update-agents-skill-and-automation.md)
 - [x] `(feat)` [universal-project-version-bumping-and-along-scripts](file://.along/ISSUES/done/feat--universal-project-version-bumping-and-along-scripts.md)
