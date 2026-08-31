@@ -98,3 +98,9 @@ flowchart TD
 - Implemented in 100% pure Python standard library (`os`, `re`, `argparse`, `sys`).
 - No Node.js, `npm`, or third-party binary requirements.
 - Runs identically across Claude Code, OpenAI Codex, OpenCode, and Google Antigravity.
+
+### 7. Public Entry Point Contract (`README.md`)
+- `README.md` is the primary public entry point for humans, GitHub, and package registries.
+- It provides a high-level overview, installation/usage steps, and links directly to the Knowledge Base catalog `docs/INDEX.md` and/or foundational articles (`docs/topic--architecture.md`, `docs/topic--domain-model.md`, `docs/topic--setup-and-workflow.md`).
+- Direct references to internal service directories (`.along/KB/`) or legacy numbered files (`01-...md`) are forbidden and automatically rewritten by `along-kb-sync` and `along-update`.
+

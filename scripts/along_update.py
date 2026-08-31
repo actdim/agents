@@ -307,6 +307,15 @@ def apply_migration_to_context(ctx_dir, protocol_text, migrate_script, is_root=T
         else:
             print("   [WARN] migrate_protocol.py not found; skipping entity structure migration.")
 
+    # Unconditionally rewrite legacy inbound links in README.md and all Markdown files
+    kb_script = locate_skill_script(ctx_dir, "along-kb-sync", "along_kb_sync.py")
+    if kb_script:
+        try:
+            import along_kb_sync
+            along_kb_sync.rewrite_inbound_links(ctx_dir, dry_run=dry_run)
+        except Exception:
+            subprocess.run([sys.executable, kb_script, ctx_dir, "--check"])
+
     return True
 
 def find_uninitialized_subprojects(repo_root, contexts):
@@ -448,6 +457,7 @@ def run_update(repo_root, check_only=False, dry_run=False, force=False, local_on
     else:
         user_home = os.path.expanduser("~")
         cand_scripts = [
+            os.path.join(user_home, ".along", "bin", "migrate_protocol.py"),
             os.path.join(user_home, ".gemini", "config", "skills", "along-init", "migrate_protocol.py"),
             os.path.join(user_home, ".claude", "skills", "along-init", "migrate_protocol.py"),
             os.path.join(user_home, ".codex", "skills", "along-init", "migrate_protocol.py"),
@@ -485,7 +495,26 @@ def run_update(repo_root, check_only=False, dry_run=False, force=False, local_on
             dry_run=dry_run
         )
 
-    # Post-update sync execution or recommendation table
+    # Post-update sync execution: interactive prompt if in terminal, or follow CLI flags
+    if not (do_kb_sync or do_dep_scan or do_history_sync) and sys.stdin.isatty() and not (check_only or dry_run):
+        print("\n==================================================")
+        print("-> Interactive Post-Update Operations:")
+        try:
+            ans_kb = input("   [?] Compile Knowledge Base in docs/ (/along-kb-sync)? [y/N]: ").strip().lower()
+            if ans_kb in ('y', 'yes'):
+                do_kb_sync = True
+
+            ans_dep = input("   [?] Scan project dependencies for AI guidelines (/along-dep-scan)? [y/N]: ").strip().lower()
+            if ans_dep in ('y', 'yes'):
+                do_dep_scan = True
+
+            ans_hist = input("   [?] Reconcile Git history into .along/ (/along-history-sync)? [y/N]: ").strip().lower()
+            if ans_hist in ('y', 'yes'):
+                do_history_sync = True
+        except (EOFError, KeyboardInterrupt):
+            pass
+        print("==================================================")
+
     if do_kb_sync or do_dep_scan or do_history_sync:
         execute_post_update_syncs(contexts, repo_root, do_kb_sync, do_dep_scan, do_history_sync)
     else:

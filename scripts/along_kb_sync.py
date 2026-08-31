@@ -295,17 +295,36 @@ def rewrite_inbound_links(repo_root, dry_run=False):
                 is_legacy = False
                 orig_filename = os.path.basename(target_base)
 
-                if any(k in target_base for k in [".along/KB/", ".agents/KB/", "/KB/", "along/KB/", "agents/KB/", "/kb/", "/wiki/", "kb/", "wiki/"]):
+                # 1. Path contains legacy Knowledge Base directories
+                has_kb_dir = any(k in target_base for k in [".along/KB", ".agents/KB", "/KB", "along/KB", "agents/KB", "/kb", "/wiki", "kb/", "wiki/"])
+                
+                if has_kb_dir:
                     is_legacy = True
+                    if orig_filename in ("", "KB", "kb", "wiki", "INDEX.md", "INDEX"):
+                        new_filename = "INDEX.md"
+                    elif orig_filename in LEGACY_FILE_MAPPING:
+                        new_filename = LEGACY_FILE_MAPPING[orig_filename]
+                    elif re.match(r'^\d+[-_]', orig_filename):
+                        clean_name = re.sub(r'^\d+[-_]', '', orig_filename)
+                        if not clean_name.endswith('.md'):
+                            clean_name += '.md'
+                        new_filename = f"topic--{clean_name}"
+                    else:
+                        clean_name = orig_filename if orig_filename.endswith('.md') else f"{orig_filename}.md"
+                        new_filename = clean_name if clean_name.startswith("topic--") or clean_name == "INDEX.md" else f"topic--{clean_name}"
                 elif orig_filename in LEGACY_FILE_MAPPING:
                     is_legacy = True
+                    new_filename = LEGACY_FILE_MAPPING[orig_filename]
+                elif re.match(r'^\d+[-_]', orig_filename):
+                    # Legacy numbered filename (e.g. docs/01-architecture.md or ./01-overview.md)
+                    is_legacy = True
+                    clean_name = re.sub(r'^\d+[-_]', '', orig_filename)
+                    if not clean_name.endswith('.md'):
+                        clean_name += '.md'
+                    new_filename = f"topic--{clean_name}"
 
                 if not is_legacy:
                     return match.group(0)
-
-                new_filename = LEGACY_FILE_MAPPING.get(orig_filename, orig_filename)
-                if not new_filename.startswith("topic--") and new_filename != "INDEX.md" and new_filename.endswith(".md"):
-                    new_filename = f"topic--{new_filename}"
 
                 # Determine target docs directory (nearest subproject docs if present, else root docs)
                 target_docs = root_docs_dir

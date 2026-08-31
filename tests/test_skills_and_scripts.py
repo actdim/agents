@@ -497,8 +497,65 @@ class TestAlongSkillsAndScripts(unittest.TestCase):
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
 
+    def test_19_retroactive_link_rewriting_without_kb_dir(self):
+        """Verify that along_update retroactively rewrites legacy KB links even when .along/KB was already deleted."""
+        temp_dir = tempfile.mkdtemp(prefix="along_retroactive_links_")
+        try:
+            # Context already migrated to docs/, .along/KB is gone
+            docs_dir = os.path.join(temp_dir, "docs")
+            os.makedirs(docs_dir, exist_ok=True)
+            with open(os.path.join(docs_dir, "topic--architecture.md"), "w", encoding="utf-8") as f:
+                f.write("---\nprotocol: along\nslug: topic--architecture\n---\n# Arch\n")
+            with open(os.path.join(docs_dir, "topic--domain-model.md"), "w", encoding="utf-8") as f:
+                f.write("---\nprotocol: along\nslug: topic--domain-model\n---\n# Domain\n")
+            with open(os.path.join(docs_dir, "INDEX.md"), "w", encoding="utf-8") as f:
+                f.write("# Index\n")
+
+            with open(os.path.join(temp_dir, "AGENTS.md"), "w", encoding="utf-8") as f:
+                f.write("<!-- BEGIN ALONG-PROTOCOL root -->\n# ALONG-PROTOCOL v2.1.0\n<!-- END ALONG-PROTOCOL -->\n")
+
+            # README with broken links from old versions
+            readme_path = os.path.join(temp_dir, "README.md")
+            with open(readme_path, "w", encoding="utf-8") as f:
+                f.write(
+                    "# Project Title\n\n"
+                    "- [Architecture](.along/KB/01-architecture.md)\n"
+                    "- [Domain](docs/02-domain-model.md)\n"
+                    "- [Custom Section](.along/KB/05-custom-guide.md)\n"
+                    "- [Catalog](.along/KB/)\n"
+                )
+
+            update_script = os.path.join(REPO_ROOT, "scripts", "along_update.py")
+            res = subprocess.run([sys.executable, update_script, temp_dir, "--local-only"], capture_output=True, text=True)
+            self.assertEqual(res.returncode, 0, f"along_update failed:\n{res.stderr}\nSTDOUT:\n{res.stdout}")
+
+            with open(readme_path, "r", encoding="utf-8") as f:
+                updated_readme = f.read()
+
+            self.assertIn("./docs/topic--architecture.md", updated_readme)
+            self.assertIn("./docs/topic--domain-model.md", updated_readme)
+            self.assertIn("./docs/topic--custom-guide.md", updated_readme)
+            self.assertIn("./docs/INDEX.md", updated_readme)
+            self.assertNotIn(".along/KB", updated_readme)
+            self.assertNotIn("01-architecture", updated_readme)
+
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+    def test_20_candidate_scripts_resolution(self):
+        """Verify that along_update resolves helper scripts in ~/.along/bin/ and scripts/."""
+        scripts_dir = os.path.join(REPO_ROOT, "scripts")
+        if scripts_dir not in sys.path:
+            sys.path.insert(0, scripts_dir)
+        import along_update
+
+        resolved_kb = along_update.locate_skill_script(REPO_ROOT, "along-kb-sync", "along_kb_sync.py")
+        self.assertIsNotNone(resolved_kb, "Should resolve along_kb_sync.py in repository scripts/")
+        self.assertTrue(os.path.exists(resolved_kb))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
 
 

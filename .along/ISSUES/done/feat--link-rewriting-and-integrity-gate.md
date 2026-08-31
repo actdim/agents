@@ -28,3 +28,4 @@ Add automated Inbound Link Rewriting and Global Link Integrity Gate across the e
 - [x] Update `skills/along-init/protocol.md` and `AGENTS.md` with Stable Entry Point Rule, Monorepo Scope Rule, and Link Integrity Gate in checklist.
 - [x] Update `skills/along-kb-sync/SKILL.md`, `skills/along-wrap/SKILL.md`, and `skills/along-update/SKILL.md`.
 - [x] Verify test suite and repository link integrity.
+
