@@ -3,7 +3,7 @@ name: along-kb-sync
 description: Synchronize, compile, and reconcile the Knowledge Base in docs/ using LLM-Wiki pipeline. Ingests README facts and raw sources, moves originals to .archive/, validates Markdown links, and rebuilds docs/INDEX.md. Use when invoking /along-kb-sync.
 ---
 
-# Along KB Sync  [v2.1.3]
+# Along KB Sync  [v2.1.4]
 
 Idempotent LLM-Wiki Knowledge Base synchronization, compilation, and link-linting engine for `docs/`.
 
@@ -30,11 +30,11 @@ When executing `/along-kb-sync`:
   - When processing extensive documentation dumps, large monorepos, or multiple subprojects:
     1. **Decompose Topics**: Split the knowledge extraction into 2-4 discrete domain vectors (e.g. `architecture`, `data-models`, `api-integrations`, `workflows`).
     2. **Spawn Parallel Subagents**: Concurrently invoke research subagents to synthesize independent `docs/topic--<slug>.md` articles in parallel with standard YAML front-matter.
-    3. **Reconcile & Link**: Run `python skills/along-kb-sync/along_kb_sync.py` to validate all relative links `[Title](./target.md)`, move processed raw sources into `.archive/`, and rebuild `docs/INDEX.md`.
+    3. **Reconcile & Link**: Run `python scripts/along_kb_sync.py` to validate all relative links `[Title](./target.md)`, move processed raw sources into `.archive/`, and rebuild `docs/INDEX.md`.
 
 ## Usage
 ```bash
-python skills/along-kb-sync/along_kb_sync.py [REPO_ROOT] [--check]
+python scripts/along_kb_sync.py [REPO_ROOT] [--check]
 ```
+*(Or `python scripts/along_exec.py kb-sync` / `/along-kb-sync`)*
 
-- Command: `/along-kb-sync`

@@ -101,6 +101,16 @@ install_skillfolders() {  # $1 = tool home dir; installs SKILL.md folders verbat
   done
 }
 
+install_along_scripts() {
+  local along_bin="$HOME/.along/bin"
+  mkdir -p "$along_bin"
+  local scripts_src="$SCRIPT_DIR/scripts"
+  if [ -d "$scripts_src" ]; then
+    cp -r "$scripts_src"/*.py "$along_bin/" 2>/dev/null || true
+    echo "-> Along tools installed -> $along_bin"
+  fi
+}
+
 install_opencode() {  # generate flat commands + place along-init helper
   local cmddir="$OPENCODE_HOME/commands"
   local helper="$OPENCODE_HOME/actdim-along"
@@ -113,15 +123,11 @@ install_opencode() {  # generate flat commands + place along-init helper
     rm -f "$cmddir/$leg.md"
   done
 
+  local scripts_src="$SCRIPT_DIR/scripts"
+  if [ -d "$scripts_src" ]; then
+    cp -r "$scripts_src"/*.py "$helper/" 2>/dev/null || true
+  fi
   [ -f "$src/along-init/protocol.md" ] && cp -f "$src/along-init/protocol.md" "$helper/protocol.md"
-  [ -f "$src/along-init/migrate_protocol.py" ] && cp -f "$src/along-init/migrate_protocol.py" "$helper/migrate_protocol.py"
-  [ -f "$src/along-update/along_update.py" ] && cp -f "$src/along-update/along_update.py" "$helper/along_update.py"
-  [ -f "$src/along-dash/along_dash.py" ] && cp -f "$src/along-dash/along_dash.py" "$helper/along_dash.py"
-  [ -f "$src/along-dep-scan/along_dep_scan.py" ] && cp -f "$src/along-dep-scan/along_dep_scan.py" "$helper/along_dep_scan.py"
-  [ -f "$src/along-version-bump/along_version_bump.py" ] && cp -f "$src/along-version-bump/along_version_bump.py" "$helper/along_version_bump.py"
-  [ -f "$src/along-kb-sync/along_kb_sync.py" ] && cp -f "$src/along-kb-sync/along_kb_sync.py" "$helper/along_kb_sync.py"
-  [ -f "$src/along-kb-search/along_kb_search.py" ] && cp -f "$src/along-kb-search/along_kb_search.py" "$helper/along_kb_search.py"
-  [ -f "$src/along-history-sync/along_history_sync.py" ] && cp -f "$src/along-history-sync/along_history_sync.py" "$helper/along_history_sync.py"
 
   local d name sk desc out
   for d in "$src"/*/; do
@@ -179,6 +185,8 @@ else:
 " "$file" 2>/dev/null || true
   fi
 }
+
+install_along_scripts
 
 if [ "$do_claude" -eq 1 ]; then
   install_skillfolders "$CLAUDE_HOME"

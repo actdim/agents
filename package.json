@@ -1,8 +1,11 @@
 {
   "name": "along",
-  "version": "2.0.8",
+  "version": "2.1.3",
   "private": true,
   "scripts": {
+    "test": "python .along/scripts/test.py",
+    "test:quiet": "python -m unittest discover tests -q",
+    "build": "pnpm run build:ui",
     "dev": "uv run scripts/along_dash.py --dev",
     "dash": "uv run scripts/along_dash.py --web",
     "build:ui": "pnpm --filter @along/dashboard-ui build"

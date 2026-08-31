@@ -3,7 +3,7 @@ name: along-build
 description: Build the target repository using .along/scripts/build.py or auto-detected build tool (npm, cargo, dotnet, python).
 ---
 
-# Along Build (`/along-build`) [v2.1.3]
+# Along Build (`/along-build`) [v2.1.4]
 
 Execute project build lifecycle hook via `.along/scripts/build.py` or auto-detected build runner.
 
@@ -12,7 +12,7 @@ Execute project build lifecycle hook via `.along/scripts/build.py` or auto-detec
 ## Usage
 
 ```bash
-python scripts/along_exec.py build
+python .along/scripts/build.py
 ```
-*(Or `/along-build`)*
+*(Or `/along-build`, or stack fallback: `npm run build`, `cargo build`, `dotnet build -v q`, `python -m build`)*
 

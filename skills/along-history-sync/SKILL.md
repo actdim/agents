@@ -3,7 +3,7 @@ name: along-history-sync
 description: Reconstruct and reconcile .along/ project history (ISSUES, MILESTONES, SESSIONS, HISTORY.md) from Git commits, tags, and PRs. Use when initializing on an existing git repo or when invoking /along-history-sync.
 ---
 
-# Along History Sync (`/along-history-sync`) [v2.1.3]
+# Along History Sync (`/along-history-sync`) [v2.1.4]
 
 Analyzes Git commits, tags, and PRs to synthesize missing `.along/` entities (`ISSUES/done/`, `MILESTONES/`, `SESSIONS/`, `HISTORY.md`) with `protocol: along`.
 
@@ -15,8 +15,9 @@ Analyzes Git commits, tags, and PRs to synthesize missing `.along/` entities (`I
 ## Usage
 
 ```bash
-python skills/along-history-sync/along_history_sync.py [repo_root] [--check] [--synthesize] [--limit <N>]
+python scripts/along_history_sync.py [repo_root] [--check] [--synthesize] [--limit <N>]
 ```
+*(Or `python scripts/along_exec.py history-sync` / `/along-history-sync`)*
 
 ### CLI Flags
 - `--check`: Inspect and report unmapped commits without modifying `.along/` files (default).

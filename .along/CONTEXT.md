@@ -1,13 +1,14 @@
-# Context Snapshot (2026-08-30)
+# Context Snapshot (2026-08-31)
 
 ## Repository State
-- **Along Protocol**: `v2.1.2`
-- **Active Area**: Multi-Agent Development Protocol (`along-team`), Living Plan state machine, and hierarchical dependency discovery.
-- **Key Modules**: `skills/along-team/SKILL.md`, `skills/along-dep-scan/along_dep_scan.py`, `skills/along-kb-sync/along_kb_sync.py`, `docs/`.
+- **Along Protocol**: `v2.1.3`
+- **Active Area**: Skills audit, lifecycle hooks standardization, and deterministic agent execution.
+- **Key Modules**: `.along/scripts/`, `scripts/`, `skills/`, `dashboard/`, `package.json`.
 
 ## Current Status
-- Sequential Multi-Agent Development Protocol formalized with 5 roles: Supervisor, Researcher, Architect, Implementer, Reviewer.
-- Canonical `/along-team` skill created and deployed across Claude Code, Codex, OpenCode, and Antigravity.
-- Integrated `/goal` autonomous execution mode with bounded feedback loops and Adaptive Complexity Routing (S/M/L).
-- ADR #013 recorded in `.along/DECISIONS.md`; issue `feat--agentic-goals-and-mandatory-checklists.md` completed.
-- All 15 unit tests passing (`python -m unittest`).
+- Standardized project lifecycle hooks in `.along/scripts/` (`test.py`, `dev.py`, `build.py`).
+- Eliminated test discovery crashes on `dashboard.api` by isolating imports.
+- Synchronized script duplicates across `scripts/` and `skills/` (`along_version_bump.py`, `along_update.py`).
+- Declared explicit deterministic lifecycle commands in `package.json`, `AGENTS.md`, and `SKILL.md` manifests.
+- All 15 unit tests passing (`python .along/scripts/test.py` or `python -m unittest discover tests -q`).
+

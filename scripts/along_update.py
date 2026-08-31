@@ -300,6 +300,7 @@ def apply_migration_to_context(ctx_dir, protocol_text, migrate_script, is_root=T
     return True
 
 def locate_skill_script(repo_root: str, skill_folder: str, script_name: str) -> Optional[str]:
+    """Locates a skill runner script either in local repo or in global environment."""
     local_p = os.path.join(repo_root, "skills", skill_folder, script_name)
     if os.path.isfile(local_p):
         return local_p
@@ -316,6 +317,7 @@ def locate_skill_script(repo_root: str, skill_folder: str, script_name: str) -> 
     return None
 
 def execute_post_update_syncs(repo_root: str, do_kb: bool, do_dep: bool, do_hist: bool):
+    """Executes requested post-update sync engines."""
     if do_kb:
         kb_script = locate_skill_script(repo_root, "along-kb-sync", "along_kb_sync.py")
         if kb_script:
@@ -444,6 +446,7 @@ def run_update(repo_root, check_only=False, dry_run=False, force=False, local_on
             dry_run=dry_run
         )
 
+    # Post-update sync execution or recommendation table
     if do_kb_sync or do_dep_scan or do_history_sync:
         execute_post_update_syncs(repo_root, do_kb_sync, do_dep_scan, do_history_sync)
     else:

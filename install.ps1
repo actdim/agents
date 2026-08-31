@@ -116,6 +116,16 @@ function Install-RuleFolders([string]$homeDir) {
     }
 }
 
+function Install-AlongScripts {
+    $alongBin = Join-Path $env:USERPROFILE '.along\bin'
+    New-Item -ItemType Directory -Force -Path $alongBin | Out-Null
+    $scriptsSrc = Join-Path $PSScriptRoot 'scripts'
+    if (Test-Path $scriptsSrc) {
+        Copy-Item -Path "$scriptsSrc\*" -Destination $alongBin -Recurse -Force
+        Write-Host "-> Along tools installed -> $alongBin"
+    }
+}
+
 function Install-OpenCode {
     $cmddir = Join-Path $OpencodeHome 'commands'
     $helper = Join-Path $OpencodeHome 'actdim-along'
@@ -142,32 +152,12 @@ function Install-OpenCode {
         }
     }
 
+    $scriptsSrc = Join-Path $PSScriptRoot 'scripts'
+    if (Test-Path $scriptsSrc) {
+        Copy-Item -Path "$scriptsSrc\*" -Destination $helper -Recurse -Force
+    }
     if (Test-Path (Join-Path $src 'along-init\protocol.md')) {
-        Copy-Item -Force (Join-Path $src 'along-init\protocol.md')       (Join-Path $helper 'protocol.md')
-    }
-    if (Test-Path (Join-Path $src 'along-init\migrate_protocol.py')) {
-        Copy-Item -Force (Join-Path $src 'along-init\migrate_protocol.py') (Join-Path $helper 'migrate_protocol.py')
-    }
-    if (Test-Path (Join-Path $src 'along-update\along_update.py')) {
-        Copy-Item -Force (Join-Path $src 'along-update\along_update.py')  (Join-Path $helper 'along_update.py')
-    }
-    if (Test-Path (Join-Path $src 'along-dash\along_dash.py')) {
-        Copy-Item -Force (Join-Path $src 'along-dash\along_dash.py')      (Join-Path $helper 'along_dash.py')
-    }
-    if (Test-Path (Join-Path $src 'along-dep-scan\along_dep_scan.py')) {
-        Copy-Item -Force (Join-Path $src 'along-dep-scan\along_dep_scan.py') (Join-Path $helper 'along_dep_scan.py')
-    }
-    if (Test-Path (Join-Path $src 'along-version-bump\along_version_bump.py')) {
-        Copy-Item -Force (Join-Path $src 'along-version-bump\along_version_bump.py') (Join-Path $helper 'along_version_bump.py')
-    }
-    if (Test-Path (Join-Path $src 'along-kb-sync\along_kb_sync.py')) {
-        Copy-Item -Force (Join-Path $src 'along-kb-sync\along_kb_sync.py') (Join-Path $helper 'along_kb_sync.py')
-    }
-    if (Test-Path (Join-Path $src 'along-kb-search\along_kb_search.py')) {
-        Copy-Item -Force (Join-Path $src 'along-kb-search\along_kb_search.py') (Join-Path $helper 'along_kb_search.py')
-    }
-    if (Test-Path (Join-Path $src 'along-history-sync\along_history_sync.py')) {
-        Copy-Item -Force (Join-Path $src 'along-history-sync\along_history_sync.py') (Join-Path $helper 'along_history_sync.py')
+        Copy-Item -Force (Join-Path $src 'along-init\protocol.md') (Join-Path $helper 'protocol.md')
     }
 
     foreach ($d in Get-ChildItem -Directory $src) {
@@ -269,6 +259,8 @@ $targets = switch ($Target) {
     'both'        { @('claude', 'codex') }
     'all'         { @('claude', 'codex', 'opencode', 'antigravity') }
 }
+
+Install-AlongScripts
 
 foreach ($t in $targets) {
     switch ($t) {

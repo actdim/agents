@@ -38,14 +38,14 @@ from .api.metrics_api import get_collector as metrics_get_collector
 def create_app(agents_dir: Path) -> FastAPI:
     """Create and configure the FastAPI application."""
     if not HAS_FASTAPI:
-        raise RuntimeError("FastAPI is required to run web server. Install with: pip install fastapi uvicorn")
+        raise RuntimeError("FastAPI is required to run web server. Run via uv: uv run scripts/along_dash.py --web")
 
     collector = EntityCollector(agents_dir)
     watcher = RepoWatcher(agents_dir.parent)
 
     app = FastAPI(
         title="Along Dashboard & Knowledge Base API",
-        version="2.0.8",
+        version="2.1.3",
         description="Type-safe OpenAPI REST & SSE service for Along Protocol entities, dependency DAGs, and Knowledge Base search.",
         docs_url="/docs",
         redoc_url="/redoc",

@@ -190,9 +190,31 @@ class TestAlongSkillsAndScripts(unittest.TestCase):
         self.assertIn("Get-ChildItem -Directory $src", ps1_content)
         self.assertIn('for d in "$src"/*/', sh_content)
 
-        for helper in ["protocol.md", "migrate_protocol.py", "along_update.py", "along_dash.py"]:
-            self.assertIn(helper, ps1_content, f"install.ps1 should handle {helper}")
-            self.assertIn(helper, sh_content, f"install.sh should handle {helper}")
+        self.assertIn("scripts", ps1_content)
+        self.assertIn("scripts", sh_content)
+        self.assertIn("protocol.md", ps1_content)
+        self.assertIn("protocol.md", sh_content)
+
+    def test_10_skills_pure_declarative(self):
+        """Verify that skills/ directory contains only clean Markdown manifests and zero .py or __pycache__ files."""
+        py_in_skills = glob.glob(os.path.join(REPO_ROOT, "skills", "**", "*.py"), recursive=True)
+        pyc_in_skills = glob.glob(os.path.join(REPO_ROOT, "skills", "**", "*.pyc"), recursive=True)
+        pycache_dirs = [d for d in glob.glob(os.path.join(REPO_ROOT, "skills", "**"), recursive=True) if "__pycache__" in d]
+
+        self.assertEqual(len(py_in_skills), 0, f"skills/ directory must not contain .py files: {py_in_skills}")
+        self.assertEqual(len(pyc_in_skills), 0, f"skills/ directory must not contain .pyc files: {pyc_in_skills}")
+        self.assertEqual(len(pycache_dirs), 0, f"skills/ directory must not contain __pycache__: {pycache_dirs}")
+
+    def test_11_along_exec_router_dispatch(self):
+        """Verify that along_exec.py command router responds to --help and dispatches known commands."""
+        exec_script = os.path.join(REPO_ROOT, "scripts", "along_exec.py")
+        self.assertTrue(os.path.exists(exec_script), "scripts/along_exec.py must exist")
+
+        res = subprocess.run([sys.executable, exec_script, "--help"], capture_output=True, text=True)
+        self.assertEqual(res.returncode, 0)
+        self.assertIn("Along Command Router", res.stdout)
+        self.assertIn("kb-sync", res.stdout)
+        self.assertIn("dep-scan", res.stdout)
 
 
 if __name__ == "__main__":

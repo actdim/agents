@@ -3,7 +3,7 @@ name: along-kb-search
 description: Fast unified retrieval engine across Knowledge Base (docs/) and living project memory (.along/ISSUES, DECISIONS.md, MILESTONES, RISKS, SESSIONS). Minimizes agent context tokens during research, blast radius analysis, and decision-making. Use when invoking /along-kb-search.
 ---
 
-# Along KB Search  [v2.1.3]
+# Along KB Search  [v2.1.4]
 
 Unified Multi-Scope Knowledge & Memory Retrieval Engine for AI coding agents and developers.
 
@@ -21,7 +21,7 @@ Instead of reading thousands of tokens of project files into prompt context duri
 
 ## Usage
 ```bash
-python skills/along-kb-search/along_kb_search.py "<query>" [--category all|kb|issue|decision|milestone|risk|spike|session] [--limit 8] [--tag <tag>]
+python scripts/along_kb_search.py "<query>" [--category all|kb|issue|decision|milestone|risk|spike|session] [--limit 8] [--tag <tag>]
 ```
+*(Or `python scripts/along_exec.py kb-search` / `/along-kb-search`)*
 
-- Command: `/along-kb-search`

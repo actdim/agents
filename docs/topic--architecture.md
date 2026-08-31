@@ -3,8 +3,8 @@ protocol: along
 slug: topic--architecture
 title: System Architecture & Flow
 type: architecture
-created: 2026-08-30
-updated: 2026-08-30
+created: 2026-08-31
+updated: 2026-08-31
 tags: [architecture]
 ---
 

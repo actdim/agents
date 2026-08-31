@@ -11,6 +11,7 @@
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [centralize-scripts-and-clean-skills-purity](file://.along/ISSUES/done/feat--centralize-scripts-and-clean-skills-purity.md)
 - [x] `(feat)` [agentic-goals-and-mandatory-checklists](file://.along/ISSUES/done/feat--agentic-goals-and-mandatory-checklists.md)
 - [x] `(feat)` [hierarchical-dep-scan-and-wiki-integration](file://.along/ISSUES/done/feat--hierarchical-dep-scan-and-wiki-integration.md)
 - [x] `(feat)` [llm-wiki-docs-architecture-and-skill-refactor](file://.along/ISSUES/done/feat--llm-wiki-docs-architecture-and-skill-refactor.md)

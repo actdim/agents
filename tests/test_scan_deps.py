@@ -11,8 +11,8 @@ import tempfile
 import unittest
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCAN_DEPS_MODULE = os.path.join(REPO_ROOT, "skills", "along-dep-scan")
-sys.path.insert(0, SCAN_DEPS_MODULE)
+SCRIPTS_DIR = os.path.join(REPO_ROOT, "scripts")
+sys.path.insert(0, SCRIPTS_DIR)
 
 import along_dep_scan as along_scan_deps
 

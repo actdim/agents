@@ -1,5 +1,5 @@
 <!-- BEGIN ALONG-PROTOCOL root (managed by along-init - do not edit by hand) -->
-# ALONG-PROTOCOL v2.1.3
+# ALONG-PROTOCOL v2.1.4
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
@@ -155,6 +155,10 @@ This repository is `Along` (`actdim-along`) - the provider-agnostic agent-contex
 - **Install Commands**:
   - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Target all` (or `install.bat`).
   - Linux / macOS: `bash install.sh`.
+- **Lifecycle Commands**:
+  - Run Tests: `python .along/scripts/test.py` (or `python -m unittest discover tests -q`).
+  - Run Dev Server: `npm run dev` (or `python .along/scripts/dev.py`).
+  - Build Assets: `npm run build` (or `python .along/scripts/build.py`).
 - **Frontend Architecture (`packages/along-dash-ui/`)**:
   - Full architectural rules in `[docs/topic--frontend-frameworks.md](file://docs/topic--frontend-frameworks.md)` and `[.along/DECISIONS.md](file://.along/DECISIONS.md#011)`.
   - Strict `@actdim/dynstruct` component architecture with MobX reactive state; zero raw `useState`/`useEffect` hooks.
