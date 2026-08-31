@@ -27,7 +27,7 @@ import shutil
 import subprocess
 from datetime import datetime
 
-CURRENT_PROTOCOL_VERSION = "2.2.5"
+CURRENT_PROTOCOL_VERSION = "2.2.6"
 
 def parse_yaml_frontmatter(content):
     match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n(.*)$", content, re.DOTALL)
@@ -705,15 +705,15 @@ def run_migrations(repo_root):
     print("-> Step 7 [v2.0 -> v2.1]: Migrating Knowledge Base to docs/ and .archive/...")
     step_migrate_v2_1_docs_wiki_and_archive(repo_root)
 
-    # Step 8: v2.2.4 -> v2.2.5 Inbound Link Rewriting & Integrity Verification
-    print("-> Step 8 [v2.2.3/v2.2.4 -> v2.2.5]: Retroactively repairing broken README links & verifying integrity...")
+    # Step 8: v2.2.x -> v2.2.6 Inbound Link Rewriting & Integrity Verification
+    print("-> Step 8 [v2.2.x -> v2.2.6]: Retroactively repairing broken README links & verifying integrity...")
     step_migrate_v2_2_5_link_rewriting_and_integrity(repo_root, detected_version)
 
     print(f"-> [OK] All Along v{CURRENT_PROTOCOL_VERSION} migrations & validations completed successfully!")
 
 def step_migrate_v2_2_5_link_rewriting_and_integrity(repo_root, detected_version="1.0.0"):
     """
-    Step 8 [v2.2.3 / v2.2.4 -> v2.2.5]:
+    Step 8 [v2.2.x -> v2.2.6]:
     Retroactively repairs broken inbound links in README.md and all project Markdown files
     caused by premature deletion of .along/KB/ without inbound link rewriting in versions 2.1.0 - 2.2.4.
     """
