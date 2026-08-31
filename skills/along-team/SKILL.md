@@ -3,7 +3,7 @@ name: along-team
 description: Execute software development tasks via sequential multi-agent protocol (Supervisor -> Research -> Architect -> Living Plan -> Step Loops [Implement -> Review/Test -> Reassess]). Supports autonomous execution, /goal integration, and adaptive complexity routing.
 ---
 
-# Along Team (`/along-team`) [v2.1.6]
+# Along Team (`/along-team`) [v2.1.7]
 
 Universal sequential multi-agent development protocol and state machine for complex engineering tasks.
 
@@ -63,7 +63,12 @@ All roles map to standard built-in agent primitives:
 ### 5. Reviewer (Gatekeeper: Tester + Critic + Judge)
 - **Question**: *Is the current step good enough to proceed?*
 - **Execution**: `invoke_subagent` with `TypeName: "self"`, `Role: "Code Reviewer"`.
-- **Scope**: Runs automated test runner (`along-test`), inspects `git diff`, checks blast radius (`code-review-graph`), enforces `.along/DECISIONS.md` and clean ASCII rules.
+- **Mandatory Reviewer Rubric (Fail if any check fails)**:
+  1. **Zero-Byte & File Integrity Gate**: Inspect all created/modified/untracked files (`git status -u`). Verify `size > 0` bytes and ensure no empty placeholders or truncated bodies exist.
+  2. **Automated Tests**: Execute unit tests (`python scripts/along_exec.py test`). Verify test discovery count increased appropriately and zero tests failed.
+  3. **Diff & Scope Audit**: Inspect `git diff` for out-of-scope modifications, broken imports, or missing implementations.
+  4. **Blast Radius & Architecture**: Verify caller contracts, handle nulls/exceptions, and ensure compliance with `.along/DECISIONS.md`.
+  5. **Typography & Encoding**: Guarantee clean UTF-8 ASCII without forbidden typographic characters (em-dash, curly quotes, non-breaking spaces).
 - **Output**: `PASS` or `FAIL` with actionable issue list.
 
 ---

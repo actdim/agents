@@ -11,6 +11,7 @@
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [self-diagnostics-and-feedback-subsystem](file://.along/ISSUES/done/feat--self-diagnostics-and-feedback-subsystem.md)
 - [x] `(feat)` [deterministic-entity-cli-and-powershell-escaping-resilience](file://.along/ISSUES/done/feat--deterministic-entity-cli-and-powershell-escaping-resilience.md)
 - [x] `(feat)` [multi-agent-blackboard-and-architectural-rationale](file://.along/ISSUES/done/feat--multi-agent-blackboard-and-architectural-rationale.md)
 - [x] `(feat)` [centralize-scripts-and-clean-skills-purity](file://.along/ISSUES/done/feat--centralize-scripts-and-clean-skills-purity.md)

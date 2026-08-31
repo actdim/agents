@@ -48,6 +48,9 @@ TOOL_MAPPINGS = {
     "migrate": "migrate_protocol.py",
     "sanitize": "sanitize_typography.py",
     "typography": "sanitize_typography.py",
+    "feedback": "along_feedback.py",
+    "diagnostics": "along_feedback.py",
+    "telemetry": "along_feedback.py",
 }
 
 LIFECYCLE_ACTIONS = {"build", "test", "dev", "debug"}
@@ -84,6 +87,27 @@ def resolve_tool_script(script_name: str, repo_root: str) -> Optional[str]:
         if os.path.isfile(p):
             return os.path.abspath(p)
     return None
+
+
+def try_record_incident(component: str, error_message: str, stack_trace: str = "", command: str = "", repo_root: str = ""):
+    """Safely traps and records internal Along exceptions into ~/.along/diagnostics/ without crashing."""
+    try:
+        feedback_script = resolve_tool_script("along_feedback.py", repo_root)
+        if feedback_script and os.path.exists(feedback_script):
+            scripts_dir = os.path.dirname(feedback_script)
+            if scripts_dir not in sys.path:
+                sys.path.insert(0, scripts_dir)
+            import along_feedback
+            along_feedback.DiagnosticsStore.record_incident(
+                component=component,
+                error_message=error_message,
+                event_type="script_crash",
+                stack_trace=stack_trace,
+                command=command,
+                repo_root=repo_root
+            )
+    except Exception:
+        pass
 
 
 def get_lifecycle_script_path(repo_root: str, action: str) -> str:
@@ -193,6 +217,7 @@ Along Protocol Tools:
   dash           Launch executive dashboard and OpenAPI service
   migrate        Run protocol migration and YAML front-matter fixes
   sanitize       Sanitize non-ASCII typography across repository files
+  feedback       Global diagnostics, error capture, and feedback dispatch (Telegram/Webhook/File)
 """)
 
 

@@ -32,9 +32,11 @@ Along provides a complete suite of **17 singular automation skills** operating a
 | `along-context-sync` | `/along-context-sync` | `python skills/along-context-sync/along_context_sync.py` | Refresh and compact the nearest `.along/CONTEXT.md` (<20 lines). |
 | `along-decision-sync` | `/along-decision-sync` | `python skills/along-decision-sync/along_decision_sync.py` | Append numbered ADR entries in `.along/DECISIONS.md`. |
 | `along-history-sync` | `/along-history-sync` | `python skills/along-history-sync/along_history_sync.py` | Reconstruct `.along/` entities and milestones from Git commit history. |
-| `along-graph-check` | `/along-graph-check` | `python skills/along-graph-check/along_graph_check.py` | Evaluate `code-review-graph` AST impact radius and blast radius. |
-| `along-dep-scan` | `/along-dep-scan` | `python skills/along-dep-scan/along_dep_scan.py` | Scan declared dependencies for AI instructions into `docs/topic--dependencies.md`. |
+| `along-graph-check` | `/along-graph-check` | `python scripts/along_graph_check.py` | Evaluate `code-review-graph` AST impact radius and blast radius. |
+| `along-dep-scan` | `/along-dep-scan` | `python scripts/along_dep_scan.py` | Scan declared dependencies for AI instructions into `docs/topic--dependencies.md`. |
 | `along-version-bump` | `/along-version-bump` | `python scripts/along_version_bump.py` | Multi-stack version bump with pre-commit test gate and release commit. |
+| `along-team` | `/along-team` | `along-team` | Multi-agent autonomous team coordination and living execution plans. |
+| `along-feedback` | `/along-feedback` | `python scripts/along_feedback.py` | System self-diagnostics, incident logging, and feedback dispatch (Telegram/Webhook/File). |
 
 ---
 

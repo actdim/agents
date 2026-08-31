@@ -102,12 +102,19 @@ install_skillfolders() {  # $1 = tool home dir; installs SKILL.md folders verbat
 }
 
 install_along_scripts() {
-  local along_bin="$HOME/.along/bin"
+  local along_home="$HOME/.along"
+  local along_bin="$along_home/bin"
   mkdir -p "$along_bin"
   local scripts_src="$SCRIPT_DIR/scripts"
   if [ -d "$scripts_src" ]; then
     cp -r "$scripts_src"/*.py "$along_bin/" 2>/dev/null || true
     echo "-> Along tools installed -> $along_bin"
+  fi
+  local cfg_file="$along_home/config.json"
+  local example_cfg="$SCRIPT_DIR/config/along-config.example.json"
+  if [ ! -f "$cfg_file" ] && [ -f "$example_cfg" ]; then
+    cp "$example_cfg" "$cfg_file"
+    echo "-> Initialized default Along configuration: $cfg_file"
   fi
 }
 

@@ -1,5 +1,5 @@
 <!-- BEGIN ALONG-PROTOCOL root (managed by along-init - do not edit by hand) -->
-# ALONG-PROTOCOL v2.1.6
+# ALONG-PROTOCOL v2.1.7
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
@@ -109,12 +109,13 @@ To keep `.along/` lean and avoid token bloat:
 
 ## Mandatory Stage & Session Completion Checklist
 When a Stage or session completes, agents MUST execute this verification checklist in exact order:
-1. [ ] **Verification & Tests**: Run automated unit tests / linting / builds with quiet flags.
-2. [ ] **Code Review & Blast Radius Assessment**:
+1. [ ] **Verification & Tests**: Run automated unit tests / linting / builds with quiet flags. Verify test discovery count increased appropriately and zero tests failed.
+2. [ ] **File Integrity & Untracked Audit**: Inspect `git status -u` and verify that all newly created and modified files have non-zero size (`getsize > 0`), containing expected code/content without empty placeholders or corrupted bodies.
+3. [ ] **Code Review & Blast Radius Assessment**:
    - Inspect git diff for unintended side effects, unhandled nulls/errors, and edge cases.
    - Evaluate systemic impact radius on callers/dependents using `code-review-graph` or AST analysis.
    - Verify compliance with architectural decisions in `.along/DECISIONS.md`.
-3. [ ] **Entity Reconciliation**:
+4. [ ] **Entity Reconciliation**:
    - Set `status: done` and `completed: YYYY-MM-DD` for finished issues; MOVE to `.along/ISSUES/done/`.
    - Update related `.along/MILESTONES/` progress percentages.
    - Resolve mitigated `.along/RISKS/` (`status: resolved` / `mitigated`).

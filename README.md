@@ -1,6 +1,6 @@
-# Along (v2.1.6)
+# Along (v2.1.7)
 
-A provider-agnostic **agent-context and memory system** for software repositories - the `ALONG-PROTOCOL v2.1.6` plus the automation skills suite that scaffolds and maintains it. One unified convention, honored natively across **Claude Code**, **OpenAI Codex**, **OpenCode**, and **Google Antigravity**.
+A provider-agnostic **agent-context and memory system** for software repositories - the `ALONG-PROTOCOL v2.1.7` plus the automation skills suite that scaffolds and maintains it. One unified convention, honored natively across **Claude Code**, **OpenAI Codex**, **OpenCode**, and **Google Antigravity**.
 
 ---
 
@@ -18,7 +18,7 @@ AI coding agents start every session blind. They lack persistent memory of past 
 - **Provider-Agnostic Single Protocol**: Write conventions once in `AGENTS.md`; Claude Code, Codex, OpenCode, and Antigravity follow them identically.
 - **LLM-Wiki Knowledge Base (`docs/`)**: Modular, cross-linked topic articles with isolated raw source archival (`.archive/`) and 95-98% token reduction on retrieval.
 - **Nearest Context Boundary**: Strict isolation for monorepos, microservices, and Git submodules preventing root workspace pollution.
-- **Zero Bookkeeping Overhead**: 17 automation skills handle scaffolding, sync, commit checks, and stage wrap-ups in the background.
+- **Zero Bookkeeping Overhead**: 19 automation skills handle scaffolding, sync, commit checks, and stage wrap-ups in the background.
 
 ---
 
@@ -80,6 +80,8 @@ The repository's complete technical specification is maintained as a living LLM-
 | `along-graph-check` (`/along-graph-check`) | Inspect `code-review-graph` status, impact radius (blast radius), and architecture flows. |
 | `along-dep-scan` (`/along-dep-scan`) | Scan declared dependencies for AI instructions and register in `docs/topic--dependencies.md`. |
 | `along-version-bump` (`/along-version-bump`) | Multi-stack version bump (Node, Python, Rust, .NET, or .along/scripts/bump_version.py). |
+| `along-team` (`/along-team`) | Multi-agent autonomous team coordination and living execution plans. |
+| `along-feedback` (`/along-feedback`) | System self-diagnostics, incident logging, and feedback dispatch (Telegram/Webhook/File). |
 
 ---
 

@@ -25,17 +25,38 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class TestAlongSkillsAndScripts(unittest.TestCase):
 
+    def test_00_zero_byte_files_forbidden(self):
+        """Verify zero 0-byte (empty) files across repository source, config, and skills."""
+        patterns = ['**/*.md', '**/*.py', '**/*.sh', '**/*.ps1', '**/*.json', '**/*.yaml', '**/*.yml']
+        zero_byte_files = []
+
+        for pat in patterns:
+            for filepath in glob.glob(os.path.join(REPO_ROOT, pat), recursive=True):
+                if any(x in filepath for x in [".git", "__pycache__", "node_modules", "dist", ".vite"]):
+                    continue
+                if os.path.basename(filepath) == ".gitkeep":
+                    continue
+                size = os.path.getsize(filepath)
+                if size == 0:
+                    rel = os.path.relpath(filepath, REPO_ROOT)
+                    zero_byte_files.append(f"{rel} (0 bytes)")
+
+        self.assertEqual(len(zero_byte_files), 0, f"Found empty 0-byte files in repository:\n" + "\n".join(zero_byte_files))
+
     def test_01_all_python_files_compile(self):
-        """Verify that every .py file in scripts/ and skills/ compiles with zero syntax errors."""
+        """Verify that every .py file in scripts/ and skills/ compiles and has non-trivial size."""
         py_files = (
             glob.glob(os.path.join(REPO_ROOT, "scripts", "**", "*.py"), recursive=True) +
             glob.glob(os.path.join(REPO_ROOT, "skills", "**", "*.py"), recursive=True) +
-            glob.glob(os.path.join(REPO_ROOT, ".along", "scripts", "**", "*.py"), recursive=True)
+            glob.glob(os.path.join(REPO_ROOT, ".along", "scripts", "**", "*.py"), recursive=True) +
+            glob.glob(os.path.join(REPO_ROOT, "tests", "**", "*.py"), recursive=True)
         )
         self.assertGreater(len(py_files), 5, "Should find at least 5 Python scripts in repo")
 
         for py_path in py_files:
             rel = os.path.relpath(py_path, REPO_ROOT)
+            size = os.path.getsize(py_path)
+            self.assertGreater(size, 40, f"Python file {rel} is unexpectedly small ({size} bytes)")
             with open(py_path, "r", encoding="utf-8") as f:
                 code = f.read()
             try:

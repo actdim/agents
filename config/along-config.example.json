@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0",
+  "telemetry_enabled": true,
+  "auto_redact_secrets": true,
+  "default_transport": "file",
+  "transports": {
+    "file": {
+      "enabled": true,
+      "export_dir": "~/.along/diagnostics/export"
+    },
+    "telegram": {
+      "enabled": false,
+      "bot_token": "",
+      "chat_id": ""
+    },
+    "webhook": {
+      "enabled": false,
+      "url": "",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  }
+}
+

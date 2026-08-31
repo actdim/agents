@@ -117,12 +117,19 @@ function Install-RuleFolders([string]$homeDir) {
 }
 
 function Install-AlongScripts {
-    $alongBin = Join-Path $env:USERPROFILE '.along\bin'
+    $alongHome = Join-Path $env:USERPROFILE '.along'
+    $alongBin = Join-Path $alongHome 'bin'
     New-Item -ItemType Directory -Force -Path $alongBin | Out-Null
     $scriptsSrc = Join-Path $PSScriptRoot 'scripts'
     if (Test-Path $scriptsSrc) {
         Copy-Item -Path "$scriptsSrc\*" -Destination $alongBin -Recurse -Force
         Write-Host "-> Along tools installed -> $alongBin"
+    }
+    $cfgFile = Join-Path $alongHome 'config.json'
+    $exampleCfg = Join-Path $PSScriptRoot 'config\along-config.example.json'
+    if (-not (Test-Path $cfgFile) -and (Test-Path $exampleCfg)) {
+        Copy-Item -Path $exampleCfg -Destination $cfgFile -Force
+        Write-Host "-> Initialized default Along configuration: $cfgFile"
     }
 }
 
