@@ -447,7 +447,27 @@ def main():
     else:
         print("-> [Notice] Version updated on disk. Use --commit (-c) to create release commit automatically.")
 
+    sync_local_global_install(repo_root)
+
     print(f"\n[OK] Release v{new_version} finalized successfully!")
+
+
+def sync_local_global_install(repo_root):
+    """If running inside the along core repository, re-run install script to keep local machine synced."""
+    is_along = os.path.exists(os.path.join(repo_root, "skills", "along-init", "protocol.md")) and os.path.exists(os.path.join(repo_root, "scripts", "along_exec.py"))
+    if not is_along:
+        return
+
+    print("-> [Along Core] Syncing global installation on local machine...")
+    if sys.platform == "win32":
+        ps1 = os.path.join(repo_root, "install.ps1")
+        if os.path.exists(ps1):
+            subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ps1, "-Target", "all"], cwd=repo_root, capture_output=True)
+    else:
+        sh = os.path.join(repo_root, "install.sh")
+        if os.path.exists(sh):
+            subprocess.run(["bash", sh, "--target=all"], cwd=repo_root, capture_output=True)
+    print("-> [Along Core] Global skills & scripts synchronized on local machine.")
 
 if __name__ == "__main__":
     main()
