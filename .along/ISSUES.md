@@ -11,6 +11,7 @@
 ## Backlog
 
 ## Done (recent)
+- [x] `(feat)` [deterministic-entity-cli-and-powershell-escaping-resilience](file://.along/ISSUES/done/feat--deterministic-entity-cli-and-powershell-escaping-resilience.md)
 - [x] `(feat)` [multi-agent-blackboard-and-architectural-rationale](file://.along/ISSUES/done/feat--multi-agent-blackboard-and-architectural-rationale.md)
 - [x] `(feat)` [centralize-scripts-and-clean-skills-purity](file://.along/ISSUES/done/feat--centralize-scripts-and-clean-skills-purity.md)
 - [x] `(feat)` [agentic-goals-and-mandatory-checklists](file://.along/ISSUES/done/feat--agentic-goals-and-mandatory-checklists.md)
