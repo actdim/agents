@@ -1,14 +1,14 @@
 # Context Snapshot (2026-08-31)
 
 ## Repository State
-- **Along Protocol**: `v2.1.3`
-- **Active Area**: Skills audit, lifecycle hooks standardization, and deterministic agent execution.
-- **Key Modules**: `.along/scripts/`, `scripts/`, `skills/`, `dashboard/`, `package.json`.
+- **Along Protocol**: `v2.1.4`
+- **Active Area**: Multi-agent blackboard memory, strict role contracts, and architectural rationale.
+- **Key Modules**: `.along/`, `skills/along-team/`, `skills/along-wrap/`, `docs/topic--architecture.md`, `scripts/`.
 
 ## Current Status
-- Standardized project lifecycle hooks in `.along/scripts/` (`test.py`, `dev.py`, `build.py`).
-- Eliminated test discovery crashes on `dashboard.api` by isolating imports.
-- Synchronized script duplicates across `scripts/` and `skills/` (`along_version_bump.py`, `along_update.py`).
-- Declared explicit deterministic lifecycle commands in `package.json`, `AGENTS.md`, and `SKILL.md` manifests.
-- All 15 unit tests passing (`python .along/scripts/test.py` or `python -m unittest discover tests -q`).
+- Codified Session-Scoped Blackboard layout and lifecycle (`.along/.session/<slug>/`) with automated GC in `along-wrap`.
+- Enforced strict 4-part role contracts (Boundaries, Input, Prompt, Output) and 5-point Reviewer rubric in `skills/along-team/SKILL.md`.
+- Implemented Context Pruning gatekeeping rules for Supervisor.
+- Institutionalized mandatory architectural rationale ("Why & Value Proposition") standard in `AGENTS.md` and ADR #014.
+- All 17 automated tests passing (`python -m unittest discover tests -v`).
 

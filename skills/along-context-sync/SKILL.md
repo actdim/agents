@@ -3,7 +3,7 @@ name: along-context-sync
 description: Refresh the nearest .along/CONTEXT.md into a short, accurate current-state snapshot ("you are here"). Use when updating/saving context or when invoking /along-context-sync.
 ---
 
-# Along Context Sync  [v2.1.4]
+# Along Context Sync  [v2.1.5]
 
 Keeps the nearest `.along/CONTEXT.md` compact (< 20 lines) and strictly focused on current focus, active issues, and immediate next steps.
 
