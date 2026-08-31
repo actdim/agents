@@ -163,15 +163,24 @@ def glob_files(root: str, pattern: str) -> bool:
 
 
 def print_help():
-    print("""Along Command Router (along_exec.py) [v2.1.3]
+    print("""Along Command Router (along_exec.py) [v2.1.5]
 
 Usage:
-  python scripts/along_exec.py <command> [args...]
+  python scripts/along_exec.py <command> [subcommand] [args...]
 
 Lifecycle Commands (project hooks):
   build          Execute project build (.along/scripts/build.py or auto-detected)
   test           Execute project tests (.along/scripts/test.py or auto-detected)
   dev            Launch project dev server (.along/scripts/dev.py or auto-detected)
+
+Entity Management Commands:
+  issue create <type> <slug> --title "Title" [--priority high|medium|low] [--tags "t1,t2"]
+  issue done <slug>
+  issue list
+  session create <slug> --summary "Summary" [--issues "slug1,slug2"] [--decisions "#001"]
+  decision add <num> "Title" --context "Why" --decision "What" --consequences "Tradeoffs"
+  scratch init <slug>
+  scratch purge <slug>
 
 Along Protocol Tools:
   kb-sync        Synchronize and compile Knowledge Base in docs/
@@ -187,6 +196,310 @@ Along Protocol Tools:
 """)
 
 
+def handle_issue_command(repo_root: str, args: List[str]):
+    if not args or args[0] in ("-h", "--help", "help"):
+        print("Usage: along_exec.py issue [create|done|list] [args...]")
+        sys.exit(0)
+
+    subcmd = args[0].lower()
+    from datetime import datetime
+
+    issues_dir = os.path.join(repo_root, ".along", "ISSUES")
+    done_dir = os.path.join(issues_dir, "done")
+    os.makedirs(issues_dir, exist_ok=True)
+    os.makedirs(done_dir, exist_ok=True)
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    if subcmd == "create":
+        if len(args) < 3:
+            print("[Error] Usage: along_exec.py issue create <type> <slug> --title \"Title\" [--priority high|medium|low] [--tags \"tag1,tag2\"]", file=sys.stderr)
+            sys.exit(1)
+        itype = args[1].lower()
+        islug = args[2].lower()
+        title = islug.replace("-", " ").capitalize()
+        priority = "medium"
+        tags = []
+
+        i = 3
+        while i < len(args):
+            if args[i] in ("--title", "-t") and i + 1 < len(args):
+                title = args[i + 1]
+                i += 2
+            elif args[i] in ("--priority", "-p") and i + 1 < len(args):
+                priority = args[i + 1]
+                i += 2
+            elif args[i] in ("--tags",) and i + 1 < len(args):
+                tags = [t.strip() for t in args[i + 1].split(",") if t.strip()]
+                i += 2
+            else:
+                i += 1
+
+        target_file = os.path.join(issues_dir, f"{itype}--{islug}.md")
+        tags_str = f"[{', '.join(tags)}]" if tags else "[]"
+        content = f"""---
+protocol: along
+slug: {islug}
+type: {itype}
+status: open
+priority: {priority}
+created: {today}
+updated: {today}
+agent: antigravity
+tags: {tags_str}
+milestone: v2.1.0-along
+blocked_by: []
+related: []
+---
+
+# {title}
+
+Describe the feature, requirements, and background context here.
+
+## Acceptance Criteria
+- [ ] Task requirement 1
+- [ ] Automated tests passing
+"""
+        with open(target_file, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"-> Created issue: {target_file}")
+
+        # Update ISSUES.md
+        issues_board = os.path.join(repo_root, ".along", "ISSUES.md")
+        if os.path.exists(issues_board):
+            with open(issues_board, "r", encoding="utf-8") as f:
+                b_content = f.read()
+            entry = f"- [ ] `({itype})` [{islug}](file://.along/ISSUES/{itype}--{islug}.md)"
+            if entry not in b_content:
+                b_content = b_content.replace("## Active\n", f"## Active\n{entry}\n")
+                with open(issues_board, "w", encoding="utf-8") as f:
+                    f.write(b_content)
+                print(f"-> Updated .along/ISSUES.md")
+        sys.exit(0)
+
+    elif subcmd == "done":
+        if len(args) < 2:
+            print("[Error] Usage: along_exec.py issue done <slug>", file=sys.stderr)
+            sys.exit(1)
+        islug = args[1].lower()
+        
+        # Locate issue file
+        found_file = None
+        for f in os.listdir(issues_dir):
+            if f.endswith(f"--{islug}.md") and os.path.isfile(os.path.join(issues_dir, f)):
+                found_file = os.path.join(issues_dir, f)
+                break
+
+        if not found_file:
+            print(f"[Error] Issue '{islug}' not found in {issues_dir}", file=sys.stderr)
+            sys.exit(1)
+
+        filename = os.path.basename(found_file)
+        dest_file = os.path.join(done_dir, filename)
+
+        with open(found_file, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        content = re.sub(r'status:\s*\w+', 'status: done', content)
+        content = re.sub(r'updated:\s*\S+', f'updated: {today}', content)
+        if "completed:" not in content:
+            content = re.sub(r'(status:\s*done\n)', f'\\1completed: {today}\n', content)
+        else:
+            content = re.sub(r'completed:\s*\S+', f'completed: {today}', content)
+
+        with open(dest_file, "w", encoding="utf-8") as f:
+            f.write(content)
+        os.remove(found_file)
+        print(f"-> Moved issue to done: {dest_file}")
+
+        # Update ISSUES.md
+        issues_board = os.path.join(repo_root, ".along", "ISSUES.md")
+        if os.path.exists(issues_board):
+            with open(issues_board, "r", encoding="utf-8") as f:
+                b_content = f.read()
+            # Remove from Active
+            b_content = re.sub(rf'- \[[ ~]\] `\(\w+\)` \[{re.escape(islug)}\]\([^\)]+\)\n?', '', b_content)
+            # Add to Done
+            itype = filename.split("--")[0]
+            done_entry = f"- [x] `({itype})` [{islug}](file://.along/ISSUES/done/{filename})"
+            if done_entry not in b_content:
+                b_content = b_content.replace("## Done (recent)\n", f"## Done (recent)\n{done_entry}\n")
+            with open(issues_board, "w", encoding="utf-8") as f:
+                f.write(b_content)
+            print(f"-> Updated .along/ISSUES.md")
+        sys.exit(0)
+
+    elif subcmd == "list":
+        print(f"-> Active issues in {issues_dir}:")
+        count = 0
+        for f in os.listdir(issues_dir):
+            if f.endswith(".md") and os.path.isfile(os.path.join(issues_dir, f)):
+                print(f"   - {f}")
+                count += 1
+        print(f"Total active issues: {count}")
+        sys.exit(0)
+
+
+def handle_session_command(repo_root: str, args: List[str]):
+    if not args or args[0] in ("-h", "--help", "help"):
+        print("Usage: along_exec.py session create <slug> --summary \"Summary text\" [--issues \"slug1,slug2\"] [--decisions \"#001\"]")
+        sys.exit(0)
+
+    subcmd = args[0].lower()
+    from datetime import datetime
+    today = datetime.now().strftime("%Y-%m-%d")
+    year = datetime.now().strftime("%Y")
+    sessions_dir = os.path.join(repo_root, ".along", "SESSIONS", year)
+    os.makedirs(sessions_dir, exist_ok=True)
+
+    if subcmd == "create":
+        if len(args) < 2:
+            print("[Error] Usage: along_exec.py session create <slug> --summary \"Summary\"", file=sys.stderr)
+            sys.exit(1)
+        slug = args[1].lower()
+        summary = "Work session"
+        issues = []
+        decisions = []
+
+        i = 2
+        while i < len(args):
+            if args[i] in ("--summary", "-s") and i + 1 < len(args):
+                summary = args[i + 1]
+                i += 2
+            elif args[i] in ("--issues", "-i") and i + 1 < len(args):
+                issues = [iss.strip() for iss in args[i + 1].split(",") if iss.strip()]
+                i += 2
+            elif args[i] in ("--decisions", "-d") and i + 1 < len(args):
+                decisions = [d.strip() for d in args[i + 1].split(",") if d.strip()]
+                i += 2
+            else:
+                i += 1
+
+        target_file = os.path.join(sessions_dir, f"{today}--{slug}.md")
+        issues_str = f"[{', '.join(issues)}]" if issues else "[]"
+        decisions_str = f"[{', '.join([f'\"{d}\"' for d in decisions])}]" if decisions else "[]"
+
+        content = f"""---
+protocol: along
+date: {today}
+slug: {slug}
+agent: antigravity
+branch: main
+commit: pending
+summary: {summary}
+milestone: v2.1.0-along
+issues_advanced: []
+issues_completed: {issues_str}
+decisions: {decisions_str}
+risks_logged: []
+spikes_conducted: []
+---
+
+# Session: {slug.replace('-', ' ').capitalize()}
+
+## Summary
+{summary}
+
+## Work Completed
+- Document key tasks and achievements.
+
+## Code Review & Blast Radius
+- Automated tests verified and passing.
+"""
+        with open(target_file, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"-> Created session log: {target_file}")
+
+        # Update HISTORY.md
+        history_file = os.path.join(repo_root, ".along", "HISTORY.md")
+        if os.path.exists(history_file):
+            with open(history_file, "r", encoding="utf-8") as f:
+                h_content = f.read()
+            entry = f"{today} - {slug} - antigravity - {summary} - [.along/SESSIONS/{year}/{today}--{slug}.md](file://.along/SESSIONS/{year}/{today}--{slug}.md)"
+            if entry not in h_content:
+                h_content = h_content.strip() + f"\n{entry}\n"
+                with open(history_file, "w", encoding="utf-8") as f:
+                    f.write(h_content)
+                print(f"-> Appended history entry to .along/HISTORY.md")
+        sys.exit(0)
+
+
+def handle_decision_command(repo_root: str, args: List[str]):
+    if not args or args[0] in ("-h", "--help", "help"):
+        print("Usage: along_exec.py decision add <num> \"Title\" --context \"Context\" --decision \"Decision\" --consequences \"Tradeoffs\"")
+        sys.exit(0)
+
+    subcmd = args[0].lower()
+    from datetime import datetime
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    if subcmd == "add":
+        if len(args) < 3:
+            print("[Error] Usage: along_exec.py decision add <num> \"Title\" --context \"Why\" --decision \"What\" --consequences \"Consequences\"", file=sys.stderr)
+            sys.exit(1)
+        num = args[1].lstrip("#")
+        title = args[2]
+        context = ""
+        decision = ""
+        consequences = ""
+
+        i = 3
+        while i < len(args):
+            if args[i] == "--context" and i + 1 < len(args):
+                context = args[i + 1]
+                i += 2
+            elif args[i] == "--decision" and i + 1 < len(args):
+                decision = args[i + 1]
+                i += 2
+            elif args[i] == "--consequences" and i + 1 < len(args):
+                consequences = args[i + 1]
+                i += 2
+            else:
+                i += 1
+
+        dec_file = os.path.join(repo_root, ".along", "DECISIONS.md")
+        entry = f"""
+## #{num} - {title}
+- Date: {today}
+- Status: accepted
+- Context: {context}
+- Decision: {decision}
+- Consequences: {consequences}
+"""
+        with open(dec_file, "a", encoding="utf-8") as f:
+            f.write(entry)
+        print(f"-> Appended Decision #{num} to .along/DECISIONS.md")
+        sys.exit(0)
+
+
+def handle_scratch_command(repo_root: str, args: List[str]):
+    if not args or args[0] in ("-h", "--help", "help"):
+        print("Usage: along_exec.py scratch [init|purge] <slug>")
+        sys.exit(0)
+
+    subcmd = args[0].lower()
+    if len(args) < 2:
+        print("[Error] Usage: along_exec.py scratch [init|purge] <slug>", file=sys.stderr)
+        sys.exit(1)
+    slug = args[1].lower()
+    scratch_dir = os.path.join(repo_root, ".along", ".session", slug)
+
+    if subcmd == "init":
+        os.makedirs(scratch_dir, exist_ok=True)
+        plan_file = os.path.join(scratch_dir, "plan.md")
+        if not os.path.exists(plan_file):
+            with open(plan_file, "w", encoding="utf-8") as f:
+                f.write(f"# Living Plan: {slug}\n\n## Steps\n- [ ] Step 1: Initialize\n")
+        print(f"-> Initialized scratchpad: {scratch_dir}")
+        sys.exit(0)
+    elif subcmd == "purge":
+        if os.path.exists(scratch_dir):
+            shutil.rmtree(scratch_dir)
+            print(f"-> Purged scratchpad: {scratch_dir}")
+        else:
+            print(f"-> Scratchpad not found (already clean): {scratch_dir}")
+        sys.exit(0)
+
+
 def main():
     if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help", "help"):
         print_help()
@@ -196,7 +509,17 @@ def main():
     extra_args = sys.argv[2:]
     repo_root = find_repo_root()
 
-    # 1. Check if command is an Along Protocol Tool
+    # 1. Native Entity Management Subcommands
+    if cmd == "issue":
+        handle_issue_command(repo_root, extra_args)
+    elif cmd == "session":
+        handle_session_command(repo_root, extra_args)
+    elif cmd == "decision":
+        handle_decision_command(repo_root, extra_args)
+    elif cmd == "scratch":
+        handle_scratch_command(repo_root, extra_args)
+
+    # 2. Check if command is an Along Protocol Tool
     if cmd in TOOL_MAPPINGS:
         script_name = TOOL_MAPPINGS[cmd]
         script_path = resolve_tool_script(script_name, repo_root)
@@ -217,7 +540,7 @@ def main():
         res = subprocess.run(full_cmd, cwd=repo_root)
         sys.exit(res.returncode)
 
-    # 2. Check if command is a Lifecycle Hook (build / test / dev / debug)
+    # 3. Check if command is a Lifecycle Hook (build / test / dev / debug)
     if cmd in LIFECYCLE_ACTIONS:
         script_file = get_lifecycle_script_path(repo_root, cmd)
 

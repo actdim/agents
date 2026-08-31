@@ -142,6 +142,7 @@ When a Stage or session completes, agents MUST execute this verification checkli
   - **Explicit Code Fence Languages**: Always specify the language identifier on code fences (e.g. ```` ```bash ````, ```` ```yaml ````, ```` ```typescript ````, ```` ```python ````). Never use bare unlabelled fences.
   - **Relative & Portable Links**: Always use relative paths (`file://...` or standard markdown links) without hardcoding local absolute paths.
   - **UTF-8 Clean Encoding**: Keep all text files in clean UTF-8 without BOM.
+  - **Deterministic Entity & Command Execution**: Never execute fragile multi-line inline shell strings (`python -c "..."`) containing escaped quotes on Windows / PowerShell. Always use deterministic subcommands via `python scripts/along_exec.py` (`issue create`, `session create`, `scratch init`) or execute clean standalone Python scripts.
 - Windows-safe filenames: dates `YYYY-MM-DD` (no `:`), date first.
 - Keep `CONTEXT.md` and `ISSUES.md` compact - they cost context every session.
 - Never write secrets/credentials/tokens/keys into these files; they are committed.

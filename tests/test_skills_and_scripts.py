@@ -216,6 +216,27 @@ class TestAlongSkillsAndScripts(unittest.TestCase):
         self.assertIn("kb-sync", res.stdout)
         self.assertIn("dep-scan", res.stdout)
 
+    def test_12_along_exec_entity_management(self):
+        """Verify that along_exec.py manages issues, sessions, and scratchpads cleanly without inline shell scripts."""
+        exec_script = os.path.join(REPO_ROOT, "scripts", "along_exec.py")
+        
+        # 1. Scratchpad lifecycle
+        init_res = subprocess.run([sys.executable, exec_script, "scratch", "init", "unit-test-task"], capture_output=True, text=True)
+        self.assertEqual(init_res.returncode, 0)
+        scratch_dir = os.path.join(REPO_ROOT, ".along", ".session", "unit-test-task")
+        self.assertTrue(os.path.exists(scratch_dir), "Scratchpad directory should exist")
+        self.assertTrue(os.path.exists(os.path.join(scratch_dir, "plan.md")), "plan.md should exist")
+
+        purge_res = subprocess.run([sys.executable, exec_script, "scratch", "purge", "unit-test-task"], capture_output=True, text=True)
+        self.assertEqual(purge_res.returncode, 0)
+        self.assertFalse(os.path.exists(scratch_dir), "Scratchpad directory should be purged")
+
+        # 2. Issue list command
+        list_res = subprocess.run([sys.executable, exec_script, "issue", "list"], capture_output=True, text=True)
+        self.assertEqual(list_res.returncode, 0)
+        self.assertIn("Active issues in", list_res.stdout)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
