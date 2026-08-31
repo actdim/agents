@@ -1,6 +1,6 @@
-# Along (v2.1.8)
+# Along (v2.2.1)
 
-A provider-agnostic **agent-context and memory system** for software repositories - the `ALONG-PROTOCOL v2.1.8` plus the automation skills suite that scaffolds and maintains it. One unified convention, honored natively across **Claude Code**, **OpenAI Codex**, **OpenCode**, and **Google Antigravity**.
+A provider-agnostic **agent-context and memory system** for software repositories - the `ALONG-PROTOCOL v2.2.1` plus the automation skills suite that scaffolds and maintains it. One unified convention, honored natively across **Claude Code**, **OpenAI Codex**, **OpenCode**, and **Google Antigravity**.
 
 ---
 
@@ -14,11 +14,11 @@ AI coding agents start every session blind. They lack persistent memory of past 
 
 ## Core Value Proposition
 
-- **Persistent In-Repo Memory**: Context snapshot, DAG issue tracking, append-only ADR log, milestones, risks, and session logs committed with the code.
+- **Persistent In-Repo Memory**: DAG issue tracking, append-only ADR log, milestones, risks, and session logs committed with the code.
 - **Provider-Agnostic Single Protocol**: Write conventions once in `AGENTS.md`; Claude Code, Codex, OpenCode, and Antigravity follow them identically.
 - **LLM-Wiki Knowledge Base (`docs/`)**: Modular, cross-linked topic articles with isolated raw source archival (`.archive/`) and 95-98% token reduction on retrieval.
 - **Nearest Context Boundary**: Strict isolation for monorepos, microservices, and Git submodules preventing root workspace pollution.
-- **Zero Bookkeeping Overhead**: 19 automation skills handle scaffolding, sync, commit checks, and stage wrap-ups in the background.
+- **Zero Bookkeeping Overhead**: 18 automation skills handle scaffolding, sync, commit checks, and stage wrap-ups in the background.
 
 ---
 
@@ -74,7 +74,6 @@ The repository's complete technical specification is maintained as a living LLM-
 | `along-kb-sync` (`/along-kb-sync`) | Synchronize, compile, and reconcile the Knowledge Base in `docs/` using LLM-Wiki pipeline. |
 | `along-kb-search` (`/along-kb-search`) | Fast targeted structured retrieval across `docs/` and project documentation. |
 | `along-issue-sync` (`/along-issue-sync`) | Reconcile the issue board + per-issue `<type>--<slug>.md` files with the actual work. |
-| `along-context-sync` (`/along-context-sync`) | Refresh just the nearest `.along/CONTEXT.md`. |
 | `along-decision-sync` (`/along-decision-sync`) | Append architectural decisions as ADR entries; mark superseded ones. |
 | `along-history-sync` (`/along-history-sync`) | Reconstruct and reconcile `.along/` milestones, issues, and sessions from Git commits. |
 | `along-graph-check` (`/along-graph-check`) | Inspect `code-review-graph` status, impact radius (blast radius), and architecture flows. |

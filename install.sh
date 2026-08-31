@@ -30,7 +30,7 @@ LEGACY_SKILLS=(
   "along-wrap-session" "along-wrap-stage"
   "along-sync-issues" "along-sync-context" "along-sync-decisions" "along-sync-history"
   "along-check-graph" "along-scan-deps" "along-bump-version"
-  "along-init-kb" "along-sync-kb" "along-search-kb"
+  "along-init-kb" "along-sync-kb" "along-search-kb" "along-context-sync"
 )
 
 for arg in "$@"; do

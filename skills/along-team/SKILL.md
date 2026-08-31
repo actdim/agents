@@ -3,7 +3,7 @@ name: along-team
 description: Execute software development tasks via sequential multi-agent protocol (Supervisor -> Research -> Architect -> Living Plan -> Step Loops [Implement -> Review/Test -> Reassess]). Supports autonomous execution, /goal integration, and adaptive complexity routing.
 ---
 
-# Along Team (`/along-team`) [v2.1.8]
+# Along Team (`/along-team`) [v2.2.1]
 
 Universal sequential multi-agent development protocol and state machine for complex engineering tasks.
 
@@ -162,7 +162,7 @@ When running in `/goal` mode:
 2. Execute `/along-wrap` checklist:
    - Run full test suite (`/along-test`).
    - Move issue to `.along/ISSUES/done/`.
-   - Update `CONTEXT.md` and `ISSUES.md`.
+   - Update `ISSUES.md` projection (`/along-issue-sync`).
    - Record session log in `.along/SESSIONS/`.
 3. Present a single concise completion summary to the user.
 

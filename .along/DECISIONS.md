@@ -3,15 +3,15 @@
 _One dated entry per architectural decision. Never edit past entries; mark a replaced one "Superseded by #N"._
 
 <!-- Template:
-## #001 - <title>
+## ADR-YYYY-MM-DD--<slug> - <Title>
 - Date: YYYY-MM-DD
-- Status: accepted            (or: superseded by #NNN)
+- Status: accepted            (or: superseded by ADR-YYYY-MM-DD--<slug>)
 - Context: <why this came up>
 - Decision: <what was decided>
 - Consequences: <trade-offs / follow-ups>
 -->
 
-## #001 - Single-file append-only DECISIONS.md over multi-file MADR/Nygard
+## ADR-2026-08-15--single-file-append-only-decisions - Single-file append-only DECISIONS.md over multi-file MADR/Nygard
 - Date: 2026-08-15
 - Status: accepted
 - Context: In software engineering, Architectural Decision Records (ADRs) are often kept as separate files per decision (e.g. Michael Nygard / MADR format `doc/adr/0001-*.md`). We evaluated whether `.along/` should store decisions in separate files (like `.along/ISSUES/`) or in a single file.
@@ -20,28 +20,28 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   - **Single-shot context load**: Agents read all active constraints on session start in one tool call (< 300 tokens) without traversing or indexing multiple files.
   - **No lifecycle overhead**: Unlike Issues (`open` -> `in-progress` -> `done/`), decisions are immutable and only appended or marked `superseded by #NNN`.
 
-## #002 - Protocol v1.2.0 & Knowledge Base (KB) Architecture Standard
+## ADR-2026-08-26--protocol-v120-knowledge-base-architecture - Protocol v1.2.0 & Knowledge Base (KB) Architecture Standard
 - Date: 2026-08-26
 - Status: accepted
 - Context: Projects require a structured, persistent Knowledge Base that provides deep architecture, domain model, and workflow guidance without bloating `AGENTS.md` context window.
 - Decision: Adopt Knowledge Base (KB) terminology and structure in `.along/KB/` (`INDEX.md`, `01-architecture.md`, `02-domain-model.md`, `03-setup-and-workflow.md`). `AGENTS.md` remains a compact executive entry point linking to KB articles (`[[.along/KB/INDEX.md]]`). Human `docs/` and `README.md` are scanned as read-only inputs during `/along-init-kb` and `/along-sync-kb`.
 - Consequences: `AGENTS.md` stays lean (< 80 lines) while agents and humans have structured access to deep documentation.
 
-## #003 - Code Graph & Hybrid Knowledge Base Search MCP Integration
+## ADR-2026-08-26--code-graph-mcp-and-hybrid-kb-search - Code Graph & Hybrid Knowledge Base Search MCP Integration
 - Date: 2026-08-26
 - Status: accepted
 - Context: Agents need lightweight tools to inspect call hierarchies and search project documentation without loading massive raw files.
 - Decision: Integrate `code-review-graph` for AST call graph analysis and impact radius, and `wiki-llm` / native hybrid search (`/along-search-kb`, `/along-sync-kb`) for document querying. Provide `/along-check-graph` and `/along-search-kb` debugging slash commands across all agent tools (Antigravity, Claude Code, Codex, OpenCode).
 - Consequences: Agents prioritize MCP graph and hybrid search calls during research and refactoring, saving token overhead.
 
-## #004 - Protocol v1.5.0: Automated Entity Ecosystem & Zero-Friction Intent Recognition
+## ADR-2026-08-27--protocol-v150-automated-entities-and-intent-heuristics - Protocol v1.5.0: Automated Entity Ecosystem & Zero-Friction Intent Recognition
 - Date: 2026-08-27
 - Status: accepted
 - Context: Turning agent tracking into a complete project tracking and dashboard-ready analytics system requires tracking milestones, risks, spikes, checklists, and completed issue timestamps without forcing the human developer to manually manage project files.
 - Decision: Expand entity ecosystem with `MILESTONES/`, `RISKS/`, `SPIKES/`, `CHECKLISTS/`, and standardized YAML front-matter (`completed: YYYY-MM-DD`, `agent`, `tags`). Enforce strict automatic intent recognition heuristics in `AGENTS.md` and mandatory stage wrap-up verification checklists in `along-wrap-session`. Provide retroactive auto-migration tooling (`migrate_protocol.py`) across all installation targets.
 - Consequences: Full project visibility and analytics ready for `/along-dash` while maintaining zero human friction during everyday coding.
 
-## #005 - Entity Relationships, Unidirectional Graph Storage & Canonical Slug Invariance
+## ADR-2026-08-27--entity-relationships-unidirectional-graph-and-canonical-slugs - Entity Relationships, Unidirectional Graph Storage & Canonical Slug Invariance
 - Date: 2026-08-27
 - Status: accepted
 - Context: Representing dependencies and associations between issues, risks, and spikes is required for dependency modeling and DAG/timeline visualizations. Using relative file paths breaks references when completed issues move into `done/`. Dual-syncing reciprocal fields (`blocks` vs `blocked_by`, `parent` vs `children`) causes drift by LLM agents.
@@ -51,7 +51,7 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   3. Validate DAGs for cyclic dependencies and dangling references in `migrate_protocol.py` and provide a `/along-update` one-liner skill for automated global and project upgrades.
 - Consequences: Eliminates link drift, guarantees graph invariance across entity lifecycles, and enables automated dashboard dependency graphs.
 
-## #006 - Autonomous Multi-Mode Repository Dashboard & Analytics Engine
+## ADR-2026-08-27--autonomous-multi-mode-dashboard-and-analytics-engine - Autonomous Multi-Mode Repository Dashboard & Analytics Engine
 - Date: 2026-08-27
 - Status: accepted
 - Context: Developers and agents require instant visibility into entity lifecycles, milestone completion rates, active blockers, and dependency DAGs without manual data compilation or heavy infrastructure.
@@ -61,7 +61,7 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   3. Expose the `/along-dash` skill across Claude Code, Codex, OpenCode, and Antigravity.
 - Consequences: Zero setup cost, instant offline/online dashboard visualization across all execution environments.
 
-## #007 - Along v2.0.0: Rebranding, Isolated .along/ Directory, along-* Skill Prefixes, and protocol: along Metadata
+## ADR-2026-08-27--along-v200-rebranding-and-namespace-isolation - Along v2.0.0: Rebranding, Isolated .along/ Directory, along-* Skill Prefixes, and protocol: along Metadata
 - Date: 2026-08-27
 - Status: accepted
 - Context: The generic `.along/` folder was prone to collision with third-party tools, and generic un-namespaced skills (like `dashboard`, `bump-version`, `sync-context`) collided in global agent environments (`~/.claude/skills/`, `~/.gemini/config/skills/`).
@@ -73,7 +73,7 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   5. Upgrade migration engine (`scripts/migrate_protocol.py`) to seamlessly detect legacy `.along/`, inject `protocol: along`, relocate files to `.along/`, and clean up empty `.along/` directories without touching foreign files.
 - Consequences: Total isolation from third-party tools, zero namespace collision in global skill registries, backward-compatible automated migration path for existing projects.
 
-## #008 - Mandatory Agentic Code Review & Blast Radius Impact Assessment Gate
+## ADR-2026-08-27--mandatory-code-review-and-blast-radius-impact-gate - Mandatory Agentic Code Review & Blast Radius Impact Assessment Gate
 - Date: 2026-08-27
 - Status: accepted
 - Context: Unchecked AI code modifications often introduce regression risks, silent broken callers, edge-case crashes, or unhandled nulls that accumulate unnoticed until runtime.
@@ -84,7 +84,7 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   4. Document the code review findings and impact summary in the session log (`.along/SESSIONS/`).
 - Consequences: Significantly reduced regression rate, improved long-term architectural health, and explicit accountability for multi-module impact.
 
-## #009 - Universal Project Version Bumping & Repository Scripts Ecosystem (.along/scripts/)
+## ADR-2026-08-27--universal-version-bumping-and-scripts-ecosystem - Universal Project Version Bumping & Repository Scripts Ecosystem (.along/scripts/)
 - Date: 2026-08-27
 - Status: accepted
 - Context: `along-bump-version` was initially hardcoded for `actdim/along` internal development, failing when executed in external consumer repositories (Node, Python, Rust, .NET).
@@ -95,7 +95,7 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   4. Auto-synthesize `.along/scripts/bump_version.py` on first run for detected stacks, with diagnostic templates for custom environments.
 - Consequences: Every project adopting Along gains automated, stack-agnostic version bumping and release orchestration out-of-the-box.
 
-## #010 - Unified /along-wrap, Smart /along-commit, and Lifecycle Execution Suite (/along-build, /along-test, /along-dev)
+## ADR-2026-08-27--unified-along-wrap-commit-and-lifecycle-runners - Unified /along-wrap, Smart /along-commit, and Lifecycle Execution Suite (/along-build, /along-test, /along-dev)
 - Date: 2026-08-27
 - Status: accepted
 - Context: Separate `along-wrap-session` and `along-wrap-stage` skills created redundant duplication and prompt bloat. Developers also needed safe pre-commit ASCII checks, automated Conventional Commit formatting, and project lifecycle runners (`build`, `test`, `dev`).
@@ -106,7 +106,7 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   4. Refine `along-bump-version` to update files on disk by default, committing only when `--commit` is explicitly passed.
 - Consequences: Reduced skill token footprint, unified wrap mental model, and robust development lifecycle automation.
 
-## #011 - Frontend Architecture: Dynstruct Component Architecture, MessageMesh Integration, and NSwag Adapters
+## ADR-2026-08-28--frontend-dynstruct-architecture-and-msgmesh-adapters - Frontend Architecture: Dynstruct Component Architecture, MessageMesh Integration, and NSwag Adapters
 - Date: 2026-08-28
 - Status: accepted
 - Context: The web dashboard UI for Along required clear architectural guidelines for frontend components, state management, and backend communication. Ad-hoc React hooks, manual fetch calls, unstructured global variables, and loose `any` typing create boilerplate, high maintenance overhead, and obscure component communication.
@@ -121,7 +121,7 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   5. **100% Strict Type Safety**: No `any` casting, no type assertions (`as ...`), and strict channel typing. All interaction points, emitted events, and subscriptions must be fully visible and traceable through component structs (`ComponentStruct<AppMsgStruct, ...>`).
 - Consequences: Zero boilerplate, clean separation between UI components and backend transport, fully automated API client maintenance via NSwag, and transparent, declarative message routing with compile-time type safety.
 
-## 012 - LLM-Wiki Knowledge Base Architecture in docs/, .archive/ Isolation & Singular Domain-First Skills Refactoring
+## ADR-2026-08-30--llm-wiki-docs-architecture-and-singular-skills-refactoring - LLM-Wiki Knowledge Base Architecture in docs/, .archive/ Isolation & Singular Domain-First Skills Refactoring
 - Date: 2026-08-30
 - Status: Accepted
 - Context:
@@ -145,7 +145,7 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   5. **Strict Nearest Subproject & Submodule Localization**: When working in submodules, nested packages, or symlinked component libraries, all entity creation and updates (`ISSUES`, `SESSIONS`, `CONTEXT`, `DECISIONS`, `HISTORY`) MUST strictly occur in the **nearest `.along/`** corresponding to the modified files, preventing workspace root pollution.
 - Consequences: Cleaner repository layout, universal Markdown rendering on GitHub/npm, reduced agent token usage via targeted retrieval, a consistent domain-first skill naming convention across all providers, and strict project boundary isolation for submodules and multi-package workspaces.
 
-## #013 - Multi-Agent Development Protocol (along-team), Sequential State Machine, Living Plan, and /goal Integration
+## ADR-2026-08-30--multi-agent-protocol-along-team-and-goal-integration - Multi-Agent Development Protocol (along-team), Sequential State Machine, Living Plan, and /goal Integration
 - Date: 2026-08-30
 - Status: accepted
 - Context:
@@ -168,7 +168,7 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   5. **Deploy `/along-team` Skill**: Provide canonical `/along-team` skill across all agent runtimes and wire it with `/goal` semantics.
 - Consequences: Eliminates parallel file race conditions, cuts token waste on simple tasks through adaptive routing, guarantees rigorous automated verification per step, and enables true autonomous goal execution.
 
-## #014 - Session-Scoped Blackboard Memory, Strict Multi-Agent Role Contracts, and Mandatory Architectural Rationale Standards
+## ADR-2026-08-31--session-scoped-blackboard-memory-and-role-contracts - Session-Scoped Blackboard Memory, Strict Multi-Agent Role Contracts, and Mandatory Architectural Rationale Standards
 - Date: 2026-08-31
 - Status: accepted
 - Context:
@@ -196,9 +196,25 @@ _One dated entry per architectural decision. Never edit past entries; mark a rep
   - Elevates documentation quality to provide clear engineering rationale and user value across the entire codebase.
 
 
-## #015 - Global Self-Diagnostics, PII Redaction, and Multi-Transport Feedback Engine
+## ADR-2026-08-31--global-self-diagnostics-and-feedback-subsystem - Global Self-Diagnostics, PII Redaction, and Multi-Transport Feedback Engine
 - Date: 2026-08-31
 - Status: accepted
 - Context: When Along tools or agent scripts encounter unexpected runtime errors or platform incompatibilities in user repositories, developers lack a centralized telemetry and diagnostic mechanism to capture and report these incidents without risking credential or PII leaks.
 - Decision: 1. Implement global diagnostics store in user home directory (~/.along/diagnostics/) with structured incident JSON files and an auto-compiled REPORT.md. 2. Enforce strict automatic regex redaction for user home paths and authentication credentials. 3. Support three pluggable feedback transports: File export, Telegram Bot API, and REST Webhook. 4. Deploy /along-feedback skill and along_feedback.py CLI tool.
 - Consequences: Enables reliable debugging and continuous protocol improvement while guaranteeing zero silent transmissions and preventing secret/PII leakage.
+
+## ADR-2026-08-31--concurrency-projections-and-context-deprecation - Multi-Branch Concurrency, Derived Projections, Context Deprecation, and Mandatory Issue Anchoring
+- Date: 2026-08-31
+- Status: accepted
+- Context:
+  1. Multiple developers and parallel agent sessions working across branches encounter git merge conflicts on shared bottleneck files (CONTEXT.md, ISSUES.md, HISTORY.md, DECISIONS.md).
+  2. CONTEXT.md became a degenerate global state entity, causing continuous merge conflicts while duplicating information already tracked in .along/SESSIONS/, active .along/ISSUES/, and session blackboard directories.
+  3. Sequential integer numbering of ADRs (#012) led to collisions when two branches added decisions concurrently.
+  4. Agents lacked a strict rule prohibiting unanchored code modifications.
+- Decision:
+  1. **SSOT vs Derived Projections**: Formally classify .along/ISSUES/*.md, .along/SESSIONS/*.md, and docs/topic--*.md as Single Source of Truth (SSOT). Classify ISSUES.md, docs/INDEX.md, and DASHBOARD.md as compiled projections. Enforce zero-manual-merge: merge conflicts in projections are resolved by automated re-sync via /along-issue-sync and /along-kb-sync.
+  2. **Deprecate & Delete CONTEXT.md**: Remove CONTEXT.md entirely from protocol scaffolding, session start reading lists, and wrap checklists. Context is localized to feature issues (.along/ISSUES/) and ephemeral session blackboards (.along/.session/<slug>/).
+  3. **Decentralized ADR Identifiers**: Transition DECISIONS.md from sequential integers (#NNN) to non-colliding date-slug headers (ADR-YYYY-MM-DD--<slug>).
+  4. **Git Merge Union (.gitattributes)**: Configure merge=union for append-only linear files (HISTORY.md, DECISIONS.md).
+  5. **Mandatory Issue Anchoring**: Require all non-micro source code modifications to be tied to an active issue in .along/ISSUES/ with status: in-progress.
+- Consequences: Eliminates >95% of merge conflicts across parallel developer and agent branches, reduces cold-start token consumption by removing redundant context reads, and ensures full traceability from issue to code commit.

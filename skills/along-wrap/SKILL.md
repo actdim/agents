@@ -1,9 +1,9 @@
 ---
 name: along-wrap
-description: Wrap up the current coding session or completed work stage by updating the repo's .along/ state - execute code review checklist, write a session log file, refresh CONTEXT.md, move completed issues to ISSUES/done/, append a HISTORY line, and record decisions/glossary terms. Use when ending work, wrapping up, or when invoking /along-wrap.
+description: Wrap up the current coding session or completed work stage by updating the repo's .along/ state - execute code review checklist, write a session log file, synchronize ISSUES.md projection, move completed issues to ISSUES/done/, append a HISTORY line, and record decisions/glossary terms. Use when ending work, wrapping up, or when invoking /along-wrap.
 ---
 
-# Along Wrap  [v2.1.8]
+# Along Wrap  [v2.2.1]
 
 Universal finalization and memory synchronization protocol for sessions, tasks, and milestone stages.
 
@@ -28,7 +28,7 @@ Universal finalization and memory synchronization protocol for sessions, tasks, 
    - Conclude active `.along/SPIKES/` and log any resulting ADR in `.along/DECISIONS.md`.
 4. [ ] **Documentation Check**: Update `README.md`, `AGENTS.md` (project specifics), or `docs/` if code interfaces or architecture changed, and run `/along-kb-sync`.
 5. [ ] **Session Log**: Write `.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` in the nearest `.along/` with complete front-matter (`protocol: along`, `issues_advanced`, `issues_completed`, `decisions`, `risks_logged`, `spikes_conducted`) and a concise Code Review & Impact summary.
-6. [ ] **CONTEXT Snapshot**: Rewrite nearest `.along/CONTEXT.md` to a short "you are here" snapshot (< 20 lines).
-7. [ ] **ISSUES Board**: Update nearest `.along/ISSUES.md` (keep active list lean, reflect done items).
-8. [ ] **HISTORY**: Append one line to nearest `.along/HISTORY.md`: `<YYYY-MM-DD> - <slug> - <agent> - <summary> - <link>`.
-9. [ ] **Compaction Prompt**: Advise user to run `/compact` to free up token budget.
+6. [ ] **ISSUES Board Projection**: Run `/along-issue-sync` (or update nearest `.along/ISSUES.md`).
+7. [ ] **HISTORY**: Append one line to nearest `.along/HISTORY.md`: `<YYYY-MM-DD> - <slug> - <agent> - <summary> - <link>`.
+8. [ ] **Compaction Prompt**: Advise user to run `/compact` to free up token budget.
+

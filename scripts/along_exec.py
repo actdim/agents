@@ -187,7 +187,7 @@ def glob_files(root: str, pattern: str) -> bool:
 
 
 def print_help():
-    print("""Along Command Router (along_exec.py) [v2.1.5]
+    print("""Along Command Router (along_exec.py) [v2.2.0]
 
 Usage:
   python scripts/along_exec.py <command> [subcommand] [args...]
@@ -198,13 +198,17 @@ Lifecycle Commands (project hooks):
   dev            Launch project dev server (.along/scripts/dev.py or auto-detected)
 
 Entity Management Commands:
-  issue create <type> <slug> --title "Title" [--priority high|medium|low] [--tags "t1,t2"]
-  issue done <slug>
-  issue list
-  session create <slug> --summary "Summary" [--issues "slug1,slug2"] [--decisions "#001"]
-  decision add <num> "Title" --context "Why" --decision "What" --consequences "Tradeoffs"
-  scratch init <slug>
-  scratch purge <slug>
+  status         Instant terminal summary of repository state, active issues, and recent sessions
+  doctor         Validate .along/ structure, .gitattributes, and ADR headers
+  issue create   <type> <slug> --title "Title" [--priority high|medium|low] [--tags "t1,t2"]
+  issue sync     Recompile .along/ISSUES.md projection deterministically from entity files
+  issue done     <slug>
+  issue list     List active issues in terminal
+  session create <slug> --summary "Summary" [--issues "slug1,slug2"] [--decisions "ADR-slug"]
+  decision add   <slug> --title "Title" --context "Why" --decision "What" --consequences "Tradeoffs"
+  decision create <slug> --title "Title" --context "Why" --decision "What" --consequences "Tradeoffs"
+  scratch init   <slug>
+  scratch purge  <slug>
 
 Along Protocol Tools:
   kb-sync        Synchronize and compile Knowledge Base in docs/
@@ -353,6 +357,43 @@ Describe the feature, requirements, and background context here.
             print(f"-> Updated .along/ISSUES.md")
         sys.exit(0)
 
+    elif subcmd == "sync":
+        active_items = []
+        done_items = []
+
+        if os.path.exists(issues_dir):
+            for f in sorted(os.listdir(issues_dir)):
+                if f.endswith(".md") and os.path.isfile(os.path.join(issues_dir, f)):
+                    parts = f[:-3].split("--", 1)
+                    itype = parts[0]
+                    islug = parts[1] if len(parts) > 1 else f[:-3]
+                    active_items.append(f"- [ ] `({itype})` [{islug}](file://.along/ISSUES/{f})")
+
+        if os.path.exists(done_dir):
+            for f in sorted(os.listdir(done_dir), reverse=True):
+                if f.endswith(".md") and os.path.isfile(os.path.join(done_dir, f)):
+                    parts = f[:-3].split("--", 1)
+                    itype = parts[0]
+                    islug = parts[1] if len(parts) > 1 else f[:-3]
+                    done_items.append(f"- [x] `({itype})` [{islug}](file://.along/ISSUES/done/{f})")
+
+        board_content = f"""# Active Issues
+
+## Active
+{chr(10).join(active_items) if active_items else "<!-- No active issues -->"}
+
+## Backlog
+<!-- Planned or deferred issues -->
+
+## Done (recent)
+{chr(10).join(done_items) if done_items else "<!-- No completed issues -->"}
+"""
+        issues_board = os.path.join(repo_root, ".along", "ISSUES.md")
+        with open(issues_board, "w", encoding="utf-8") as f:
+            f.write(board_content)
+        print(f"-> Recompiled .along/ISSUES.md projection ({len(active_items)} active, {len(done_items)} done).")
+        sys.exit(0)
+
     elif subcmd == "list":
         print(f"-> Active issues in {issues_dir}:")
         count = 0
@@ -366,7 +407,7 @@ Describe the feature, requirements, and background context here.
 
 def handle_session_command(repo_root: str, args: List[str]):
     if not args or args[0] in ("-h", "--help", "help"):
-        print("Usage: along_exec.py session create <slug> --summary \"Summary text\" [--issues \"slug1,slug2\"] [--decisions \"#001\"]")
+        print("Usage: along_exec.py session create <slug> --summary \"Summary text\" [--issues \"slug1,slug2\"] [--decisions \"ADR-slug\"]")
         sys.exit(0)
 
     subcmd = args[0].lower()
@@ -411,7 +452,7 @@ agent: antigravity
 branch: main
 commit: pending
 summary: {summary}
-milestone: v2.1.0-along
+milestone: v2.2.0-along
 issues_advanced: []
 issues_completed: {issues_str}
 decisions: {decisions_str}
@@ -450,26 +491,30 @@ spikes_conducted: []
 
 def handle_decision_command(repo_root: str, args: List[str]):
     if not args or args[0] in ("-h", "--help", "help"):
-        print("Usage: along_exec.py decision add <num> \"Title\" --context \"Context\" --decision \"Decision\" --consequences \"Tradeoffs\"")
+        print("Usage: along_exec.py decision create <slug> --title \"Title\" --context \"Context\" --decision \"Decision\" --consequences \"Tradeoffs\"")
         sys.exit(0)
 
     subcmd = args[0].lower()
     from datetime import datetime
     today = datetime.now().strftime("%Y-%m-%d")
 
-    if subcmd == "add":
-        if len(args) < 3:
-            print("[Error] Usage: along_exec.py decision add <num> \"Title\" --context \"Why\" --decision \"What\" --consequences \"Consequences\"", file=sys.stderr)
+    if subcmd in ("create", "add"):
+        if len(args) < 2:
+            print("[Error] Usage: along_exec.py decision create <slug> --title \"Title\" --context \"Why\" --decision \"What\" --consequences \"Consequences\"", file=sys.stderr)
             sys.exit(1)
-        num = args[1].lstrip("#")
-        title = args[2]
+        first_arg = args[1].lstrip("#")
+        slug = first_arg.lower()
+        title = slug.replace("-", " ").capitalize()
         context = ""
         decision = ""
         consequences = ""
 
-        i = 3
+        i = 2
         while i < len(args):
-            if args[i] == "--context" and i + 1 < len(args):
+            if args[i] in ("--title", "-t") and i + 1 < len(args):
+                title = args[i + 1]
+                i += 2
+            elif args[i] == "--context" and i + 1 < len(args):
                 context = args[i + 1]
                 i += 2
             elif args[i] == "--decision" and i + 1 < len(args):
@@ -479,11 +524,15 @@ def handle_decision_command(repo_root: str, args: List[str]):
                 consequences = args[i + 1]
                 i += 2
             else:
-                i += 1
+                if i == 2 and not args[i].startswith("-"):
+                    title = args[i]
+                    i += 1
+                else:
+                    i += 1
 
         dec_file = os.path.join(repo_root, ".along", "DECISIONS.md")
         entry = f"""
-## #{num} - {title}
+## ADR-{today}--{slug} - {title}
 - Date: {today}
 - Status: accepted
 - Context: {context}
@@ -492,8 +541,114 @@ def handle_decision_command(repo_root: str, args: List[str]):
 """
         with open(dec_file, "a", encoding="utf-8") as f:
             f.write(entry)
-        print(f"-> Appended Decision #{num} to .along/DECISIONS.md")
+        print(f"-> Appended ADR-{today}--{slug} to .along/DECISIONS.md")
         sys.exit(0)
+
+
+def handle_status_command(repo_root: str, args: List[str]):
+    print("=== Along Repository Status ===")
+    print(f"Repo Root: {repo_root}")
+    along_dir = os.path.join(repo_root, ".along")
+    if not os.path.exists(along_dir):
+        print("[Notice] .along/ directory not found in repository.")
+        sys.exit(0)
+
+    # Active issues
+    issues_dir = os.path.join(along_dir, "ISSUES")
+    active_issues = []
+    if os.path.exists(issues_dir):
+        for f in os.listdir(issues_dir):
+            if f.endswith(".md") and os.path.isfile(os.path.join(issues_dir, f)):
+                active_issues.append(f)
+    print(f"\nActive Issues ({len(active_issues)}):")
+    for iss in active_issues:
+        print(f"  - {iss}")
+
+    # Latest session
+    sessions_dir = os.path.join(along_dir, "SESSIONS")
+    latest_session = None
+    if os.path.exists(sessions_dir):
+        all_sessions = []
+        for root, _, files in os.walk(sessions_dir):
+            for f in files:
+                if f.endswith(".md"):
+                    all_sessions.append(os.path.join(root, f))
+        if all_sessions:
+            all_sessions.sort()
+            latest_session = all_sessions[-1]
+
+    if latest_session:
+        print(f"\nLatest Session: {os.path.basename(latest_session)}")
+        with open(latest_session, "r", encoding="utf-8", errors="ignore") as f:
+            lines = [l.strip() for l in f.readlines() if l.strip().startswith("summary:")]
+            if lines:
+                print(f"  {lines[0]}")
+    else:
+        print("\nLatest Session: None recorded yet")
+
+    # In-flight blackboards
+    session_bb_dir = os.path.join(along_dir, ".session")
+    if os.path.exists(session_bb_dir):
+        bbs = [d for d in os.listdir(session_bb_dir) if os.path.isdir(os.path.join(session_bb_dir, d))]
+        if bbs:
+            print(f"\nActive Blackboards ({len(bbs)}): {', '.join(bbs)}")
+    print("\n===============================")
+    sys.exit(0)
+
+
+def handle_doctor_command(repo_root: str, args: List[str]):
+    print("=== Along Protocol Diagnostics (Doctor) ===")
+    errors = 0
+    warnings = 0
+
+    along_dir = os.path.join(repo_root, ".along")
+    if not os.path.exists(along_dir):
+        print("[FAIL] Missing .along/ directory.")
+        errors += 1
+    else:
+        print("[OK] .along/ directory exists.")
+
+    # Check .gitattributes
+    gitattributes_file = os.path.join(repo_root, ".gitattributes")
+    if not os.path.exists(gitattributes_file):
+        print("[WARN] Missing .gitattributes (recommended for merge=union on HISTORY.md/DECISIONS.md).")
+        warnings += 1
+    else:
+        with open(gitattributes_file, "r", encoding="utf-8", errors="ignore") as f:
+            ga_content = f.read()
+        if "merge=union" in ga_content:
+            print("[OK] .gitattributes configured with merge=union.")
+        else:
+            print("[WARN] .gitattributes exists but lacks merge=union for .along/ files.")
+            warnings += 1
+
+    # Check DECISIONS.md
+    dec_file = os.path.join(along_dir, "DECISIONS.md")
+    if os.path.exists(dec_file):
+        with open(dec_file, "r", encoding="utf-8", errors="ignore") as f:
+            dec_content = f.read()
+        if "## ADR-" in dec_content:
+            print("[OK] .along/DECISIONS.md uses decentralized ADR-YYYY-MM-DD--<slug> format.")
+        else:
+            print("[WARN] .along/DECISIONS.md uses legacy sequential numbering.")
+            warnings += 1
+
+    # Check obsolete CONTEXT.md
+    context_file = os.path.join(along_dir, "CONTEXT.md")
+    if os.path.exists(context_file):
+        print("[WARN] .along/CONTEXT.md detected (deprecated in v2.2.0, recommend removal).")
+        warnings += 1
+
+    # Check AGENTS.md
+    agents_file = os.path.join(repo_root, "AGENTS.md")
+    if os.path.exists(agents_file):
+        print("[OK] AGENTS.md exists.")
+    else:
+        print("[FAIL] Missing AGENTS.md at repository root.")
+        errors += 1
+
+    print(f"\nDoctor Summary: {errors} errors, {warnings} warnings.")
+    sys.exit(1 if errors > 0 else 0)
 
 
 def handle_scratch_command(repo_root: str, args: List[str]):
@@ -535,7 +690,11 @@ def main():
     repo_root = find_repo_root()
 
     # 1. Native Entity Management Subcommands
-    if cmd == "issue":
+    if cmd == "status":
+        handle_status_command(repo_root, extra_args)
+    elif cmd == "doctor":
+        handle_doctor_command(repo_root, extra_args)
+    elif cmd == "issue":
         handle_issue_command(repo_root, extra_args)
     elif cmd == "session":
         handle_session_command(repo_root, extra_args)
@@ -543,6 +702,13 @@ def main():
         handle_decision_command(repo_root, extra_args)
     elif cmd == "scratch":
         handle_scratch_command(repo_root, extra_args)
+    elif cmd == "kb":
+        sub = extra_args[0].lower() if extra_args else "sync"
+        mapped = "along_kb_sync.py" if sub == "sync" else "along_kb_search.py"
+        script_path = resolve_tool_script(mapped, repo_root)
+        if script_path:
+            res = subprocess.run([sys.executable, script_path] + extra_args[1:], cwd=repo_root)
+            sys.exit(res.returncode)
 
     # 2. Check if command is an Along Protocol Tool
     if cmd in TOOL_MAPPINGS:

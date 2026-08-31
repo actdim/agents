@@ -1,11 +1,11 @@
 ---
 name: along-init
-description: Scaffold or refresh the provider-agnostic agent-context structure in a repository - root AGENTS.md (with a managed block carrying the ALONG-PROTOCOL v2.1.8), a CLAUDE.md that imports it, and the .along/ directory (CONTEXT, ISSUES + ISSUES/, DECISIONS, VISION, GLOSSARY, HISTORY, SESSIONS, docs/). Use when the user wants to set up agent context/instructions for a project, initialize the agent structure, or invokes /along-init. Idempotent - re-running refreshes only the managed protocol block and never overwrites existing dynamic state files.
+description: Scaffold or refresh the provider-agnostic agent-context structure in a repository - root AGENTS.md (with a managed block carrying the ALONG-PROTOCOL v2.2.1), a CLAUDE.md that imports it, .gitattributes for merge union, and the .along/ directory (ISSUES + ISSUES/, DECISIONS, VISION, GLOSSARY, HISTORY, SESSIONS, docs/). Use when the user wants to set up agent context/instructions for a project, initialize the agent structure, or invokes /along-init. Idempotent - re-running refreshes only the managed protocol block and never overwrites existing dynamic state files.
 ---
 
-# Along Init (`/along-init`) [v2.1.8]
+# Along Init (`/along-init`) [v2.2.1]
 
-Scaffold or refresh the provider-agnostic agent-context structure in a repository - root `AGENTS.md` (with a managed block carrying the `ALONG-PROTOCOL v2.1.8`), a `CLAUDE.md` that imports it, and the `.along/` directory (`CONTEXT.md`, `ISSUES.md` + `ISSUES/`, `DECISIONS.md`, `VISION.md`, `GLOSSARY.md`, `HISTORY.md`, `SESSIONS/`, `docs/`).
+Scaffold or refresh the provider-agnostic agent-context structure in a repository - root `AGENTS.md` (with a managed block carrying the `ALONG-PROTOCOL v2.2.1`), a `CLAUDE.md` that imports it, `.gitattributes`, and the `.along/` directory (`ISSUES.md` + `ISSUES/`, `DECISIONS.md`, `VISION.md`, `GLOSSARY.md`, `HISTORY.md`, `SESSIONS/`, `docs/`).
 
 ## When to use
 - The user wants to set up agent context or instructions for a project (`/along-init`, "set up agent context", "initialize along").
@@ -20,23 +20,29 @@ Scaffold or refresh the provider-agnostic agent-context structure in a repositor
 - If `AGENTS.md` already exists: update only the managed block between `<!-- BEGIN ALONG-PROTOCOL ... -->` and `<!-- END ALONG-PROTOCOL -->`, preserving all human-written content outside the markers.
 - If legacy `<!-- BEGIN ACTDIM-AGENTS-PROTOCOL ... -->` markers are detected, replace them cleanly with the new ALONG-PROTOCOL markers.
 
-### Step 2: `CLAUDE.md` Import Link
+### Step 2: `CLAUDE.md` & `.gitattributes` Scaffolding
 - Ensure `CLAUDE.md` contains the line:
   ```markdown
   See @AGENTS.md for project instructions and guidance.
   ```
+- Ensure `.gitattributes` exists at repository root with merge union configuration:
+  ```gitattributes
+  *.md text eol=lf
+  .along/HISTORY.md merge=union
+  .along/DECISIONS.md merge=union
+  ```
 
 ### Step 3: Scaffold `.along/` Directory Skeleton (Create only if missing)
 Create the directory structure if missing:
-- `.along/CONTEXT.md`: Short current snapshot (< 20 lines).
 - `.along/ISSUES.md` + `.along/ISSUES/` + `.along/ISSUES/done/`: Issue tracking board and typed issue files (`protocol: along`).
-- `.along/DECISIONS.md`: Append-only ADR log.
+- `.along/DECISIONS.md`: Append-only ADR log with slug headers (`ADR-YYYY-MM-DD--<slug>`).
 - `docs/`: Knowledge base articles (`INDEX.md`, `topic--architecture.md`, `topic--domain-model.md`, `topic--setup-and-workflow.md`).
 - `.along/MILESTONES/`: Milestone tracking files.
 - `.along/RISKS/`: Risk & blocker registry.
 - `.along/SPIKES/`: R&D experiment logs.
 - `.along/CHECKLISTS/`: Standard verification checklists (`pre-commit.md`, `stage-completion.md`).
 - `.along/VISION.md`, `.along/GLOSSARY.md`, `.along/HISTORY.md`, `.along/SESSIONS/<YYYY>/`.
+*(Notice: CONTEXT.md is deprecated in v2.2.0 and is not created).*
 
 ### Step 4: Run Protocol Migration
 Execute the migration engine against the target folder to validate front-matter and migrate any legacy `.agents/` content:

@@ -1,5 +1,5 @@
 <!-- BEGIN ALONG-PROTOCOL root (managed by along-init - do not edit by hand) -->
-# ALONG-PROTOCOL v2.1.8
+# ALONG-PROTOCOL v2.2.1
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
@@ -7,7 +7,7 @@ This repo carries its own agent context, provider-agnostically. Follow it every 
 - **Nearest Context Boundary**: Any folder may carry its own `AGENTS.md` + `.along/`; they apply to that folder and everything under it. Use the NEAREST ones for the area you're working in; higher-level ones add broader context. On conflict, the more specific wins.
 - **Strict Subproject & Submodule Localization**:
   - In modular repositories, monorepos, Git submodules, or symlinked folders (e.g. `packages/*`, `libs/*`, `modules/*`, `Common/*`):
-    - **Entity Anchoring**: All entity creation and lifecycle updates (`.along/ISSUES/`, `ISSUES.md`, `SESSIONS/`, `CONTEXT.md`, `DECISIONS.md`, `HISTORY.md`, `docs/`) MUST be created in the **NEAREST `.along/`** directory corresponding to the specific component/subproject being modified.
+    - **Entity Anchoring**: All entity creation and lifecycle updates (`.along/ISSUES/`, `ISSUES.md`, `SESSIONS/`, `DECISIONS.md`, `HISTORY.md`, `docs/`) MUST be created in the **NEAREST `.along/`** directory corresponding to the specific component/subproject being modified.
     - **Submodule Isolation**: When fixing a bug, refactoring, or adding a feature to a Git submodule or symlinked utility library, the issue (`ISSUES/<type>--<slug>.md`), session log (`SESSIONS/`), ADR (`DECISIONS.md`), and history line (`HISTORY.md`) MUST be recorded directly in that submodule's `.along/`.
     - **Parent Orchestration**: The root workspace `.along/` is strictly reserved for whole-solution orchestration, top-level integration tasks, and cross-package architectural ADRs. Parent issues may reference subproject issue canonical keys (e.g. `[pkg-auth:feat--token-refresh]`), but MUST NOT absorb subproject internal entity history.
     - **Anti-Root Pollution Rule**: Agents are STRICTLY FORBIDDEN from blindly dumping subproject or submodule changes into the workspace root `.along/`.
@@ -17,10 +17,34 @@ This repo carries its own agent context, provider-agnostically. Follow it every 
 ## At session start - read these yourself (they are NOT auto-loaded)
 Use the NEAREST `.along/` for the area you're working in (fall back to a higher-level one if the folder has none):
 1. `AGENTS.md` (nearest) - conventions to follow.
-2. `.along/CONTEXT.md` - current state.
-3. `.along/ISSUES.md` - active issue board.
-4. `.along/DECISIONS.md` - don't contradict.
-Also, when relevant: `.along/VISION.md`, `.along/GLOSSARY.md`, and the `.along/ISSUES/<type>--<slug>.md` you'll work on. These reflect the state WHEN WRITTEN - verify any named file/API/flag against the real code first.
+2. `.along/ISSUES.md` - active issue board (or query `/along-kb-search`).
+3. `.along/DECISIONS.md` - architectural decisions & constraints.
+4. Active Issue file `.along/ISSUES/<type>--<slug>.md` for your task.
+Also, when relevant: `.along/VISION.md`, `.along/GLOSSARY.md`. These reflect the state WHEN WRITTEN - verify any named file/API/flag against the real code first.
+
+## Multi-Agent & Multi-Branch Concurrency Protocol
+1. **Single Source of Truth (SSOT) vs Derived Projections**:
+   - **SSOT Entities**: Atomic markdown files (`.along/ISSUES/<type>--<slug>.md`, `.along/SESSIONS/<YYYY>/<date>--<slug>.md`, `docs/topic--<slug>.md`, `.along/DECISIONS.md`).
+   - **Derived Projections (Compiled Views)**: `.along/ISSUES.md`, `docs/INDEX.md`, `.along/DASHBOARD.md`.
+   - **Zero-Manual-Merge Rule**: When git merge conflicts occur in derived projections (`ISSUES.md`, `INDEX.md`), never resolve diffs manually. Accept either incoming change and run `/along-issue-sync` or `/along-kb-sync` to recompile the projection from source files.
+2. **Append-Only Linear Merge Driver**:
+   - `.along/HISTORY.md` and `.along/DECISIONS.md` are append-only. Configure `.gitattributes` with `merge=union` to allow parallel branches to append entries without git merge conflicts.
+3. **Feature-Scoped Context & Blackboard Isolation**:
+   - The obsolete global `CONTEXT.md` file is deleted. Context is strictly localized to:
+     - The target issue file (`.along/ISSUES/<type>--<slug>.md`).
+     - Session-scoped ephemeral blackboard (`.along/.session/<slug>/` in `along-team`), automatically purged on wrap-up.
+     - Completed session logs in `.along/SESSIONS/<YYYY>/<date>--<slug>.md`.
+
+## Mandatory Issue Anchoring (Issue-Driven Execution)
+1. **No Code Edits Without an Issue**:
+   Before modifying any source code, agents MUST identify an existing issue or create a new one in `.along/ISSUES/<type>--<slug>.md`:
+   - Set `status: in-progress` and assign agent/branch metadata.
+   - For multi-issue tasks, declare the parent issue (`parent: <slug>`) or list active issues in the session log (`issues_advanced: []`).
+2. **Exemptions (Anti-Pollution & Token Conservation)**:
+   - **Read-only / Q&A**: DO NOT create issues for questions or code exploration.
+   - **Micro-edits**: 1-line typo fixes, comment adjustments, or tiny lint tweaks are recorded directly in the session log without creating an issue file.
+3. **Commit & History Binding**:
+   - Every commit created by `/along-commit` MUST bind to the active issue slug.
 
 ## Entity Ecosystem & Structured Metadata
 All entities are designed for zero-friction auto-parsing by dashboards and tools via YAML front-matter:
@@ -48,23 +72,29 @@ All entities are designed for zero-friction auto-parsing by dashboards and tools
 - `.along/ISSUES.md` is the compact board read every session (`## Active`, `## Backlog`, `## Done (recent)`).
 - On completion: set `status: done` and `completed: YYYY-MM-DD`, MOVE to `.along/ISSUES/done/<type>--<slug>.md`, and update `.along/ISSUES.md`.
 
-### 2. Milestones & Releases (`.along/MILESTONES/<slug>.md`)
+### 2. Decisions (ADRs) (`.along/DECISIONS.md`)
+- Append-only Architectural Decision Records with decentralized slug headers:
+  - Header: `## ADR-YYYY-MM-DD--<slug> - <Title>`
+  - Fields: `- Date: YYYY-MM-DD`, `- Status: accepted | superseded by ADR-YYYY-MM-DD--<slug>`, `- Context: ...`, `- Decision: ...`, `- Consequences: ...`
+  - Slug-based headers prevent merge collisions when parallel branches record architectural decisions.
+
+### 3. Milestones & Releases (`.along/MILESTONES/<slug>.md`)
 - Group multiple issues into a release target, stage, or sprint.
 - **Front-matter**: `protocol: along`, `slug`, `title`, `status` (`open` | `in-progress` | `completed`), `due_date`, `created`, `target_issues: []`, `progress_pct`.
 
-### 3. Risks & Blockers (`.along/RISKS/<slug>.md`)
+### 4. Risks & Blockers (`.along/RISKS/<slug>.md`)
 - Track external dependencies, API limits, blocking ambiguities, and security flags.
 - **Front-matter**: `protocol: along`, `slug`, `title`, `severity` (`critical` | `high` | `medium` | `low`), `status` (`active` | `mitigated` | `resolved`), `owner` (`agent` | `user`), `mitigation`, `created`, `updated`.
 
-### 4. Spikes & R&D Experiments (`.along/SPIKES/<slug>.md`)
+### 5. Spikes & R&D Experiments (`.along/SPIKES/<slug>.md`)
 - Exploratory spikes, benchmark experiments, and library evaluations before implementation.
 - **Front-matter**: `protocol: along`, `slug`, `title`, `status` (`hypothesis` | `evaluating` | `concluded`), `hypothesis`, `outcome`, `resulting_adr`, `created`.
 
-### 5. Checklists & Verification (`.along/CHECKLISTS/<slug>.md`)
+### 6. Checklists & Verification (`.along/CHECKLISTS/<slug>.md`)
 - Reusable verification checklists for quality gates, pre-commit, and security audits.
 - **Front-matter**: `protocol: along`, `slug`, `title`, `category` (`pre-commit` | `stage-completion` | `release` | `security`), `items: [{ id, text, verified: bool }]`.
 
-### 6. Sessions (`.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<slug>.md`)
+### 7. Sessions (`.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<slug>.md`)
 - Comprehensive work session log.
 - **Front-matter**: `protocol: along`, `date`, `slug`, `agent`, `branch`, `commit`, `summary`, `milestone`, `issues_advanced: []`, `issues_completed: []`, `decisions: []`, `risks_logged: []`, `spikes_conducted: []`.
 
@@ -101,7 +131,7 @@ To keep `.along/` lean and avoid token bloat:
 
 ## While working
 - Follow the conventions in `AGENTS.md`.
-- `DECISIONS.md` is APPEND-ONLY: add a new dated entry per non-trivial architectural decision; never edit past ones - mark a replaced one "Superseded by #N".
+- `DECISIONS.md` is APPEND-ONLY: add a new dated entry with slug header (`## ADR-YYYY-MM-DD--<slug>`) per non-trivial architectural decision; never edit past ones - mark a replaced one "Superseded by ADR-YYYY-MM-DD--<slug>".
 - Add any new/clarified domain term to `.along/GLOSSARY.md`.
 - **Context & Token hygiene**: Keep tool output lean to prevent context bloat. Use quiet flags for builds/tests (`pytest -q`, `dotnet test -v q`), filter command outputs, and inspect targeted line ranges.
 - **Mandatory Agentic Code Review & Blast Radius Impact**: After completing non-trivial code modifications, agents MUST critically inspect their own diffs and evaluate systemic blast radius. Use `code-review-graph` MCP tools (`build_or_update_graph_tool`, `get_impact_radius_tool`, `get_affected_flows_tool`) to verify that downstream callers, interfaces, and dependent systems remain unbroken, edge cases and nulls are handled, and active ADRs in `.along/DECISIONS.md` are respected.
@@ -120,10 +150,9 @@ When a Stage or session completes, agents MUST execute this verification checkli
    - Update related `.along/MILESTONES/` progress percentages.
    - Resolve mitigated `.along/RISKS/` (`status: resolved` / `mitigated`).
    - Conclude active `.along/SPIKES/` and log any resulting ADR in `.along/DECISIONS.md`.
-4. [ ] **Documentation Check**: Update `README.md`, `AGENTS.md` (project specifics), or `docs/` if code interfaces or architecture changed, and run `/along-kb-sync`.
-5. [ ] **Session Log**: Write `.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` with complete front-matter (`protocol: along`, `issues_advanced`, `issues_completed`, `decisions`, `risks_logged`, `spikes_conducted`) and a concise Code Review & Impact summary.
-6. [ ] **CONTEXT Snapshot**: Rewrite `.along/CONTEXT.md` to a short "you are here" snapshot (< 20 lines).
-7. [ ] **ISSUES Board**: Update `.along/ISSUES.md` (keep active list lean, reflect done items).
+5. [ ] **Documentation Check**: Update `README.md`, `AGENTS.md` (project specifics), or `docs/` if code interfaces or architecture changed, and run `/along-kb-sync`.
+6. [ ] **Session Log**: Write `.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` with complete front-matter (`protocol: along`, `issues_advanced`, `issues_completed`, `decisions`, `risks_logged`, `spikes_conducted`) and a concise Code Review & Impact summary.
+7. [ ] **ISSUES Board Projection**: Run `/along-issue-sync` (or update `.along/ISSUES.md`).
 8. [ ] **HISTORY**: Append one line to `.along/HISTORY.md`: `<YYYY-MM-DD> - <slug> - <agent> - <summary> - <link>`.
 9. [ ] **Compaction Prompt**: Advise user to run `/compact` to free up token budget.
 
@@ -143,6 +172,7 @@ When a Stage or session completes, agents MUST execute this verification checkli
   - **Explicit Code Fence Languages**: Always specify the language identifier on code fences (e.g. ```` ```bash ````, ```` ```yaml ````, ```` ```typescript ````, ```` ```python ````). Never use bare unlabelled fences.
   - **Relative & Portable Links**: Always use relative paths (`file://...` or standard markdown links) without hardcoding local absolute paths.
   - **UTF-8 Clean Encoding**: Keep all text files in clean UTF-8 without BOM.
+  - **Deterministic Entity & Command Execution**: Never execute fragile multi-line inline shell strings (`python -c "..."`) containing escaped quotes on Windows / PowerShell. Always use deterministic subcommands via `python scripts/along_exec.py` (`issue create`, `session create`, `scratch init`) or execute clean standalone Python scripts.
 - Windows-safe filenames: dates `YYYY-MM-DD` (no `:`), date first.
-- Keep `CONTEXT.md` and `ISSUES.md` compact - they cost context every session.
+- Keep `ISSUES.md` compact - it costs context every session.
 - Never write secrets/credentials/tokens/keys into these files; they are committed.

@@ -10,7 +10,7 @@ tags: [skills, commands, reference, runners, lifecycle]
 
 # Skills & Slash Commands Technical Reference
 
-Along provides a complete suite of **17 singular automation skills** operating across Claude Code, OpenAI Codex, OpenCode, and Google Antigravity.
+Along provides a complete suite of **18 singular automation skills** operating across Claude Code, OpenAI Codex, OpenCode, and Google Antigravity.
 
 ---
 
@@ -18,20 +18,19 @@ Along provides a complete suite of **17 singular automation skills** operating a
 
 | Skill Name | Canonical Command | Invocation Script | Purpose |
 | :--- | :--- | :--- | :--- |
-| `along-init` | `/along-init` | `python skills/along-init/along_init.py` | Scaffold or refresh `AGENTS.md` and `.along/` in a directory. |
-| `along-update` | `/along-update` | `python skills/along-update/along_update.py` | One-liner update of repository context and global skills from GitHub. |
+| `along-init` | `/along-init` | `along-init` | Scaffold or refresh `AGENTS.md`, `.gitattributes`, and `.along/` in a directory. |
+| `along-update` | `/along-update` | `along-update` | One-liner update of repository context and global skills from GitHub. |
 | `along-dash` | `/along-dash` | `python scripts/along_dash.py -w` | Launch dynamic FastAPI executive dashboard and Cytoscape DAG UI. |
-| `along-wrap` | `/along-wrap` | `along-wrap` | Unified session finalization: verification, session log, context, issues, history. |
+| `along-wrap` | `/along-wrap` | `along-wrap` | Unified session finalization: verification, session log, issues, history. |
 | `along-commit` | `/along-commit` | `along-commit -i <slug>` | ASCII cleanliness check and Conventional Commit linked to active issue. |
-| `along-build` | `/along-build` | `python skills/along-build/along_build.py` | Universal build lifecycle runner (.along/scripts/build.py, npm, cargo, dotnet). |
-| `along-test` | `/along-test` | `python skills/along-test/along_test.py` | Automated test suite runner with quiet flags (pytest, npm, cargo, dotnet). |
-| `along-dev` | `/along-dev` | `python skills/along-dev/along_dev.py` | Local development and debugging server runner. |
-| `along-kb-sync` | `/along-kb-sync` | `python skills/along-kb-sync/along_kb_sync.py` | Idempotent LLM-Wiki Knowledge Base compiler in `docs/`. |
-| `along-kb-search` | `/along-kb-search` | `python skills/along-kb-search/along_kb_search.py` | Fast unified search across `docs/` and `.along/` project memory. |
-| `along-issue-sync` | `/along-issue-sync` | `python skills/along-issue-sync/along_issue_sync.py` | Reconcile active issue board and `<type>--<slug>.md` entity files. |
-| `along-context-sync` | `/along-context-sync` | `python skills/along-context-sync/along_context_sync.py` | Refresh and compact the nearest `.along/CONTEXT.md` (<20 lines). |
-| `along-decision-sync` | `/along-decision-sync` | `python skills/along-decision-sync/along_decision_sync.py` | Append numbered ADR entries in `.along/DECISIONS.md`. |
-| `along-history-sync` | `/along-history-sync` | `python skills/along-history-sync/along_history_sync.py` | Reconstruct `.along/` entities and milestones from Git commit history. |
+| `along-build` | `/along-build` | `python scripts/along_exec.py build` | Universal build lifecycle runner (.along/scripts/build.py, npm, cargo, dotnet). |
+| `along-test` | `/along-test` | `python scripts/along_exec.py test` | Automated test suite runner with quiet flags (pytest, npm, cargo, dotnet). |
+| `along-dev` | `/along-dev` | `python scripts/along_exec.py dev` | Local development and debugging server runner. |
+| `along-kb-sync` | `/along-kb-sync` | `python scripts/along_kb_sync.py` | Idempotent LLM-Wiki Knowledge Base compiler in `docs/`. |
+| `along-kb-search` | `/along-kb-search` | `python scripts/along_kb_search.py` | Fast unified search across `docs/` and `.along/` project memory. |
+| `along-issue-sync` | `/along-issue-sync` | `python scripts/along_exec.py issue sync` | Reconcile active issue board and `<type>--<slug>.md` entity files. |
+| `along-decision-sync` | `/along-decision-sync` | `along-decision-sync` | Append decentralized ADR entries in `.along/DECISIONS.md`. |
+| `along-history-sync` | `/along-history-sync` | `python scripts/along_history_sync.py` | Reconstruct `.along/` entities and milestones from Git commit history. |
 | `along-graph-check` | `/along-graph-check` | `python scripts/along_graph_check.py` | Evaluate `code-review-graph` AST impact radius and blast radius. |
 | `along-dep-scan` | `/along-dep-scan` | `python scripts/along_dep_scan.py` | Scan declared dependencies for AI instructions into `docs/topic--dependencies.md`. |
 | `along-version-bump` | `/along-version-bump` | `python scripts/along_version_bump.py` | Multi-stack version bump with pre-commit test gate and release commit. |
