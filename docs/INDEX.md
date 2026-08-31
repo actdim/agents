@@ -56,4 +56,4 @@ flowchart TD
 - [AGENTS.md](file://AGENTS.md): Active protocol conventions and rules.
 - [.along/DECISIONS.md](file://.along/DECISIONS.md): Architectural Decision Records.
 - [.along/ISSUES.md](file://.along/ISSUES.md): Active issue tracking board.
-- [.along/CONTEXT.md](file://.along/CONTEXT.md): Current session snapshot.
+- [.along/HISTORY.md](file://.along/HISTORY.md): Append-only project history log.

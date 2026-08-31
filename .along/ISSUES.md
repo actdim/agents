@@ -35,6 +35,7 @@
 - [x] `(feat)` [concurrency-projections-and-context-deprecation](file://.along/ISSUES/done/feat--concurrency-projections-and-context-deprecation.md)
 - [x] `(feat)` [centralize-scripts-and-clean-skills-purity](file://.along/ISSUES/done/feat--centralize-scripts-and-clean-skills-purity.md)
 - [x] `(feat)` [bump-version-skill-and-typography-sanitizer](file://.along/ISSUES/done/feat--bump-version-skill-and-typography-sanitizer.md)
+- [x] `(feat)` [automated-kb-migration-and-context-updates](file://.along/ISSUES/done/feat--automated-kb-migration-and-context-updates.md)
 - [x] `(feat)` [antigravity-support-and-tasks-to-issues-migration](file://.along/ISSUES/done/feat--antigravity-support-and-tasks-to-issues-migration.md)
 - [x] `(feat)` [ai-dependencies-discovery-and-scan-deps-skill](file://.along/ISSUES/done/feat--ai-dependencies-discovery-and-scan-deps-skill.md)
 - [x] `(feat)` [agentic-goals-and-mandatory-checklists](file://.along/ISSUES/done/feat--agentic-goals-and-mandatory-checklists.md)

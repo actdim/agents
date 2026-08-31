@@ -370,13 +370,24 @@ def sync_kb(repo_root, check_only=False):
     index_body_lines.append("- [AGENTS.md](file://AGENTS.md): Active protocol conventions and rules.")
     index_body_lines.append("- [.along/DECISIONS.md](file://.along/DECISIONS.md): Architectural Decision Records.")
     index_body_lines.append("- [.along/ISSUES.md](file://.along/ISSUES.md): Active issue tracking board.")
-    index_body_lines.append("- [.along/CONTEXT.md](file://.along/CONTEXT.md): Current session snapshot.")
+    index_body_lines.append("- [.along/HISTORY.md](file://.along/HISTORY.md): Append-only project history log.")
 
     if not check_only:
         full_index = dump_frontmatter(index_fm, "\n".join(index_body_lines))
         with open(index_path, "w", encoding="utf-8") as fp:
             fp.write(full_index)
         print(f"   -> Rebuilt docs/INDEX.md ({len(articles)} articles indexed).")
+
+        # Cleanup obsolete files/dirs
+        ctx_file = os.path.join(repo_root, ".along", "CONTEXT.md")
+        if os.path.exists(ctx_file):
+            try:
+                os.remove(ctx_file)
+            except Exception:
+                pass
+        for old_kb in [os.path.join(repo_root, ".along", "KB"), os.path.join(repo_root, ".agents", "KB")]:
+            if os.path.exists(old_kb):
+                shutil.rmtree(old_kb, ignore_errors=True)
 
     if broken_links:
         print(f"   [WARN] Detected {len(broken_links)} dangling or unverified Markdown link(s):")

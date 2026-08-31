@@ -289,6 +289,103 @@ class TestAlongSkillsAndScripts(unittest.TestCase):
             self.assertIn("type", edge)
             self.assertIn("label", edge)
 
+    def test_14_legacy_kb_and_context_migration(self):
+        """Verify that legacy .along/KB/ and CONTEXT.md are automatically migrated to docs/ and .archive/."""
+        temp_dir = tempfile.mkdtemp(prefix="along_mig_test_")
+        try:
+            # 1. Setup mock legacy v2.0 repository
+            agents_md = os.path.join(temp_dir, "AGENTS.md")
+            with open(agents_md, "w", encoding="utf-8") as f:
+                f.write("<!-- BEGIN ALONG-PROTOCOL root -->\n# ALONG-PROTOCOL v2.0.0\n<!-- END ALONG-PROTOCOL -->\n\n## Project specifics\n")
+
+            along_dir = os.path.join(temp_dir, ".along")
+            kb_dir = os.path.join(along_dir, "KB")
+            os.makedirs(kb_dir, exist_ok=True)
+
+            # Legacy CONTEXT.md
+            ctx_path = os.path.join(along_dir, "CONTEXT.md")
+            with open(ctx_path, "w", encoding="utf-8") as f:
+                f.write("# Temporary Session Context\nLegacy snapshot.\n")
+
+            # Legacy 01-architecture.md
+            arch_path = os.path.join(kb_dir, "01-architecture.md")
+            with open(arch_path, "w", encoding="utf-8") as f:
+                f.write("---\nprotocol: along\nslug: 01-architecture\ntitle: Architecture\ntype: architecture\n---\n# Architecture Spec\nCore flow.\n")
+
+            # Legacy raw note
+            raw_path = os.path.join(kb_dir, "unstructured-notes.md")
+            with open(raw_path, "w", encoding="utf-8") as f:
+                f.write("# Unstructured Notes\nRaw brainstorm text.\n")
+
+            # 2. Run migration script
+            mig_script = os.path.join(REPO_ROOT, "scripts", "migrate_protocol.py")
+            res = subprocess.run([sys.executable, mig_script, temp_dir], capture_output=True, text=True)
+            self.assertEqual(res.returncode, 0, f"migrate_protocol failed in test:\n{res.stderr}")
+
+            # 3. Assertions
+            docs_dir = os.path.join(temp_dir, "docs")
+            archive_dir = os.path.join(temp_dir, ".archive")
+
+            self.assertTrue(os.path.exists(docs_dir), "docs/ directory must exist after migration")
+            self.assertTrue(os.path.exists(os.path.join(docs_dir, "topic--architecture.md")), "01-architecture.md must migrate to docs/topic--architecture.md")
+            self.assertTrue(os.path.exists(os.path.join(docs_dir, "topic--unstructured-notes.md")), "raw note must synthesize to docs/topic--unstructured-notes.md")
+            self.assertTrue(os.path.exists(os.path.join(docs_dir, "INDEX.md")), "docs/INDEX.md must be compiled")
+
+            self.assertTrue(os.path.exists(archive_dir), ".archive/ directory must exist")
+            archived_files = os.listdir(archive_dir)
+            self.assertTrue(any("unstructured-notes" in f for f in archived_files), f"Raw note must be archived in .archive/, found: {archived_files}")
+
+            self.assertFalse(os.path.exists(kb_dir), ".along/KB/ directory must be purged")
+            self.assertFalse(os.path.exists(ctx_path), ".along/CONTEXT.md must be purged")
+
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+    def test_15_along_update_multi_context_and_uninit_subprojects(self):
+        """Verify that along_update.py updates all sub-contexts and detects uninitialized subprojects."""
+        temp_dir = tempfile.mkdtemp(prefix="along_multi_ctx_")
+        try:
+            # Root context
+            with open(os.path.join(temp_dir, "AGENTS.md"), "w", encoding="utf-8") as f:
+                f.write("<!-- BEGIN ALONG-PROTOCOL root -->\n# ALONG-PROTOCOL v2.0.0\n<!-- END ALONG-PROTOCOL -->\n\n## Project specifics\n")
+            os.makedirs(os.path.join(temp_dir, ".along", "KB"), exist_ok=True)
+            with open(os.path.join(temp_dir, ".along", "KB", "01-architecture.md"), "w", encoding="utf-8") as f:
+                f.write("# Root Architecture\nRoot spec.\n")
+
+            # Subproject context with its own .along/ and legacy KB
+            sub_dir = os.path.join(temp_dir, "packages", "sub-app")
+            os.makedirs(os.path.join(sub_dir, ".along", "KB"), exist_ok=True)
+            with open(os.path.join(sub_dir, "AGENTS.md"), "w", encoding="utf-8") as f:
+                f.write("<!-- BEGIN ALONG-PROTOCOL ref=../../AGENTS.md -->\n<!-- END ALONG-PROTOCOL -->\n")
+            with open(os.path.join(sub_dir, ".along", "KB", "02-domain-model.md"), "w", encoding="utf-8") as f:
+                f.write("# Subapp Domain\nDomain spec.\n")
+
+            # Uninitialized subproject with package.json
+            uninit_dir = os.path.join(temp_dir, "packages", "uninit-lib")
+            os.makedirs(uninit_dir, exist_ok=True)
+            with open(os.path.join(uninit_dir, "package.json"), "w", encoding="utf-8") as f:
+                f.write('{"name": "uninit-lib", "version": "1.0.0"}')
+
+            # Run along_update.py with --all-sync
+            update_script = os.path.join(REPO_ROOT, "scripts", "along_update.py")
+            res = subprocess.run([sys.executable, update_script, temp_dir, "--all-sync", "--local-only"], capture_output=True, text=True)
+            self.assertEqual(res.returncode, 0, f"along_update failed:\n{res.stderr}\nSTDOUT:\n{res.stdout}")
+
+            # Assertions
+            # Root docs
+            self.assertTrue(os.path.exists(os.path.join(temp_dir, "docs", "topic--architecture.md")), "Root 01-architecture must migrate to docs/topic--architecture.md")
+            self.assertFalse(os.path.exists(os.path.join(temp_dir, ".along", "KB")), "Root .along/KB must be purged")
+
+            # Subproject docs
+            self.assertTrue(os.path.exists(os.path.join(sub_dir, "docs", "topic--domain-model.md")), "Subproject 02-domain-model must migrate to sub-app/docs/topic--domain-model.md")
+            self.assertFalse(os.path.exists(os.path.join(sub_dir, ".along", "KB")), "Subproject .along/KB must be purged")
+
+            # Uninitialized package detected
+            self.assertIn("uninit-lib", res.stdout, "along_update stdout should mention uninitialized subproject")
+
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

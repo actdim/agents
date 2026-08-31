@@ -218,6 +218,12 @@ def install_global_from_local(repo_root, dry_run=False):
         print(f"   [ERROR] Local installer failed: {e}")
         return False
 
+def safe_relpath(path: str, start: str) -> str:
+    try:
+        return os.path.relpath(path, start)
+    except (ValueError, Exception):
+        return path
+
 def find_existing_agent_contexts(repo_root):
     contexts = []
     ignored = {
@@ -239,8 +245,8 @@ def find_existing_agent_contexts(repo_root):
     return contexts
 
 def apply_migration_to_context(ctx_dir, protocol_text, migrate_script, is_root=True, ancestor_root=None, dry_run=False):
-    rel_display = os.path.relpath(ctx_dir, os.getcwd())
-    if rel_display == ".":
+    rel_display = safe_relpath(ctx_dir, ancestor_root or ctx_dir)
+    if rel_display in (".", ""):
         rel_display = "repository root"
 
     print(f"-> Updating agent context: {rel_display} ({ctx_dir})")
@@ -255,7 +261,7 @@ def apply_migration_to_context(ctx_dir, protocol_text, migrate_script, is_root=T
         end_marker = "<!-- END ALONG-PROTOCOL -->"
         block = f"{begin_marker}\n{protocol_text}\n{end_marker}"
     else:
-        rel_path = os.path.relpath(os.path.join(ancestor_root, "AGENTS.md"), ctx_dir).replace('\\', '/')
+        rel_path = safe_relpath(os.path.join(ancestor_root, "AGENTS.md"), ctx_dir).replace('\\', '/')
         begin_marker = f"<!-- BEGIN ALONG-PROTOCOL ref={rel_path} (managed by along-init - do not edit by hand) -->"
         end_marker = "<!-- END ALONG-PROTOCOL -->"
         block = (
@@ -299,14 +305,41 @@ def apply_migration_to_context(ctx_dir, protocol_text, migrate_script, is_root=T
 
     return True
 
+def find_uninitialized_subprojects(repo_root, contexts):
+    uninit = []
+    ignored = {
+        '.git', 'node_modules', 'dist', 'build', '.venv', 'venv',
+        'bin', 'obj', '.cache', 'target', 'vendor', '.gemini', '.claude', '.codex', '.archive'
+    }
+    context_set = set(os.path.abspath(c) for c in contexts)
+    manifest_files = {'package.json', 'Cargo.toml', 'pyproject.toml', 'pom.xml', 'build.gradle'}
+
+    for root, dirs, files in os.walk(repo_root):
+        dirs[:] = [d for d in dirs if d not in ignored and not d.startswith('.')]
+        abs_root = os.path.abspath(root)
+        if abs_root == os.path.abspath(repo_root) or abs_root in context_set:
+            continue
+        has_manifest = any(m in files for m in manifest_files) or any(f.endswith('.csproj') for f in files)
+        if has_manifest:
+            uninit.append(abs_root)
+    uninit.sort(key=lambda p: (len(p.split(os.sep)), p))
+    return uninit
+
 def locate_skill_script(repo_root: str, skill_folder: str, script_name: str) -> Optional[str]:
     """Locates a skill runner script either in local repo or in global environment."""
-    local_p = os.path.join(repo_root, "skills", skill_folder, script_name)
+    local_p = os.path.join(repo_root, "scripts", script_name)
     if os.path.isfile(local_p):
         return local_p
     
+    exec_dir = os.path.dirname(os.path.abspath(__file__))
+    exec_p = os.path.join(exec_dir, script_name)
+    if os.path.isfile(exec_p):
+        return exec_p
+    
     user_home = os.path.expanduser("~")
     cand_paths = [
+        os.path.join(user_home, ".along", "bin", script_name),
+        os.path.join(user_home, ".config", "opencode", "actdim-along", script_name),
         os.path.join(user_home, ".gemini", "config", "skills", skill_folder, script_name),
         os.path.join(user_home, ".claude", "skills", skill_folder, script_name),
         os.path.join(user_home, ".codex", "skills", skill_folder, script_name),
@@ -316,13 +349,15 @@ def locate_skill_script(repo_root: str, skill_folder: str, script_name: str) -> 
             return cp
     return None
 
-def execute_post_update_syncs(repo_root: str, do_kb: bool, do_dep: bool, do_hist: bool):
-    """Executes requested post-update sync engines."""
+def execute_post_update_syncs(contexts: list, repo_root: str, do_kb: bool, do_dep: bool, do_hist: bool):
+    """Executes requested post-update sync engines across all discovered contexts."""
     if do_kb:
         kb_script = locate_skill_script(repo_root, "along-kb-sync", "along_kb_sync.py")
         if kb_script:
-            print(f"\n-> Running Knowledge Base sync (/along-kb-sync)...")
-            subprocess.run([sys.executable, kb_script, repo_root])
+            for ctx in contexts:
+                rel = safe_relpath(ctx, repo_root)
+                print(f"\n-> Running Knowledge Base sync (/along-kb-sync) in {rel if rel not in ('.', '') else '<root>'}...")
+                subprocess.run([sys.executable, kb_script, ctx])
 
     if do_dep:
         dep_script = locate_skill_script(repo_root, "along-dep-scan", "along_dep_scan.py")
@@ -429,8 +464,8 @@ def run_update(repo_root, check_only=False, dry_run=False, force=False, local_on
 
     print(f"   Found {len(contexts)} active agent context(s):")
     for c in contexts:
-        rel = os.path.relpath(c, repo_root)
-        print(f"     - {rel if rel != '.' else '<root>'}")
+        rel = safe_relpath(c, repo_root)
+        print(f"     - {rel if rel not in ('.', '') else '<root>'}")
 
     root_context = repo_root if repo_root in contexts else contexts[0]
 
@@ -448,7 +483,7 @@ def run_update(repo_root, check_only=False, dry_run=False, force=False, local_on
 
     # Post-update sync execution or recommendation table
     if do_kb_sync or do_dep_scan or do_history_sync:
-        execute_post_update_syncs(repo_root, do_kb_sync, do_dep_scan, do_history_sync)
+        execute_post_update_syncs(contexts, repo_root, do_kb_sync, do_dep_scan, do_history_sync)
     else:
         print("\n==================================================")
         print("-> Recommended Next Steps (Optional Onboarding & Sync):")
@@ -457,6 +492,14 @@ def run_update(repo_root, check_only=False, dry_run=False, force=False, local_on
         print("   3. /along-history-sync : Reconcile unmapped Git commit history into .along/ entities")
         print("   4. /along-dash         : Launch executive dashboard & dependency graph")
         print("==================================================")
+
+    # Check for uninitialized subprojects with manifests
+    uninit = find_uninitialized_subprojects(repo_root, contexts)
+    if uninit:
+        print(f"\n-> Note: Discovered {len(uninit)} uninitialized subproject(s) with package manifests:")
+        for u in uninit:
+            rel = safe_relpath(u, repo_root)
+            print(f"     - {rel} (run '/along-init' in this directory to initialize context)")
 
     print(f"-> [OK] Successfully updated {len(contexts)} agent context(s) across repository!\n")
 

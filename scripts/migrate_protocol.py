@@ -24,9 +24,10 @@ import re
 import sys
 import glob
 import shutil
+import subprocess
 from datetime import datetime
 
-CURRENT_PROTOCOL_VERSION = "2.2.2"
+CURRENT_PROTOCOL_VERSION = "2.2.3"
 
 def parse_yaml_frontmatter(content):
     match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n(.*)$", content, re.DOTALL)
@@ -134,52 +135,13 @@ def step_migrate_v1_1_tasks_to_issues(working_dir):
 # Step 2: v1.1.0 -> v1.3.0 (KB & Code Review Graph Scaffolding)
 # ----------------------------------------------------------------------
 def step_migrate_v1_3_kb_scaffolding(repo_root, working_dir):
-    kb_dir = os.path.join(working_dir, "KB")
-    os.makedirs(kb_dir, exist_ok=True)
-    today_str = datetime.now().strftime("%Y-%m-%d")
-
-    standard_kb_articles = {
-        "INDEX.md": ("INDEX", "Knowledge Base Index", "index", [
-            "# Knowledge Base Index\n\nCentral topic map for project documentation.\n\n"
-            "- [[topic--architecture]]: System architecture and data flows.\n"
-            "- [[topic--domain-model]]: Core domain entities and business rules.\n"
-            "- [[topic--setup-and-workflow]]: Build, run, test, and contribution workflows.\n"
-        ]),
-        "topic--architecture.md": ("topic--architecture", "System Architecture & Flow", "architecture", [
-            "# System Architecture & Flow\n\nHigh-level architectural components, module boundaries, and execution models.\n"
-        ]),
-        "topic--domain-model.md": ("topic--domain-model", "Domain Model & Entities", "domain-model", [
-            "# Domain Model & Entities\n\nCore domain terminology, data models, and schema relationships.\n"
-        ]),
-        "topic--setup-and-workflow.md": ("topic--setup-and-workflow", "Setup & Developer Workflow", "setup-workflow", [
-            "# Setup & Developer Workflow\n\nBuild instructions, test suites, local development, and skill deployment guidelines.\n"
-        ]),
-    }
-
-    created = 0
-    for filename, (slug, title, type_name, body_lines) in standard_kb_articles.items():
-        filepath = os.path.join(kb_dir, filename)
-        if not os.path.exists(filepath) or os.path.getsize(filepath) == 0:
-            fm = {
-                "protocol": "along",
-                "slug": slug,
-                "title": title,
-                "type": type_name,
-                "created": today_str,
-                "updated": today_str,
-                "tags": [type_name]
-            }
-            body = "".join(body_lines)
-            with open(filepath, "w", encoding="utf-8") as f:
-                f.write(dump_yaml_frontmatter(fm, body))
-            created += 1
-
     # .code-review-graph-ignore
     crg_ignore = os.path.join(repo_root, ".code-review-graph-ignore")
+    created = 0
     if not os.path.exists(crg_ignore):
         with open(crg_ignore, "w", encoding="utf-8") as f:
             f.write("# Code Review Graph Exclusions\nnode_modules/\ndist/\nbuild/\nout/\n.git/\n.along/SESSIONS/\n.agents/SESSIONS/\n*.min.js\n*.bundle.js\n*.pyc\n__pycache__/\n")
-
+        created += 1
     return created
 
 # ----------------------------------------------------------------------
@@ -189,11 +151,10 @@ def step_migrate_v1_5_entity_ecosystem(repo_root, working_dir):
     today_str = datetime.now().strftime("%Y-%m-%d")
     today_year = datetime.now().strftime("%Y")
 
-    # 1. Ensure directory skeleton
+    # 1. Ensure directory skeleton (KB is located in docs/ since v2.1)
     dirs = [
         os.path.join(working_dir, "ISSUES", "done"),
         os.path.join(working_dir, "SESSIONS", today_year),
-        os.path.join(working_dir, "KB"),
         os.path.join(working_dir, "MILESTONES"),
         os.path.join(working_dir, "RISKS"),
         os.path.join(working_dir, "SPIKES"),
@@ -217,8 +178,8 @@ def step_migrate_v1_5_entity_ecosystem(repo_root, working_dir):
                     "2. [ ] All completed issues moved to `ISSUES/done/` with `status: done` and `completed: YYYY-MM-DD`.\n"
                     "3. [ ] Related milestone progress percentage updated.\n"
                     "4. [ ] Active session log written to `SESSIONS/`.\n"
-                    "5. [ ] CONTEXT snapshot rewritten (< 20 lines).\n"
-                    "6. [ ] ISSUES board updated and lean.\n"
+                    "5. [ ] ISSUES board updated and lean.\n"
+                    "6. [ ] Documentation in `docs/` updated if interfaces changed.\n"
                     "7. [ ] Prompt user to compact session (`/compact`).\n"
         },
         "pre-commit.md": {
@@ -366,28 +327,6 @@ def step_migrate_v1_5_entity_ecosystem(repo_root, working_dir):
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(new_content)
 
-    # 6. Enrich KB front-matter
-    kb_files = glob.glob(os.path.join(working_dir, "KB", "*.md"))
-    for filepath in kb_files:
-        filename = os.path.basename(filepath)
-        with open(filepath, "r", encoding="utf-8") as f:
-            content = f.read()
-
-        fm, body = parse_yaml_frontmatter(content)
-        slug = filename.replace(".md", "")
-        title = slug.replace("-", " ").title()
-        fm["protocol"] = "along"
-        fm["slug"] = fm.get("slug", slug)
-        fm["title"] = fm.get("title", title)
-        fm["type"] = fm.get("type", "topic")
-        fm["created"] = fm.get("created", today_str)
-        fm["updated"] = fm.get("updated", today_str)
-        fm["tags"] = fm.get("tags", [])
-
-        new_content = dump_yaml_frontmatter(fm, body)
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(new_content)
-
     return True
 
 # ----------------------------------------------------------------------
@@ -396,9 +335,17 @@ def step_migrate_v1_5_entity_ecosystem(repo_root, working_dir):
 def step_migrate_v2_0_along_directory(repo_root):
     agents_dir = os.path.join(repo_root, ".agents")
     along_dir = os.path.join(repo_root, ".along")
+
+    # Purge deprecated CONTEXT.md files
+    for c_file in [os.path.join(along_dir, "CONTEXT.md"), os.path.join(agents_dir, "CONTEXT.md")]:
+        if os.path.exists(c_file):
+            try:
+                os.remove(c_file)
+            except Exception:
+                pass
     
     recognized_files = [
-        "CONTEXT.md", "ISSUES.md", "DECISIONS.md", "HISTORY.md",
+        "ISSUES.md", "DECISIONS.md", "HISTORY.md",
         "GLOSSARY.md", "VISION.md", "DASHBOARD.md", "dashboard.html", "TASKS.md"
     ]
     recognized_dirs = [
@@ -646,18 +593,53 @@ def validate_and_build_entity_graph(along_dir):
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # Step 7: v2.0 -> v2.1 (Knowledge Base -> docs/ & .archive/)
 # ----------------------------------------------------------------------
 def step_migrate_v2_1_docs_wiki_and_archive(repo_root, interactive=True):
-    # Delegate to the deterministic along_kb_sync engine
-    kb_sync_dir = os.path.join(repo_root, "skills", "along-kb-sync")
-    if os.path.exists(kb_sync_dir) and kb_sync_dir not in sys.path:
-        sys.path.insert(0, kb_sync_dir)
-    try:
-        import along_kb_sync
-        along_kb_sync.sync_kb(repo_root, check_only=False)
-    except Exception as e:
-        print(f"   [WARN] Step 7 Knowledge Base migration check: {e}")
+    # Locate along_kb_sync.py in local scripts/ or global paths
+    exec_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(repo_root, "scripts", "along_kb_sync.py"),
+        os.path.join(exec_dir, "along_kb_sync.py"),
+        os.path.expanduser("~/.along/bin/along_kb_sync.py"),
+        os.path.expanduser("~/.config/opencode/actdim-along/along_kb_sync.py"),
+    ]
+    kb_script = None
+    for c in candidates:
+        if os.path.isfile(c):
+            kb_script = c
+            break
+
+    if kb_script:
+        try:
+            res = subprocess.run([sys.executable, kb_script, repo_root], capture_output=True, text=True)
+            if res.returncode == 0:
+                print("   [OK] Knowledge Base migrated to docs/ and .archive/.")
+            else:
+                print(f"   [WARN] along_kb_sync returned code {res.returncode}: {res.stderr.strip()}")
+        except Exception as e:
+            print(f"   [WARN] Step 7 Knowledge Base migration execution error: {e}")
+    else:
+        # Fallback: import if in sys.path
+        try:
+            import along_kb_sync
+            along_kb_sync.sync_kb(repo_root, check_only=False)
+            print("   [OK] Knowledge Base migrated to docs/ and .archive/ via import.")
+        except Exception as e:
+            print(f"   [WARN] Step 7 Knowledge Base migration fallback error: {e}")
+
+    # Final cleanup: purge legacy .along/KB, .agents/KB, and .along/CONTEXT.md
+    for old_kb in [os.path.join(repo_root, ".along", "KB"), os.path.join(repo_root, ".agents", "KB")]:
+        if os.path.exists(old_kb):
+            shutil.rmtree(old_kb, ignore_errors=True)
+    
+    ctx_md = os.path.join(repo_root, ".along", "CONTEXT.md")
+    if os.path.exists(ctx_md):
+        try:
+            os.remove(ctx_md)
+        except Exception:
+            pass
 
 # Main Migration Controller
 # ----------------------------------------------------------------------
