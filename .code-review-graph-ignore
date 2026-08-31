@@ -11,8 +11,11 @@ temp/
 coverage/
 .git/
 .along/SESSIONS/
+.along/.session/
+.archive/
 *.min.js
 *.bundle.js
 *.map
 *.pyc
 __pycache__/
+

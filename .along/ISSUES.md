@@ -33,6 +33,7 @@
 - [x] `(feat)` [deterministic-entity-cli-and-powershell-escaping-resilience](file://.along/ISSUES/done/feat--deterministic-entity-cli-and-powershell-escaping-resilience.md)
 - [x] `(feat)` [dashboard-kb-graph-visualization](file://.along/ISSUES/done/feat--dashboard-kb-graph-visualization.md)
 - [x] `(feat)` [concurrency-projections-and-context-deprecation](file://.along/ISSUES/done/feat--concurrency-projections-and-context-deprecation.md)
+- [x] `(feat)` [code-review-graph-resilience-and-windows-mcp-optimization](file://.along/ISSUES/done/feat--code-review-graph-resilience-and-windows-mcp-optimization.md)
 - [x] `(feat)` [centralize-scripts-and-clean-skills-purity](file://.along/ISSUES/done/feat--centralize-scripts-and-clean-skills-purity.md)
 - [x] `(feat)` [bump-version-skill-and-typography-sanitizer](file://.along/ISSUES/done/feat--bump-version-skill-and-typography-sanitizer.md)
 - [x] `(feat)` [automated-kb-migration-and-context-updates](file://.along/ISSUES/done/feat--automated-kb-migration-and-context-updates.md)
