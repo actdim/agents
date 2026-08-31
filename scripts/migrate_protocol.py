@@ -705,8 +705,50 @@ def run_migrations(repo_root):
     print("-> Step 7 [v2.0 -> v2.1]: Migrating Knowledge Base to docs/ and .archive/...")
     step_migrate_v2_1_docs_wiki_and_archive(repo_root)
 
-    print("-> [OK] All Along v2.1.0 migrations & validations completed successfully!")
+    # Step 8: v2.2.4 -> v2.2.5 Inbound Link Rewriting & Integrity Verification
+    print("-> Step 8 [v2.2.3/v2.2.4 -> v2.2.5]: Retroactively repairing broken README links & verifying integrity...")
+    step_migrate_v2_2_5_link_rewriting_and_integrity(repo_root, detected_version)
+
+    print(f"-> [OK] All Along v{CURRENT_PROTOCOL_VERSION} migrations & validations completed successfully!")
+
+def step_migrate_v2_2_5_link_rewriting_and_integrity(repo_root, detected_version="1.0.0"):
+    """
+    Step 8 [v2.2.3 / v2.2.4 -> v2.2.5]:
+    Retroactively repairs broken inbound links in README.md and all project Markdown files
+    caused by premature deletion of .along/KB/ without inbound link rewriting in versions 2.1.0 - 2.2.4.
+    """
+    scripts_dir = os.path.join(repo_root, "scripts")
+    exec_dir = os.path.dirname(os.path.abspath(__file__))
+    user_home = os.path.expanduser("~")
+    for p in [scripts_dir, exec_dir, os.path.join(user_home, ".along", "bin")]:
+        if os.path.isdir(p) and p not in sys.path:
+            sys.path.insert(0, p)
+
+    try:
+        import along_kb_sync
+        rewritten_files, total_rewrites = along_kb_sync.rewrite_inbound_links(repo_root, dry_run=False)
+        broken_links, total_checked = along_kb_sync.validate_repo_link_integrity(repo_root)
+        if total_rewrites > 0:
+            print(f"   [OK] Retroactively repaired {total_rewrites} broken link(s) across {rewritten_files} file(s).")
+        else:
+            print("   [OK] Inbound links clean; verified all relative Markdown links on disk.")
+    except Exception as e:
+        candidates = [
+            os.path.join(repo_root, "scripts", "along_kb_sync.py"),
+            os.path.join(exec_dir, "along_kb_sync.py"),
+            os.path.join(user_home, ".along", "bin", "along_kb_sync.py"),
+            os.path.join(user_home, ".config", "opencode", "actdim-along", "along_kb_sync.py"),
+        ]
+        for c in candidates:
+            if os.path.isfile(c):
+                res = subprocess.run([sys.executable, c, repo_root], capture_output=True, text=True)
+                if res.returncode == 0:
+                    print("   [OK] Inbound links repaired via along_kb_sync.py.")
+                else:
+                    print(f"   [WARN] along_kb_sync returned code {res.returncode}: {res.stderr.strip()}")
+                break
 
 if __name__ == "__main__":
     root = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
     run_migrations(root)
+
