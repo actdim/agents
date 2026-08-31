@@ -20,8 +20,11 @@ import unittest
 import subprocess
 import tempfile
 import shutil
+from pathlib import Path
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
 
 class TestAlongSkillsAndScripts(unittest.TestCase):
 
@@ -256,6 +259,35 @@ class TestAlongSkillsAndScripts(unittest.TestCase):
         list_res = subprocess.run([sys.executable, exec_script, "issue", "list"], capture_output=True, text=True)
         self.assertEqual(list_res.returncode, 0)
         self.assertIn("Active issues in", list_res.stdout)
+
+    def test_13_dashboard_graph_builder_with_kb_and_adr(self):
+        """Verify that dashboard graph builder creates valid nodes and edges for KB articles and ADRs."""
+        from dashboard.core.collector import EntityCollector
+        from dashboard.core.graph import build_entity_dag_graph
+
+        agents_dir = os.path.join(REPO_ROOT, ".along")
+        collector = EntityCollector(Path(agents_dir) if "Path" in globals() else Path(agents_dir))
+        collector.collect_all()
+
+        graph = build_entity_dag_graph(collector)
+        self.assertIn("nodes", graph)
+        self.assertIn("edges", graph)
+        self.assertIsInstance(graph["nodes"], list)
+        self.assertIsInstance(graph["edges"], list)
+
+        node_types = {n.get("type") for n in graph["nodes"]}
+        self.assertIn("issue", node_types)
+        if collector.kb_articles:
+            self.assertIn("kb", node_types)
+        if collector.decisions:
+            self.assertIn("decision", node_types)
+
+        node_ids = {n["id"] for n in graph["nodes"]}
+        for edge in graph["edges"]:
+            self.assertIn(edge["source"], node_ids)
+            self.assertIn(edge["target"], node_ids)
+            self.assertIn("type", edge)
+            self.assertIn("label", edge)
 
 
 if __name__ == "__main__":

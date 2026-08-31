@@ -31,6 +31,7 @@
 - [x] `(feat)` [entity-relationships-and-dependency-graph](file://.along/ISSUES/done/feat--entity-relationships-and-dependency-graph.md)
 - [x] `(feat)` [dynamic-dashboard-and-kb-engine](file://.along/ISSUES/done/feat--dynamic-dashboard-and-kb-engine.md)
 - [x] `(feat)` [deterministic-entity-cli-and-powershell-escaping-resilience](file://.along/ISSUES/done/feat--deterministic-entity-cli-and-powershell-escaping-resilience.md)
+- [x] `(feat)` [dashboard-kb-graph-visualization](file://.along/ISSUES/done/feat--dashboard-kb-graph-visualization.md)
 - [x] `(feat)` [concurrency-projections-and-context-deprecation](file://.along/ISSUES/done/feat--concurrency-projections-and-context-deprecation.md)
 - [x] `(feat)` [centralize-scripts-and-clean-skills-purity](file://.along/ISSUES/done/feat--centralize-scripts-and-clean-skills-purity.md)
 - [x] `(feat)` [bump-version-skill-and-typography-sanitizer](file://.along/ISSUES/done/feat--bump-version-skill-and-typography-sanitizer.md)

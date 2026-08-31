@@ -11,6 +11,8 @@ import unittest
 
 def main():
     repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    if repo_root not in sys.path:
+        sys.path.insert(0, repo_root)
     tests_dir = os.path.join(repo_root, "tests")
     
     loader = unittest.TestLoader()

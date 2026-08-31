@@ -11,6 +11,8 @@ import { useComponent, toReact } from '@actdim/dynstruct/componentModel/react/ho
 import { Icon } from '@iconify/react';
 import { DashboardAppMsgStruct, DashboardMsgChannels } from '../bus';
 
+export type GraphFilterMode = 'all' | 'dag' | 'kb' | 'decisions';
+
 export type GraphViewStruct = ComponentStruct<
   DashboardAppMsgStruct,
   {
@@ -19,6 +21,7 @@ export type GraphViewStruct = ComponentStruct<
         nodes: Array<{ id: string; label: string; type: string; [key: string]: any }>;
         edges: Array<{ source: string; target: string; type: string; label?: string }>;
       };
+      filterMode?: GraphFilterMode;
     };
     msgScope: {
       publish: DashboardMsgChannels<'APP.ENTITY.SELECT'>;
@@ -29,6 +32,7 @@ export type GraphViewStruct = ComponentStruct<
       zoomIn: () => void;
       zoomOut: () => void;
       selectNode: (id: string) => void;
+      setFilterMode: (mode: GraphFilterMode) => void;
     };
   }
 >;
@@ -44,9 +48,27 @@ export const useGraphView = (
   const initCytoscape = () => {
     if (!containerRef.current || !m.graphData) return;
 
+    const currentFilter = m.filterMode || 'all';
+    const allNodes = m.graphData.nodes || [];
+    const allEdges = m.graphData.edges || [];
+
+    const filteredNodes = allNodes.filter((n) => {
+      if (currentFilter === 'all') return true;
+      if (currentFilter === 'dag') return ['issue', 'milestone', 'risk'].includes(n.type);
+      if (currentFilter === 'kb') return n.type === 'kb';
+      if (currentFilter === 'decisions') return ['decision', 'spike'].includes(n.type);
+      return true;
+    });
+
+    const activeNodeIds = new Set(filteredNodes.map((n) => n.id));
+
+    const filteredEdges = allEdges.filter(
+      (e) => activeNodeIds.has(e.source) && activeNodeIds.has(e.target)
+    );
+
     const elements: cytoscape.ElementDefinition[] = [];
 
-    (m.graphData.nodes || []).forEach((n) => {
+    filteredNodes.forEach((n) => {
       let color = '#38bdf8';
       let shape: cytoscape.Css.NodeShape = 'round-rectangle';
 
@@ -61,6 +83,15 @@ export const useGraphView = (
       } else if (n.type === 'risk') {
         color = '#f43f5e';
         shape = 'diamond';
+      } else if (n.type === 'spike') {
+        color = '#ec4899';
+        shape = 'rhomboid';
+      } else if (n.type === 'decision') {
+        color = '#06b6d4';
+        shape = 'round-rectangle';
+      } else if (n.type === 'kb') {
+        color = '#a855f7';
+        shape = 'round-rectangle';
       }
 
       elements.push({
@@ -73,17 +104,35 @@ export const useGraphView = (
       });
     });
 
-    (m.graphData.edges || []).forEach((e) => {
+    filteredEdges.forEach((e) => {
       let edgeColor = '#475569';
-      if (e.type === 'blocks') edgeColor = '#ef4444';
-      if (e.type === 'belongs_to') edgeColor = '#38bdf8';
+      let lineStyle: cytoscape.Css.LineStyle = 'solid';
+
+      if (e.type === 'blocks') {
+        edgeColor = '#ef4444';
+      } else if (e.type === 'belongs_to') {
+        edgeColor = '#38bdf8';
+      } else if (e.type === 'parent_of') {
+        edgeColor = '#818cf8';
+      } else if (e.type === 'related') {
+        edgeColor = '#64748b';
+        lineStyle = 'dotted';
+      } else if (e.type === 'supersedes') {
+        edgeColor = '#f59e0b';
+        lineStyle = 'dashed';
+      } else if (e.type === 'links_to') {
+        edgeColor = '#c084fc';
+        lineStyle = 'dashed';
+      }
+
       elements.push({
         data: {
-          id: `${e.source}->${e.target}`,
+          id: `${e.source}->${e.target}::${e.type}`,
           source: e.source,
           target: e.target,
           label: e.label || '',
           color: edgeColor,
+          lineStyle: lineStyle,
         },
       });
     });
@@ -146,6 +195,7 @@ export const useGraphView = (
     regType: 'GraphView',
     props: {
       graphData: { nodes: [], edges: [] },
+      filterMode: 'all',
     },
     actions: {
       resetLayout: () => {
@@ -174,12 +224,19 @@ export const useGraphView = (
           payload: { id },
         });
       },
+      setFilterMode: (mode: GraphFilterMode) => {
+        m.filterMode = mode;
+        initCytoscape();
+      },
     },
     events: {
       onLayoutReady: () => {
         initCytoscape();
       },
       onChangeGraphData: () => {
+        initCytoscape();
+      },
+      onChangeFilterMode: () => {
         initCytoscape();
       },
       onDestroy: () => {
@@ -192,7 +249,33 @@ export const useGraphView = (
     view: () => (
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm relative h-[720px] flex flex-col">
         {/* Controls Overlay Bar */}
-        <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-slate-950/90 backdrop-blur-md p-1.5 rounded-xl border border-slate-800 shadow-lg">
+        <div className="absolute top-4 left-4 z-10 flex flex-wrap items-center gap-2 bg-slate-950/90 backdrop-blur-md p-1.5 rounded-xl border border-slate-800 shadow-lg">
+          {/* Mode Switcher */}
+          <div className="flex items-center bg-slate-900 rounded-lg p-0.5 border border-slate-800 text-xs">
+            {(
+              [
+                { id: 'all', label: 'All Entities' },
+                { id: 'dag', label: 'Tasks & DAG' },
+                { id: 'kb', label: 'Knowledge Base' },
+                { id: 'decisions', label: 'Decisions (ADR)' },
+              ] as const
+            ).map((filter) => (
+              <button
+                key={filter.id}
+                onClick={() => m.setFilterMode(filter.id)}
+                className={`px-2.5 py-1 rounded-md transition font-medium ${
+                  (m.filterMode || 'all') === filter.id
+                    ? 'bg-sky-500 text-slate-950 font-semibold'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="w-px h-5 bg-slate-800 mx-1" />
+
           <button
             onClick={() => m.resetLayout()}
             className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-xs font-medium text-slate-200 rounded-lg transition flex items-center gap-1.5"
@@ -225,20 +308,32 @@ export const useGraphView = (
 
         {/* Legend Overlay */}
         <div className="absolute bottom-4 left-4 z-10 bg-slate-950/90 backdrop-blur-md p-3 rounded-xl border border-slate-800 text-[10px] font-mono space-y-1.5 shadow-lg">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded bg-emerald-500" /> Done Issue
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded bg-amber-500" /> In-Progress Issue
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded bg-slate-500" /> Open Issue
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded bg-indigo-400" /> Milestone (Hex)
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded bg-rose-500" /> Risk (Diamond)
+          <div className="text-slate-400 font-semibold uppercase text-[9px] mb-1">Legend</div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded bg-emerald-500" /> Done Issue
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded bg-amber-500" /> In-Progress Issue
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded bg-slate-500" /> Open Issue
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded bg-indigo-400" /> Milestone (Hex)
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded bg-rose-500" /> Risk (Diamond)
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded bg-pink-500" /> Spike (Rhomboid)
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded bg-cyan-500" /> Decision / ADR
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded bg-purple-500" /> KB Article
+            </div>
           </div>
         </div>
 

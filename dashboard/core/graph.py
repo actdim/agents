@@ -58,11 +58,70 @@ def build_entity_dag_graph(collector) -> Dict[str, Any]:
             "file_path": r.file_path,
         })
 
-    # 4. Add Edges
+    # 4. Add Spike nodes
+    for sp in collector.spikes:
+        node_id = sp.id
+        if node_id in seen_nodes:
+            continue
+        seen_nodes.add(node_id)
+        nodes.append({
+            "id": node_id,
+            "label": sp.title or sp.slug,
+            "type": "spike",
+            "status": sp.status,
+            "slug": sp.slug,
+            "file_path": sp.file_path,
+        })
+
+    # 5. Add Decision (ADR) nodes
+    for dec in collector.decisions:
+        node_id = dec.id
+        if node_id in seen_nodes:
+            continue
+        seen_nodes.add(node_id)
+        nodes.append({
+            "id": node_id,
+            "label": dec.title or dec.id,
+            "type": "decision",
+            "status": dec.status,
+            "date": dec.date,
+            "file_path": getattr(dec, "file_path", ".along/DECISIONS.md"),
+        })
+
+    # 6. Add Knowledge Base (KB) nodes
+    for kb in collector.kb_articles:
+        node_id = kb.id
+        if node_id in seen_nodes:
+            continue
+        seen_nodes.add(node_id)
+        nodes.append({
+            "id": node_id,
+            "label": kb.title or kb.slug,
+            "type": "kb",
+            "kb_type": kb.type,
+            "slug": kb.slug,
+            "tags": kb.tags,
+            "file_path": kb.file_path,
+        })
+
+    # Helper to add edge if not already present
+    added_edge_keys = set()
+
+    def add_edge(source: str, target: str, edge_type: str, label: str):
+        edge_key = (source, target, edge_type)
+        if edge_key not in added_edge_keys and source in seen_nodes and target in seen_nodes:
+            added_edge_keys.add(edge_key)
+            edges.append({
+                "source": source,
+                "target": target,
+                "type": edge_type,
+                "label": label,
+            })
+
+    # 7. Add Edges
     # A. Issue blocked_by edges
     for iss in collector.issues:
         for blocker in iss.blocked_by:
-            # Resolve canonical blocker id
             target_id = None
             if "--" in blocker:
                 target_id = blocker
@@ -71,25 +130,32 @@ def build_entity_dag_graph(collector) -> Dict[str, Any]:
                     if candidate.slug == blocker:
                         target_id = candidate.id
                         break
-            if target_id and target_id in seen_nodes:
-                edges.append({
-                    "source": target_id,
-                    "target": iss.id,
-                    "type": "blocks",
-                    "label": "blocks",
-                })
+            if target_id:
+                add_edge(target_id, iss.id, "blocks", "blocks")
+
+        # Related issue/risk edges
+        for rel in iss.related:
+            target_id = None
+            if rel in seen_nodes:
+                target_id = rel
+            else:
+                for cand in collector.issues:
+                    if cand.slug == rel or cand.id == rel:
+                        target_id = cand.id
+                        break
+                if not target_id:
+                    for cand_r in collector.risks:
+                        if cand_r.slug == rel or cand_r.id == rel:
+                            target_id = cand_r.id
+                            break
+            if target_id:
+                add_edge(iss.id, target_id, "related", "related")
 
     # B. Milestone target_issues / issue milestone relations
     for iss in collector.issues:
         if iss.milestone:
             m_id = f"milestone--{iss.milestone}"
-            if m_id in seen_nodes:
-                edges.append({
-                    "source": iss.id,
-                    "target": m_id,
-                    "type": "belongs_to",
-                    "label": "in milestone",
-                })
+            add_edge(iss.id, m_id, "belongs_to", "in milestone")
 
     for m in collector.milestones:
         for target_key in m.target_issues:
@@ -101,27 +167,50 @@ def build_entity_dag_graph(collector) -> Dict[str, Any]:
                     if candidate.slug == target_key:
                         target_id = candidate.id
                         break
-            if target_id and target_id in seen_nodes:
-                # Check if already added
-                if not any(e["source"] == target_id and e["target"] == m.id for e in edges):
-                    edges.append({
-                        "source": target_id,
-                        "target": m.id,
-                        "type": "belongs_to",
-                        "label": "target",
-                    })
+            if target_id:
+                add_edge(target_id, m.id, "belongs_to", "target")
 
     # C. Parent-child relationships
     for iss in collector.issues:
         if iss.parent:
             parent_id = iss.parent if "--" in iss.parent else f"feat--{iss.parent}"
-            if parent_id in seen_nodes:
-                edges.append({
-                    "source": parent_id,
-                    "target": iss.id,
-                    "type": "parent_of",
-                    "label": "child",
-                })
+            add_edge(parent_id, iss.id, "parent_of", "child")
+
+    # D. Decision supersedes relationships
+    for dec in collector.decisions:
+        if dec.superseded_by:
+            target_id = dec.superseded_by
+            if not target_id.startswith("decision--") and target_id not in seen_nodes:
+                target_id = f"decision--{target_id}"
+            add_edge(target_id, dec.id, "supersedes", "supersedes")
+
+    # E. Knowledge Base cross-links (outgoing_links)
+    kb_slug_map = {kb.slug: kb.id for kb in collector.kb_articles}
+    for kb in collector.kb_articles:
+        for out_ref in kb.outgoing_links:
+            clean_ref = out_ref.strip().lstrip("./").replace(".md", "")
+            # Check direct match
+            target_id = None
+            if f"kb--{clean_ref}" in seen_nodes:
+                target_id = f"kb--{clean_ref}"
+            elif clean_ref in kb_slug_map:
+                target_id = kb_slug_map[clean_ref]
+            elif clean_ref in seen_nodes:
+                target_id = clean_ref
+            else:
+                # Try finding in issues, decisions, risks
+                for cand in collector.issues:
+                    if cand.slug == clean_ref or cand.id == clean_ref:
+                        target_id = cand.id
+                        break
+                if not target_id:
+                    for cand_d in collector.decisions:
+                        if cand_d.id == clean_ref or cand_d.id == f"ADR-{clean_ref}":
+                            target_id = cand_d.id
+                            break
+
+            if target_id and target_id != kb.id:
+                add_edge(kb.id, target_id, "links_to", "links")
 
     return {"nodes": nodes, "edges": edges}
 

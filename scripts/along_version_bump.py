@@ -153,6 +153,27 @@ def bump_along_dev_repo(repo_root, new_version):
                 with open(llm_path, "w", encoding="utf-8") as f: f.write(u)
                 modified_files.append(llm_path)
 
+    # 9. Update package.json and packages/dashboard-ui/package.json
+    for pkg_file in ["package.json", os.path.join("packages", "dashboard-ui", "package.json")]:
+        pkg_path = os.path.join(repo_root, pkg_file)
+        if os.path.exists(pkg_path):
+            with open(pkg_path, "r", encoding="utf-8") as f:
+                c = f.read()
+            u = re.sub(r'"version":\s*"\d+\.\d+\.\d+"', f'"version": "{new_version}"', c)
+            if u != c:
+                with open(pkg_path, "w", encoding="utf-8") as f: f.write(u)
+                modified_files.append(pkg_path)
+
+    # 10. Update dashboard/app.py
+    dash_app = os.path.join(repo_root, "dashboard", "app.py")
+    if os.path.exists(dash_app):
+        with open(dash_app, "r", encoding="utf-8") as f:
+            c = f.read()
+        u = re.sub(r'version="\d+\.\d+\.\d+"', f'version="{new_version}"', c)
+        if u != c:
+            with open(dash_app, "w", encoding="utf-8") as f: f.write(u)
+            modified_files.append(dash_app)
+
     return modified_files
 
 def synthesize_script(script_path, content):
