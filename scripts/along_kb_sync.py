@@ -8,7 +8,7 @@ import shutil
 import argparse
 from datetime import datetime
 
-CURRENT_PROTOCOL_VERSION = "2.2.6"
+CURRENT_PROTOCOL_VERSION = "2.2.7"
 
 STANDARD_ARTICLES = [
     ("topic--architecture.md", "System Architecture & Flow", "architecture", ["architecture", "boundaries", "providers", "mcp", "dashboard"]),
@@ -315,10 +315,10 @@ def rewrite_inbound_links(repo_root, dry_run=False):
                 elif orig_filename in LEGACY_FILE_MAPPING:
                     is_legacy = True
                     new_filename = LEGACY_FILE_MAPPING[orig_filename]
-                elif re.match(r'^\d+[-_]', orig_filename):
+                elif re.match(r'^\d{1,3}[-_]', orig_filename) and not re.match(r'^\d{4}-\d{2}-\d{2}', orig_filename):
                     # Legacy numbered filename (e.g. docs/01-architecture.md or ./01-overview.md)
                     is_legacy = True
-                    clean_name = re.sub(r'^\d+[-_]', '', orig_filename)
+                    clean_name = re.sub(r'^\d{1,3}[-_]', '', orig_filename)
                     if not clean_name.endswith('.md'):
                         clean_name += '.md'
                     new_filename = f"topic--{clean_name}"
@@ -349,7 +349,21 @@ def rewrite_inbound_links(repo_root, dry_run=False):
                     return f"{prefix}{new_target}{suffix}"
                 return match.group(0)
 
-            new_content = link_pattern.sub(replace_link, content)
+            lines = content.splitlines(keepends=True)
+            new_lines = []
+            in_code_fence = False
+            for line in lines:
+                stripped = line.strip()
+                if stripped.startswith("```") or stripped.startswith("~~~"):
+                    in_code_fence = not in_code_fence
+                    new_lines.append(line)
+                    continue
+                if in_code_fence:
+                    new_lines.append(line)
+                    continue
+                new_lines.append(link_pattern.sub(replace_link, line))
+
+            new_content = "".join(new_lines)
             if file_rewrites > 0:
                 if not dry_run:
                     with open(fpath, "w", encoding="utf-8") as fp:
@@ -387,7 +401,15 @@ def validate_repo_link_integrity(repo_root):
             except Exception:
                 continue
 
+            in_code_fence = False
             for line_idx, line in enumerate(lines, 1):
+                stripped = line.strip()
+                if stripped.startswith("```") or stripped.startswith("~~~"):
+                    in_code_fence = not in_code_fence
+                    continue
+                if in_code_fence:
+                    continue
+
                 for match in link_pattern.finditer(line):
                     link_text = match.group(1)
                     target = match.group(2).strip()

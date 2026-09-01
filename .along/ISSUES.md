@@ -1,7 +1,6 @@
 # Active Issues
 
 ## Active
-- [ ] `(--slug)` [feat--documentation-blast-radius-sync](file://.along/ISSUES/--slug--feat--documentation-blast-radius-sync.md)
 - [ ] `(feat)` [automated-ui-screenshots-and-visual-verification](file://.along/ISSUES/feat--automated-ui-screenshots-and-visual-verification.md)
 - [ ] `(feat)` [external-issue-trackers-sync-and-import](file://.along/ISSUES/feat--external-issue-trackers-sync-and-import.md)
 - [ ] `(feat)` [knowledge-base-management-and-init-kb-skill](file://.along/ISSUES/feat--knowledge-base-management-and-init-kb-skill.md)
@@ -13,8 +12,6 @@
 <!-- Planned or deferred issues -->
 
 ## Done (recent)
-- [x] `(feat)` [documentation-blast-radius-sync](file://.along/ISSUES/done/feat--documentation-blast-radius-sync.md)
-- [x] `(feat)` [link-rewriting-and-integrity-gate](file://.along/ISSUES/done/feat--link-rewriting-and-integrity-gate.md)
 - [x] `(feat)` [version-bump-automation-and-release-hardening](file://.along/ISSUES/done/feat--version-bump-automation-and-release-hardening.md)
 - [x] `(feat)` [update-agents-skill-and-automation](file://.along/ISSUES/done/feat--update-agents-skill-and-automation.md)
 - [x] `(feat)` [universal-project-version-bumping-and-along-scripts](file://.along/ISSUES/done/feat--universal-project-version-bumping-and-along-scripts.md)
@@ -25,6 +22,7 @@
 - [x] `(feat)` [platform-rule-packs](file://.along/ISSUES/done/feat--platform-rule-packs.md)
 - [x] `(feat)` [multi-agent-blackboard-and-architectural-rationale](file://.along/ISSUES/done/feat--multi-agent-blackboard-and-architectural-rationale.md)
 - [x] `(feat)` [llm-wiki-docs-architecture-and-skill-refactor](file://.along/ISSUES/done/feat--llm-wiki-docs-architecture-and-skill-refactor.md)
+- [x] `(feat)` [link-rewriting-and-integrity-gate](file://.along/ISSUES/done/feat--link-rewriting-and-integrity-gate.md)
 - [x] `(feat)` [integrate-wiki-llm-mcp](file://.along/ISSUES/done/feat--integrate-wiki-llm-mcp.md)
 - [x] `(feat)` [integrate-code-review-graph-mcp](file://.along/ISSUES/done/feat--integrate-code-review-graph-mcp.md)
 - [x] `(feat)` [installer-junction-fallback-and-dependencies](file://.along/ISSUES/done/feat--installer-junction-fallback-and-dependencies.md)
@@ -33,6 +31,7 @@
 - [x] `(feat)` [graph-ignore-and-interactive-skills-refinement](file://.along/ISSUES/done/feat--graph-ignore-and-interactive-skills-refinement.md)
 - [x] `(feat)` [entity-relationships-and-dependency-graph](file://.along/ISSUES/done/feat--entity-relationships-and-dependency-graph.md)
 - [x] `(feat)` [dynamic-dashboard-and-kb-engine](file://.along/ISSUES/done/feat--dynamic-dashboard-and-kb-engine.md)
+- [x] `(feat)` [documentation-blast-radius-sync](file://.along/ISSUES/done/feat--documentation-blast-radius-sync.md)
 - [x] `(feat)` [deterministic-entity-cli-and-powershell-escaping-resilience](file://.along/ISSUES/done/feat--deterministic-entity-cli-and-powershell-escaping-resilience.md)
 - [x] `(feat)` [dashboard-kb-graph-visualization](file://.along/ISSUES/done/feat--dashboard-kb-graph-visualization.md)
 - [x] `(feat)` [concurrency-projections-and-context-deprecation](file://.along/ISSUES/done/feat--concurrency-projections-and-context-deprecation.md)
@@ -45,3 +44,4 @@
 - [x] `(feat)` [agentic-goals-and-mandatory-checklists](file://.along/ISSUES/done/feat--agentic-goals-and-mandatory-checklists.md)
 - [x] `(feat)` [agentic-code-review-and-impact-radius-assessment](file://.along/ISSUES/done/feat--agentic-code-review-and-impact-radius-assessment.md)
 - [x] `(feat)` [add-sqlite-vector-indexing](file://.along/ISSUES/done/feat--add-sqlite-vector-indexing.md)
+- [x] `(docs)` [comprehensive-knowledge-base-and-skills-architecture](file://.along/ISSUES/done/docs--comprehensive-knowledge-base-and-skills-architecture.md)

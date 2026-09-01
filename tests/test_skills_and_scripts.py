@@ -553,9 +553,28 @@ class TestAlongSkillsAndScripts(unittest.TestCase):
         self.assertIsNotNone(resolved_kb, "Should resolve along_kb_sync.py in repository scripts/")
         self.assertTrue(os.path.exists(resolved_kb))
 
+    def test_21_docs_articles_not_empty_placeholders(self):
+        """Verify that knowledge base articles in docs/ are rich, substantive, and not empty placeholder stubs."""
+        docs_dir = os.path.join(REPO_ROOT, "docs")
+        self.assertTrue(os.path.exists(docs_dir), "docs/ directory must exist")
+
+        topic_files = glob.glob(os.path.join(docs_dir, "topic--*.md"))
+        self.assertGreaterEqual(len(topic_files), 4, "Must contain at least 4 core topic articles")
+
+        for topic_path in topic_files:
+            rel = os.path.relpath(topic_path, REPO_ROOT)
+            size = os.path.getsize(topic_path)
+            with open(topic_path, "r", encoding="utf-8") as f:
+                lines = [line for line in f.readlines() if line.strip()]
+
+            # Substantive content assertion (must be > 1000 bytes and >= 20 non-empty lines)
+            self.assertGreater(size, 1000, f"{rel} is too small ({size} bytes). Documentation must not be an empty placeholder stub.")
+            self.assertGreaterEqual(len(lines), 20, f"{rel} has only {len(lines)} lines. Expected rich documentation.")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
 
 
 

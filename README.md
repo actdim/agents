@@ -1,6 +1,6 @@
-# Along (v2.2.6)
+# Along (v2.2.7)
 
-A provider-agnostic **agent-context and memory system** for software repositories - the `ALONG-PROTOCOL v2.2.6` plus the automation skills suite that scaffolds and maintains it. One unified convention, honored natively across **Claude Code**, **OpenAI Codex**, **OpenCode**, and **Google Antigravity**.
+A provider-agnostic **agent-context and memory system** for software repositories - the `ALONG-PROTOCOL v2.2.7` plus the automation skills suite that scaffolds and maintains it. One unified convention, honored natively across **Claude Code**, **OpenAI Codex**, **OpenCode**, and **Google Antigravity**.
 
 ---
 
@@ -52,35 +52,51 @@ The repository's complete technical specification is maintained as a living LLM-
 | **Domain Model & Entities** | Machine-parseable schemas for Issues, ADRs, Milestones, and Risks. | [Domain Model & Entity Ecosystem](./docs/topic--domain-model.md) |
 | **Setup & Workflows** | Installation matrix, repository onboarding, and session lifecycle. | [Setup, Installation & Workflows](./docs/topic--setup-and-workflow.md) |
 | **LLM-Wiki Architecture** | Andrej Karpathy paradigm, source isolation, and token efficiency. | [LLM-Wiki Architecture & Paradigm](./docs/topic--llm-wiki-architecture.md) |
-| **Skills & Commands** | Complete reference for all 17 singular automation skills. | [Skills & Commands Reference](./docs/topic--skills-reference.md) |
-| **Frontend & Dashboard** | Reactive Dashboard architecture (`packages/dashboard-ui`), Dynstruct & MsgMesh. | [Frontend Architecture & Dashboard](./docs/topic--frontend-frameworks.md) |
-| **Protocol Migrations** | Versioned migration engine and upgrade instructions. | [Protocol & Migrations Guide](./docs/topic--migrations.md) |
-| **Dependency AI Rules** | AI instructions discovery across package manifests. | [Dependencies AI Documentation](./docs/topic--dependencies.md) |
+## Automation Skills Reference (Grouped by Workflow Phase)
 
----
+Along provides **18 singular automation skills** structured across 6 core lifecycle phases:
 
-## Automation Skills Reference (Singular Domain-First)
-
+### 1. Bootstrap & Repository Protocol Management
 | Skill / Command | Purpose |
 | :--- | :--- |
-| `along-init` (`/along-init`) | Scaffold/refresh `AGENTS.md` + `CLAUDE.md` + `.along/` in a folder. |
-| `along-update` (`/along-update`) | One-liner update of repository context, protocol, and global skills from GitHub. |
-| `along-dash` (`/along-dash`) | Launch executive dashboard (Web UI, CLI, Cytoscape DAG, SVG/HTML export). |
-| `along-wrap` (`/along-wrap`) | Unified end-of-stage update: code review, session log, context, issues, history. |
-| `along-commit` (`/along-commit`) | Smart pre-commit ASCII check and Conventional Commit linked to active issue. |
-| `along-build` (`/along-build`) | Project build lifecycle hook via `.along/scripts/build.py` or auto-detected runner. |
-| `along-test` (`/along-test`) | Automated tests with quiet flags via `.along/scripts/test.py` or auto-detected runner. |
-| `along-dev` (`/along-dev`) | Development / debugging server via `.along/scripts/dev.py` or auto-detected runner. |
-| `along-kb-sync` (`/along-kb-sync`) | Synchronize, compile, and reconcile the Knowledge Base in `docs/` using LLM-Wiki pipeline. |
-| `along-kb-search` (`/along-kb-search`) | Fast targeted structured retrieval across `docs/` and project documentation. |
-| `along-issue-sync` (`/along-issue-sync`) | Reconcile the issue board + per-issue `<type>--<slug>.md` files with the actual work. |
-| `along-decision-sync` (`/along-decision-sync`) | Append architectural decisions as ADR entries; mark superseded ones. |
-| `along-history-sync` (`/along-history-sync`) | Reconstruct and reconcile `.along/` milestones, issues, and sessions from Git commits. |
-| `along-graph-check` (`/along-graph-check`) | Inspect `code-review-graph` status, impact radius (blast radius), and architecture flows. |
-| `along-dep-scan` (`/along-dep-scan`) | Scan declared dependencies for AI instructions and register in `docs/topic--dependencies.md`. |
-| `along-version-bump` (`/along-version-bump`) | Multi-stack version bump (Node, Python, Rust, .NET, or .along/scripts/bump_version.py). |
-| `along-team` (`/along-team`) | Multi-agent autonomous team coordination and living execution plans. |
-| `along-feedback` (`/along-feedback`) | System self-diagnostics, incident logging, and feedback dispatch (Telegram/Webhook/File). |
+| **`along-init`** (`/along-init`) | Scaffold/refresh `AGENTS.md` + `CLAUDE.md` + `.along/` in a folder. |
+| **`along-update`** (`/along-update`) | One-liner update of repository context, protocol, and global skills from GitHub. |
+| **`along-version-bump`** (`/along-version-bump`) | Multi-stack version bump and release orchestrator (Node, Python, Rust, .NET). |
+
+### 2. Orchestration, Planning & Multi-Agent Teams
+| Skill / Command | Purpose |
+| :--- | :--- |
+| **`along-team`** (`/along-team`) | Sequential multi-agent autonomous development engine and living plan. |
+| **`along-issue-sync`** (`/along-issue-sync`) | Reconcile active issue board projection (`ISSUES.md`) with atomic issue files. |
+| **`along-decision-sync`** (`/along-decision-sync`) | Append structured architectural decisions (ADRs) to `.along/DECISIONS.md`. |
+
+### 3. Development & Lifecycle Execution Runners
+| Skill / Command | Purpose |
+| :--- | :--- |
+| **`along-build`** (`/along-build`) | Project build lifecycle hook via `.along/scripts/build.py` or auto-detected runner. |
+| **`along-test`** (`/along-test`) | Automated test suite with quiet flags via `.along/scripts/test.py` or runner. |
+| **`along-dev`** (`/along-dev`) | Local development/debugging server via `.along/scripts/dev.py` or runner. |
+
+### 4. Quality Gates, Code Graph & Commit Integrity
+| Skill / Command | Purpose |
+| :--- | :--- |
+| **`along-commit`** (`/along-commit`) | Smart ASCII-clean Conventional Committer linked to active `.along/` issue. |
+| **`along-graph-check`** (`/along-graph-check`) | Inspect `code-review-graph` AST impact radius (blast radius) and caller flows. |
+| **`along-dep-scan`** (`/along-dep-scan`) | Scan declared dependencies for AI instructions into `docs/topic--dependencies.md`. |
+
+### 5. Knowledge Base & LLM-Wiki Intelligence
+| Skill / Command | Purpose |
+| :--- | :--- |
+| **`along-kb-sync`** (`/along-kb-sync`) | Idempotent LLM-Wiki Knowledge Base compiler and link integrity gate in `docs/`. |
+| **`along-kb-search`** (`/along-kb-search`) | Fast targeted snippet search across `docs/` and project memory (<100 tokens). |
+
+### 6. Visual Analytics, History & Diagnostics
+| Skill / Command | Purpose |
+| :--- | :--- |
+| **`along-dash`** (`/along-dash`) | Launch executive dashboard (Web UI, CLI, Cytoscape DAG, HTML export). |
+| **`along-history-sync`** (`/along-history-sync`) | Reconstruct `.along/` milestones, issues, and sessions from Git commits. |
+| **`along-feedback`** (`/along-feedback`) | System self-diagnostics, incident logging, and feedback dispatch. |
+| **`along-wrap`** (`/along-wrap`) | Unified end-of-stage wrap: verification checklist, session log, issues, history. |
 
 ---
 

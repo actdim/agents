@@ -1,12 +1,12 @@
 ---
 protocol: along
-protocol_version: "2.2.4"
+protocol_version: "2.2.6"
 slug: topic--llm-wiki-architecture
 title: LLM-Wiki Knowledge Base Architecture & Paradigm
 type: topic
 created: 2026-08-30
-updated: 2026-08-31
-tags: [llm-wiki, architecture, knowledge-base, token-efficiency, indexing, methodology]
+updated: 2026-09-01
+tags: [llm-wiki, architecture, knowledge-base, token-efficiency, indexing, methodology, search, karpathy]
 ---
 
 # LLM-Wiki Knowledge Base Architecture & Paradigm
@@ -17,20 +17,20 @@ Along implements the **LLM-Wiki architectural paradigm** (originated by Andrej K
 
 ## 1. Why LLM-Wiki? (The Core Problem)
 
-AI coding agents face two common failure modes when dealing with repository documentation:
+AI coding agents face two common failure modes when navigating repository documentation:
 
-1. **Context Bloat & Token Waste (Prompt Stuffing)**:
-   - Reading whole documentation files into the agent prompt consumes 10,000 to 30,000+ tokens per interaction.
+1. **Context Bloat & Prompt Saturation (Prompt Stuffing)**:
+   - Reading whole multi-kilobyte documentation files into agent prompts consumes 10,000 to 30,000+ tokens per interaction.
    - This exhausts the context window, degrades model reasoning, and drives up inference costs.
-2. **Opaque & Unverifiable External Vector DBs**:
-   - Heavy vector databases introduce complex external infrastructure, opaque retrieval chunks, and lack human-editable Markdown transparency.
+2. **Opaque & Fragile External Vector DBs**:
+   - Heavy external vector databases introduce opaque embeddings, complex C-extension dependencies, and lack human-editable Markdown transparency.
 
-**The Solution: The Living LLM-Wiki**:
-A structured, human-readable directory of interconnected Markdown files (`docs/topic--*.md`) with YAML front-matter, an auto-compiled catalog (`docs/INDEX.md`), isolated raw source archives (`.archive/`), and a fast, local snippet search engine (`along-kb-search`).
+### The Solution: The Living LLM-Wiki
+A structured, human-readable directory of interconnected Markdown files (`docs/topic--*.md`) with YAML front-matter, an auto-compiled catalog (`docs/INDEX.md`), isolated raw source archives (`.archive/`), and an ultra-fast, local snippet search engine (`along-kb-search`).
 
 ---
 
-## 2. Architectural Pillars of the Along LLM-Wiki
+## 2. LLM-Wiki Architecture & Data Flow
 
 ```mermaid
 flowchart TD
@@ -46,7 +46,7 @@ flowchart TD
 
     subgraph ActiveWiki["Active Curated Knowledge Base (docs/)"]
         TOPICS["docs/topic--*.md (Structured YAML Front-matter)"]
-        CATALOG["docs/INDEX.md (Dynamic Topic Catalog)"]
+        CATALOG["docs/INDEX.md (Dynamic Topic Catalog & Graph)"]
     end
 
     subgraph Archive["Isolated Raw Archive (.archive/)"]
@@ -54,8 +54,9 @@ flowchart TD
     end
 
     subgraph Retrieval["Agent Fast Retrieval (along-kb-search)"]
-        SEARCH["Weighted Scoring Search & Snippet Window"]
-        AGENT["AI Agent (< 100 Tokens Context)"]
+        SEARCH["Multi-Tier Weighted Search Engine"]
+        SNIPPET["230-Char Snippet Window (< 100 Tokens Context)"]
+        AGENT["Host AI Agent (Antigravity / Claude / Codex)"]
     end
 
     RAW --> INGEST
@@ -65,50 +66,48 @@ flowchart TD
     LINTER --> CATALOG
     CATALOG --> SEARCH
     TOPICS --> SEARCH
-    SEARCH --> AGENT
+    SEARCH --> SNIPPET
+    SNIPPET --> AGENT
 ```
 
 ---
 
-## 3. Key Capabilities & Features
+## 3. Fast Retrieval Mechanics & Multi-Tier Scoring
 
-### 1. Separation of Curated Knowledge (`docs/`) vs Raw Sources (`.archive/`)
-- Active, verified articles live exclusively in `docs/topic--*.md`.
-- Original unstructured notes, chat dumps, and scratch files are moved to `.archive/` upon ingestion.
-- The `.archive/` directory is strictly excluded from search and dashboard metrics, preventing duplicate hits and noise.
+Instead of loading whole articles, AI agents query `along-kb-search "<query>"` to retrieve concise context snippets in milliseconds.
 
-### 2. Front-Matter Discrimination (`protocol: along`)
-- Files containing `protocol: along` in their front-matter are recognized as active, compiled Wiki articles and remain untouched during re-synchronization.
-- Files lacking `protocol: along` are treated as raw sources, compiled into topic articles, and archived.
+### Multi-Tier Weighted Scoring Algorithm
+The search engine ranks results using a 3-tier relevance model:
 
-### 3. Token-Efficient Snippet Retrieval (95-98% Reduction)
-- Instead of reading multi-kilobyte documents, agents invoke `along-kb-search "<query>"`.
-- The search engine calculates weighted relevance (Title: +10, Tags: +5, Body: +1) and extracts a targeted 230-character snippet window.
-- The agent obtains the precise fact needed in under 100 tokens.
+| Match Scope | Weight | Rationale |
+| :--- | :--- | :--- |
+| **Title Match** | **+10 points** | Direct topic match indicating the exact domain article. |
+| **Tags Match** | **+5 points** | Curated metadata keywords matching the conceptual domain. |
+| **Body Content** | **+1 point** | Text occurrences within the Markdown body. |
 
-### 4. Deterministic Link Linting & Graph Invariance
-- All cross-references use standard relative Markdown links (`[System Architecture & Flow](./topic--architecture.md)`).
-- The `along-kb-sync` compiler scans every link and detects broken or dangling references before commits are made.
-
-### 5. Adaptive Ingestion & Parallel Research
-- **Small Updates**: Main agent synthesizes articles directly.
-- **Large-Scale Dumps**: Agent autonomously splits the topic into distinct domain vectors, spawns parallel research subagents, and lets `along-kb-sync` reconcile and link the generated articles.
-
-### 6. Zero External Dependencies
-- Implemented in 100% pure Python standard library (`os`, `re`, `argparse`, `sys`).
-- No Node.js, `npm`, or third-party binary requirements.
-- Runs identically across Claude Code, OpenAI Codex, OpenCode, and Google Antigravity.
-
-### 7. Public Entry Point Contract (`README.md`)
-- `README.md` is the primary public entry point for humans, GitHub, and package registries.
-- It provides a high-level overview, installation/usage steps, and links directly to the Knowledge Base catalog `docs/INDEX.md` and/or foundational articles (`docs/topic--architecture.md`, `docs/topic--domain-model.md`, `docs/topic--setup-and-workflow.md`).
-- Direct references to internal service directories (`.along/KB/`) or legacy numbered files (`01-...md`) are forbidden and automatically rewritten by `along-kb-sync` and `along-update`.
+### Snippet Window Extraction (95-98% Token Reduction)
+When a match is identified, `along-kb-search` extracts a targeted **230-character snippet window** centered around the matching query term.
+- *Prompt Impact*: Delivers the precise architectural constraint or API contract in **under 100 tokens**, compared to 3,000-8,000 tokens for loading the full file.
+- *Performance*: Sub-millisecond execution using pure Python standard library without vector embeddings latency.
 
 ---
 
-## 4. Documentation Blast Radius & Code-Graph-to-Wiki Synchronization
+## 4. Separation of Curated Knowledge (`docs/`) vs Raw Sources (`.archive/`)
 
-In the Karpathy LLM-Wiki model, documentation must continuously evolve alongside code without manual overhead or full-corpus re-indexing. Along achieves this through a deterministic 2-phase blast radius synchronization pipeline:
+Along enforces strict segregation between verified active documentation and unmanaged raw source dumps:
+
+1. **Curated Knowledge (`docs/topic--*.md`)**:
+   - Every file must carry valid YAML front-matter with `protocol: along`.
+   - Written in clean Markdown with universal relative links (`[Title](./topic--<name>.md)`).
+2. **Raw Sources Archival (`.archive/`)**:
+   - When raw documentation or chat dumps are ingested via `along-kb-sync`, the compiler synthesizes topic articles in `docs/` and moves the original source files to `.archive/`.
+   - `.archive/` is strictly excluded from `along-kb-search` and dashboard indexing, preventing noisy duplicate search hits.
+
+---
+
+## 5. Documentation Blast Radius & Code-Graph-to-Wiki Synchronization
+
+In the LLM-Wiki paradigm, documentation is a living asset that evolves alongside code. Along enforces a **Deterministic 2-Phase Blast Radius Gate**:
 
 ```mermaid
 flowchart LR
@@ -117,19 +116,21 @@ flowchart LR
     IMPACT --> SEARCH["along-kb-search (Topic Query)"]
     SEARCH --> TOPICS["Targeted docs/topic--*.md Files"]
     TOPICS --> EDIT["Factual Article Updates"]
-    EDIT --> KBSYNC["along-kb-sync (Catalog & Link Gate)"]
+    EDIT --> KBSYNC["along-kb-sync --strict (Integrity Gate)"]
     KBSYNC --> INDEX["docs/INDEX.md & Verified Links"]
 ```
 
-### 1. Code AST Blast Radius Analysis
-When non-trivial code modifications are made, agents invoke `code-review-graph` MCP tools (`get_impact_radius_tool`, `get_affected_flows_tool`) or AST analysis to discover all modified symbols, functions, exports, and downstream dependent modules.
+1. **AST Blast Radius Discovery**: During task review, agents invoke `code-review-graph` MCP tools (`get_impact_radius_tool`, `get_affected_flows_tool`) to identify modified symbols and dependent modules.
+2. **Topic Mapping**: Agents query `along-kb-search` with the modified symbol names to pinpoint the exact `docs/topic--*.md` files documenting those interfaces.
+3. **Factual Updating**: Agents update the affected topic articles with concrete code facts (zero placeholders).
+4. **Compilation & Link Gate**: Running `python scripts/along_kb_sync.py --strict` validates relative links across the repository and recompiles `docs/INDEX.md`.
 
-### 2. Knowledge Base Topic Mapping
-Instead of reading all documentation into context, agents query `along-kb-search` with the modified symbol and module names. This identifies the exact subset of `docs/topic--*.md` files that document the modified behaviors or dependent workflows.
+---
 
-### 3. Factual, Incremental Updates
-Agents update only the affected topic files with concrete, verifiable facts extracted from the code (zero placeholders, zero hallucinations), maintaining clean YAML front-matter (`protocol: along`) and relative links.
+## 6. References & Useful Links
 
-### 4. Integrity & Compilation Gate
-Finally, `/along-kb-sync` validates all relative Markdown links across the workspace and recompiles `docs/INDEX.md`, ensuring that the Wiki graph remains completely intact.
-
+- **Andrej Karpathy's LLM-Wiki Concept**: Conceptual foundation for repository-native, human-readable structured LLM documentation.
+- **[System Architecture & Flow](./topic--architecture.md)**: System topology, multi-branch concurrency, and multi-agent state machine.
+- **[Domain Model & Entity Ecosystem](./topic--domain-model.md)**: Taxonomy of issues, milestones, ADRs, and living memory.
+- **[Skills & Slash Commands Reference](./topic--skills-reference.md)**: Technical breakdown of all 18 automation skills.
+- **[Setup & Developer Workflow](./topic--setup-and-workflow.md)**: Installation, runner hooks, and day-in-the-life development flow.

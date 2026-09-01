@@ -3,7 +3,7 @@ name: along-team
 description: Execute software development tasks via sequential multi-agent protocol (Supervisor -> Research -> Architect -> Living Plan -> Step Loops [Implement -> Review/Test -> Reassess]). Supports autonomous execution, /goal integration, and adaptive complexity routing.
 ---
 
-# Along Team (`/along-team`) [v2.2.6]
+# Along Team (`/along-team`) [v2.2.7]
 
 Universal sequential multi-agent development protocol and state machine for complex engineering tasks.
 
@@ -67,9 +67,10 @@ All roles map to standard built-in agent primitives:
   1. **Zero-Byte & File Integrity Gate**: Inspect all created/modified/untracked files (`git status -u`). Verify `size > 0` bytes and ensure no empty placeholders or truncated bodies exist.
   2. **Automated Tests**: Execute unit tests (`python scripts/along_exec.py test`). Verify test discovery count increased appropriately and zero tests failed.
   3. **Diff & Scope Audit**: Inspect `git diff` for out-of-scope modifications, broken imports, or missing implementations.
-  4. **Blast Radius & Architecture**: Verify caller contracts, handle nulls/exceptions, evaluate impacted downstream symbols via `code-review-graph` (`get_impact_radius_tool`), and ensure compliance with `.along/DECISIONS.md`.
-  5. **Documentation & Wiki Parity**: If public interfaces, commands, skills, or architecture changed, verify that relevant `docs/topic--*.md` articles reflect the modifications.
-  6. **Typography & Encoding**: Guarantee clean UTF-8 ASCII without forbidden typographic characters (em-dash, curly quotes, non-breaking spaces).
+  4. **Requirement Traceability & Coverage Gate**: Compare the diff directly against each atomic requirement (`REQ-N`) extracted in Phase 0. Verify zero omitted requirements.
+  5. **Blast Radius & Architecture**: Verify caller contracts, handle nulls/exceptions, evaluate impacted downstream symbols via `code-review-graph` (`get_impact_radius_tool`), and ensure compliance with `.along/DECISIONS.md`.
+  6. **Documentation & Public Surface Parity**: If public interfaces, commands, skills, or entities changed, verify that BOTH `docs/topic--*.md` articles AND public entry points (`README.md`, `AGENTS.md`) reflect the modifications without drift.
+  7. **Typography & Encoding**: Guarantee clean UTF-8 ASCII without forbidden typographic characters (em-dash, curly quotes, non-breaking spaces).
 - **Output**: `PASS` or `FAIL` with actionable issue list.
 
 ---
@@ -80,13 +81,13 @@ All roles map to standard built-in agent primitives:
 TASK / GOAL
     |
     v
-[Phase 0: Analyze] ------------> S-Size? --> [Direct Fast-Path] --> [Wrap]
+[Phase 0: Analyze & REQ Extraction] ---> S-Size? --> [Direct Fast-Path] --> [Wrap]
     | (L / XL-Size)
     v
 [Phase 1: Research] (invoke_subagent: research)
     |
     v
-[Phase 2: Architect] (Produce Living Plan)
+[Phase 2: Architect & Surface Discovery] (Produce Living Plan mapped to REQ-N)
     |
     v
 +----------------------------------------+
@@ -115,10 +116,10 @@ TASK / GOAL
 
 ## Mandatory Execution Protocol (Step-by-Step)
 
-### Phase 0: Analyze (Supervisor)
+### Phase 0: Analyze & Requirement Extraction (Supervisor)
 1. Read target `.along/ISSUES/<type>--<slug>.md` (or user prompt) and `.along/DECISIONS.md`.
-2. Extract scope, constraints, and verifiable acceptance criteria.
-3. Classify task size (`S`, `M`, or `L/XL`). Announce routing decision in chat.
+2. Construct an explicit **Requirement Traceability Matrix** decomposing the user request into atomic requirements (`REQ-1`, `REQ-2`, `REQ-3`).
+3. Classify task size (`S`, `M`, or `L/XL`). Announce routing decision and requirement matrix in chat.
 
 ### Phase 1: Research (Scout)
 1. Launch read-only research subagent:
@@ -135,11 +136,12 @@ TASK / GOAL
 ```
 2. Ingest findings. If critical unknowns remain, resolve before planning.
 
-### Phase 2: Architecture & Living Plan (Architect)
-1. Formulate a **Living Plan** with 2 to 5 ordered steps.
-2. Each step must define:
-   - Target files/symbols.
-   - Expected behavior.
+### Phase 2: Architecture & Public Surface Discovery (Architect)
+1. Execute **Public Surface Discovery**: Search (`grep`) for all mirrors and occurrences of modified entities across public entry points (`README.md`, `AGENTS.md`, `docs/`, `package.json`).
+2. Formulate a **Living Plan** with 2 to 5 ordered steps, explicitly mapping each step to its corresponding `REQ-N` and target files across both core code and public surfaces.
+3. Each step must define:
+   - Target files/symbols (including mirrored surfaces).
+   - Expected behavior mapped to `REQ-N`.
    - Verifiable acceptance criteria.
 
 ### Phase 3 to 5: Step Loop (Step N)

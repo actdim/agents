@@ -1,5 +1,5 @@
 <!-- BEGIN ALONG-PROTOCOL root (managed by along-init - do not edit by hand) -->
-# ALONG-PROTOCOL v2.2.6
+# ALONG-PROTOCOL v2.2.7
 
 This repo carries its own agent context, provider-agnostically. Follow it every session, whatever tool you are.
 
@@ -148,6 +148,7 @@ When a Stage or session completes, agents MUST execute this verification checkli
 2. [ ] **File Integrity & Untracked Audit**: Inspect `git status -u` and verify that all newly created and modified files have non-zero size (`getsize > 0`), containing expected code/content without empty placeholders or corrupted bodies.
 3. [ ] **Code Review & Blast Radius Assessment**:
    - Inspect git diff for unintended side effects, unhandled nulls/errors, and edge cases.
+   - Verify 100% requirement coverage against the initial user request (`REQ-N`) across both core implementation and public mirror surfaces (`README.md`, `AGENTS.md`).
    - Evaluate systemic impact radius on callers/dependents using `code-review-graph` (`get_impact_radius_tool`, `get_affected_flows_tool`) or AST analysis.
    - Identify all modified subsystem symbols and impacted downstream interfaces to inform documentation updates.
    - Verify compliance with architectural decisions in `.along/DECISIONS.md`.
@@ -168,8 +169,9 @@ When a Stage or session completes, agents MUST execute this verification checkli
 ## Rules
 - **Strict File Modification & Anti-Deletion**:
   - **Zero Unintended Deletions**: Never delete, truncate, or overwrite existing documentation, comments, planned features, or code unless explicitly instructed by the user.
+  - **Mandatory Post-Batch & Destructive Operation Audit**: After running any batch replacement, migration script, refactor, or multi-file edit, agents MUST immediately execute `git diff --stat` to verify that net line counts align with expectations. Any unexpected net reduction in file size or line count must be inspected in detail before proceeding.
+  - **Anti-Stub & Size Regression Invariant**: It is strictly forbidden to replace populated files, documentation, or code with placeholder templates, stubs, or summary skeletons (`// ... rest of code`).
   - **Minimal Edit Scope**: Anchor edit blocks strictly on exact single lines or minimal unique chunks.
-  - **Mandatory Diff Verification**: After modifying any file, inspect the generated diff to ensure only intended lines were touched.
   - **Immediate Rollback**: If an unintended deletion or truncation is detected, restore missing lines immediately.
 - **Technical Markdown & Formatting Standards**:
   - **Forbidden Characters (Clean ASCII & Invisible Character Ban)**:

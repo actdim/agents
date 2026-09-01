@@ -1,6 +1,6 @@
 ---
 protocol: along
-protocol_version: "2.2.6"
+protocol_version: "2.2.7"
 slug: INDEX
 title: Knowledge Base Topic Index
 type: index
@@ -22,7 +22,7 @@ flowchart TD
     INDEX --> T_ARCHITECTURE
     T_DEPENDENCIES["Dependencies & Submodules AI Documentation and Rules"]
     INDEX --> T_DEPENDENCIES
-    T_DOMAIN_MODEL["Domain Model & Entities"]
+    T_DOMAIN_MODEL["Domain Model & Entity Ecosystem"]
     INDEX --> T_DOMAIN_MODEL
     T_FRONTEND_FRAMEWORKS["Frontend Architecture, Dynstruct, MsgMesh & NSwag Integration"]
     INDEX --> T_FRONTEND_FRAMEWORKS
@@ -35,20 +35,23 @@ flowchart TD
     T_SKILLS_REFERENCE["Skills & Slash Commands Technical Reference"]
     INDEX --> T_SKILLS_REFERENCE
     T_LLM_WIKI_ARCHITECTURE -.->|references| T_ARCHITECTURE
+    T_LLM_WIKI_ARCHITECTURE -.->|references| T_DOMAIN_MODEL
+    T_LLM_WIKI_ARCHITECTURE -.->|references| T_SKILLS_REFERENCE
+    T_LLM_WIKI_ARCHITECTURE -.->|references| T_SETUP_AND_WORKFLOW
 ```
 
 ---
 
 ## Articles
 
-- **[System Architecture & Flow](./topic--architecture.md)** (architecture) `architecture`
+- **[System Architecture & Flow](./topic--architecture.md)** (architecture) `architecture`, `boundaries`, `multi-agent`, `blackboard`, `concurrency`, `mcp`, `flow`
 - **[Dependencies & Submodules AI Documentation and Rules](./topic--dependencies.md)** (topic) `dependencies`, `ai-context`, `submodules`, `vendor`, `rules`
-- **[Domain Model & Entities](./topic--domain-model.md)** (domain-model) `domain-model`
+- **[Domain Model & Entity Ecosystem](./topic--domain-model.md)** (domain-model) `domain-model`, `entities`, `schemas`, `dag`, `metadata`, `issues`, `milestones`, `risks`, `spikes`, `checklists`, `sessions`
 - **[Frontend Architecture, Dynstruct, MsgMesh & NSwag Integration](./topic--frontend-frameworks.md)** (topic) `dynstruct`, `dynstruct-mui`, `msgmesh`, `utico`, `react`, `mui`, `nswag`, `openapi`, `architecture`
-- **[LLM-Wiki Knowledge Base Architecture & Paradigm](./topic--llm-wiki-architecture.md)** (topic) `llm-wiki`, `architecture`, `knowledge-base`, `token-efficiency`, `indexing`, `methodology`
+- **[LLM-Wiki Knowledge Base Architecture & Paradigm](./topic--llm-wiki-architecture.md)** (topic) `llm-wiki`, `architecture`, `knowledge-base`, `token-efficiency`, `indexing`, `methodology`, `search`, `karpathy`
 - **[Protocol & Repository Migrations Guide](./topic--migrations.md)** (topic) `migrations`, `upgrade`, `protocol`, `changelog`, `versioning`
-- **[Setup & Developer Workflow](./topic--setup-and-workflow.md)** (setup-workflow) `setup-workflow`
-- **[Skills & Slash Commands Technical Reference](./topic--skills-reference.md)** (topic) `skills`, `commands`, `reference`, `runners`, `lifecycle`
+- **[Setup & Developer Workflow](./topic--setup-and-workflow.md)** (setup-workflow) `setup-workflow`, `installation`, `lifecycle`, `runners`, `developer-workflow`, `testing`
+- **[Skills & Slash Commands Technical Reference](./topic--skills-reference.md)** (topic) `skills`, `commands`, `reference`, `runners`, `lifecycle`, `automation`, `multi-agent`
 
 ---
 
