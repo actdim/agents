@@ -67,8 +67,9 @@ All roles map to standard built-in agent primitives:
   1. **Zero-Byte & File Integrity Gate**: Inspect all created/modified/untracked files (`git status -u`). Verify `size > 0` bytes and ensure no empty placeholders or truncated bodies exist.
   2. **Automated Tests**: Execute unit tests (`python scripts/along_exec.py test`). Verify test discovery count increased appropriately and zero tests failed.
   3. **Diff & Scope Audit**: Inspect `git diff` for out-of-scope modifications, broken imports, or missing implementations.
-  4. **Blast Radius & Architecture**: Verify caller contracts, handle nulls/exceptions, and ensure compliance with `.along/DECISIONS.md`.
-  5. **Typography & Encoding**: Guarantee clean UTF-8 ASCII without forbidden typographic characters (em-dash, curly quotes, non-breaking spaces).
+  4. **Blast Radius & Architecture**: Verify caller contracts, handle nulls/exceptions, evaluate impacted downstream symbols via `code-review-graph` (`get_impact_radius_tool`), and ensure compliance with `.along/DECISIONS.md`.
+  5. **Documentation & Wiki Parity**: If public interfaces, commands, skills, or architecture changed, verify that relevant `docs/topic--*.md` articles reflect the modifications.
+  6. **Typography & Encoding**: Guarantee clean UTF-8 ASCII without forbidden typographic characters (em-dash, curly quotes, non-breaking spaces).
 - **Output**: `PASS` or `FAIL` with actionable issue list.
 
 ---
@@ -161,6 +162,7 @@ When running in `/goal` mode:
 1. Merge branch workspace changes (if isolated).
 2. Execute `/along-wrap` checklist:
    - Run full test suite (`/along-test`).
+   - Perform Documentation Blast Radius check and run `/along-kb-sync`.
    - Move issue to `.along/ISSUES/done/`.
    - Update `ISSUES.md` projection (`/along-issue-sync`).
    - Record session log in `.along/SESSIONS/`.

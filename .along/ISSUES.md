@@ -1,6 +1,7 @@
 # Active Issues
 
 ## Active
+- [ ] `(--slug)` [feat--documentation-blast-radius-sync](file://.along/ISSUES/--slug--feat--documentation-blast-radius-sync.md)
 - [ ] `(feat)` [automated-ui-screenshots-and-visual-verification](file://.along/ISSUES/feat--automated-ui-screenshots-and-visual-verification.md)
 - [ ] `(feat)` [external-issue-trackers-sync-and-import](file://.along/ISSUES/feat--external-issue-trackers-sync-and-import.md)
 - [ ] `(feat)` [knowledge-base-management-and-init-kb-skill](file://.along/ISSUES/feat--knowledge-base-management-and-init-kb-skill.md)
@@ -12,6 +13,7 @@
 <!-- Planned or deferred issues -->
 
 ## Done (recent)
+- [x] `(feat)` [documentation-blast-radius-sync](file://.along/ISSUES/done/feat--documentation-blast-radius-sync.md)
 - [x] `(feat)` [link-rewriting-and-integrity-gate](file://.along/ISSUES/done/feat--link-rewriting-and-integrity-gate.md)
 - [x] `(feat)` [version-bump-automation-and-release-hardening](file://.along/ISSUES/done/feat--version-bump-automation-and-release-hardening.md)
 - [x] `(feat)` [update-agents-skill-and-automation](file://.along/ISSUES/done/feat--update-agents-skill-and-automation.md)

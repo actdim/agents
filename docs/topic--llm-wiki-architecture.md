@@ -104,3 +104,32 @@ flowchart TD
 - It provides a high-level overview, installation/usage steps, and links directly to the Knowledge Base catalog `docs/INDEX.md` and/or foundational articles (`docs/topic--architecture.md`, `docs/topic--domain-model.md`, `docs/topic--setup-and-workflow.md`).
 - Direct references to internal service directories (`.along/KB/`) or legacy numbered files (`01-...md`) are forbidden and automatically rewritten by `along-kb-sync` and `along-update`.
 
+---
+
+## 4. Documentation Blast Radius & Code-Graph-to-Wiki Synchronization
+
+In the Karpathy LLM-Wiki model, documentation must continuously evolve alongside code without manual overhead or full-corpus re-indexing. Along achieves this through a deterministic 2-phase blast radius synchronization pipeline:
+
+```mermaid
+flowchart LR
+    DIFF["Code Modifications (git diff)"] --> CRG["code-review-graph (get_impact_radius_tool)"]
+    CRG --> IMPACT["Impacted Symbols & Downstream Callers"]
+    IMPACT --> SEARCH["along-kb-search (Topic Query)"]
+    SEARCH --> TOPICS["Targeted docs/topic--*.md Files"]
+    TOPICS --> EDIT["Factual Article Updates"]
+    EDIT --> KBSYNC["along-kb-sync (Catalog & Link Gate)"]
+    KBSYNC --> INDEX["docs/INDEX.md & Verified Links"]
+```
+
+### 1. Code AST Blast Radius Analysis
+When non-trivial code modifications are made, agents invoke `code-review-graph` MCP tools (`get_impact_radius_tool`, `get_affected_flows_tool`) or AST analysis to discover all modified symbols, functions, exports, and downstream dependent modules.
+
+### 2. Knowledge Base Topic Mapping
+Instead of reading all documentation into context, agents query `along-kb-search` with the modified symbol and module names. This identifies the exact subset of `docs/topic--*.md` files that document the modified behaviors or dependent workflows.
+
+### 3. Factual, Incremental Updates
+Agents update only the affected topic files with concrete, verifiable facts extracted from the code (zero placeholders, zero hallucinations), maintaining clean YAML front-matter (`protocol: along`) and relative links.
+
+### 4. Integrity & Compilation Gate
+Finally, `/along-kb-sync` validates all relative Markdown links across the workspace and recompiles `docs/INDEX.md`, ensuring that the Wiki graph remains completely intact.
+

@@ -132,6 +132,7 @@ To keep `.along/` lean and avoid token bloat:
 - **Idempotent Synchronization**: Use `/along-kb-sync` to bootstrap, compile, and validate links in `docs/` and archive raw sources.
 - **Strict Fact Grounding Requirement**: Agents MUST extract facts strictly from actual `README.md`, `docs/`, `package.json`, and codebase symbols. Generating generic LLM placeholders is strictly prohibited.
 - **Targeted Fast Retrieval**: Agents MUST query `/along-kb-search` or `wiki_query` for concise snippets before reading whole documentation files into context.
+- **Documentation Blast Radius & Code-Graph-to-Wiki Synchronization**: After non-trivial code modifications, agents MUST determine the documentation blast radius by mapping affected AST symbols and dependent modules (discovered via `code-review-graph` or code search) to corresponding Knowledge Base articles (`docs/topic--<slug>.md`) using `along-kb-search` or symbol search. All impacted topic articles MUST be updated to reflect interface, architectural, or workflow changes before completing the task.
 
 ## While working
 - Follow the conventions in `AGENTS.md`.
@@ -147,14 +148,18 @@ When a Stage or session completes, agents MUST execute this verification checkli
 2. [ ] **File Integrity & Untracked Audit**: Inspect `git status -u` and verify that all newly created and modified files have non-zero size (`getsize > 0`), containing expected code/content without empty placeholders or corrupted bodies.
 3. [ ] **Code Review & Blast Radius Assessment**:
    - Inspect git diff for unintended side effects, unhandled nulls/errors, and edge cases.
-   - Evaluate systemic impact radius on callers/dependents using `code-review-graph` or AST analysis.
+   - Evaluate systemic impact radius on callers/dependents using `code-review-graph` (`get_impact_radius_tool`, `get_affected_flows_tool`) or AST analysis.
+   - Identify all modified subsystem symbols and impacted downstream interfaces to inform documentation updates.
    - Verify compliance with architectural decisions in `.along/DECISIONS.md`.
 4. [ ] **Entity Reconciliation**:
    - Set `status: done` and `completed: YYYY-MM-DD` for finished issues; MOVE to `.along/ISSUES/done/`.
    - Update related `.along/MILESTONES/` progress percentages.
    - Resolve mitigated `.along/RISKS/` (`status: resolved` / `mitigated`).
    - Conclude active `.along/SPIKES/` and log any resulting ADR in `.along/DECISIONS.md`.
-5. [ ] **Documentation Check & Link Integrity Gate**: Update `README.md`, `AGENTS.md` (project specifics), or `docs/` if code interfaces or architecture changed, run `/along-kb-sync`, and verify that all relative Markdown links in all repository `.md` files resolve to physically existing files on disk without 404 broken links.
+5. [ ] **Documentation Blast Radius Check & LLM-Wiki Gate**:
+   - Map identified code blast radius symbols/modules to Knowledge Base topics using `along-kb-search` or symbol search in `docs/`.
+   - Factually update all affected `docs/topic--*.md` articles (and `README.md` / `AGENTS.md` if public entry points or conventions changed).
+   - Run `/along-kb-sync` to recompile `docs/INDEX.md`, validate link integrity, and verify zero 404 broken relative links.
 6. [ ] **Session Log**: Write `.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` with complete front-matter (`protocol: along`, `issues_advanced`, `issues_completed`, `decisions`, `risks_logged`, `spikes_conducted`) and a concise Code Review & Impact summary.
 7. [ ] **ISSUES Board Projection**: Run `/along-issue-sync` (or update `.along/ISSUES.md`).
 8. [ ] **HISTORY**: Append one line to `.along/HISTORY.md`: `<YYYY-MM-DD> - <slug> - <agent> - <summary> - <link>`.

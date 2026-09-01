@@ -20,13 +20,17 @@ Universal finalization and memory synchronization protocol for sessions, tasks, 
 2. [ ] **Code Review & Blast Radius Assessment**:
    - Inspect `git diff` for unintended side effects, unhandled nulls/errors, and edge cases.
    - Evaluate systemic blast radius on callers/dependents using `code-review-graph` (`get_impact_radius_tool`, `get_affected_flows_tool`) or AST analysis.
+   - Identify all modified subsystem symbols and impacted downstream interfaces to inform documentation updates.
    - Verify compliance with architectural decisions in `.along/DECISIONS.md`.
 3. [ ] **Entity Reconciliation**:
    - Set `status: done` and `completed: YYYY-MM-DD` for finished issues in the nearest `.along/ISSUES/`; MOVE to `ISSUES/done/<type>--<slug>.md`.
    - Update related `.along/MILESTONES/` progress percentages.
    - Resolve mitigated `.along/RISKS/` (`status: resolved` / `mitigated`).
    - Conclude active `.along/SPIKES/` and log any resulting ADR in `.along/DECISIONS.md`.
-4. [ ] **Documentation Check & Link Integrity Gate**: Update `README.md`, `AGENTS.md` (project specifics), or `docs/` if code interfaces or architecture changed, run `/along-kb-sync`, and verify that all relative Markdown links in all repository `.md` files resolve to physically existing files on disk without 404 broken links.
+4. [ ] **Documentation Blast Radius Check & LLM-Wiki Gate**:
+   - Map identified code blast radius symbols/modules to Knowledge Base topics using `along-kb-search` or symbol search in `docs/`.
+   - Factually update all affected `docs/topic--*.md` articles (and `README.md` / `AGENTS.md` if public entry points or conventions changed).
+   - Run `/along-kb-sync` to recompile `docs/INDEX.md`, validate link integrity, and verify zero 404 broken relative links.
 5. [ ] **Session Log**: Write `.along/SESSIONS/<YYYY>/<YYYY-MM-DD>--<short-slug>.md` in the nearest `.along/` with complete front-matter (`protocol: along`, `issues_advanced`, `issues_completed`, `decisions`, `risks_logged`, `spikes_conducted`) and a concise Code Review & Impact summary.
 6. [ ] **ISSUES Board Projection**: Run `/along-issue-sync` (or update nearest `.along/ISSUES.md`).
 7. [ ] **HISTORY**: Append one line to nearest `.along/HISTORY.md`: `<YYYY-MM-DD> - <slug> - <agent> - <summary> - <link>`.
