@@ -1,6 +1,6 @@
 ---
 protocol: along
-protocol_version: "2.2.6"
+protocol_version: "2.2.8"
 slug: topic--dependencies
 title: Dependencies & Submodules AI Documentation and Rules
 type: topic

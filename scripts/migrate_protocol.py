@@ -27,7 +27,7 @@ import shutil
 import subprocess
 from datetime import datetime
 
-CURRENT_PROTOCOL_VERSION = "2.2.7"
+CURRENT_PROTOCOL_VERSION = "2.2.8"
 
 def parse_yaml_frontmatter(content):
     match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n(.*)$", content, re.DOTALL)

@@ -84,3 +84,65 @@ public sealed class OrderService(
 - **Async Suffix**: Always append `Async` to asynchronous methods (e.g. `FetchUserDataAsync`).
 - **File-scoped Namespaces**: Use file-scoped namespaces (`namespace MyProject.Services;`) to reduce indentation.
 
+---
+
+## 6. NuGet Packaging & AI Documentation (LLM-Wiki)
+
+- **Centralized Packaging via `Directory.Build.props` (Recommended)**:
+  - Place AI context packaging rules in the solution root `Directory.Build.props` to ensure every published library automatically includes its agent guidelines and project wiki.
+  - Enable XML documentation generation (`<GenerateDocumentationFile>true</GenerateDocumentationFile>`).
+  - Pack `README.md`, `AGENTS.md`, `llms.txt`, and the full `docs/` Knowledge Base into the generated `.nupkg`.
+
+```xml
+<!-- Directory.Build.props -->
+<Project>
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile Condition="Exists('README.md')">README.md</PackageReadmeFile>
+    <PackageTags>along;ai-agent;llms;$(PackageTags)</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Package Readme -->
+    <None Include="README.md" Pack="true" PackagePath="" Condition="Exists('README.md')" />
+
+    <!-- AI Instructions in Package Root -->
+    <None Include="AGENTS.md" Pack="true" PackagePath="" Condition="Exists('AGENTS.md')" />
+    <None Include="llms.txt" Pack="true" PackagePath="" Condition="Exists('llms.txt')" />
+
+    <!-- Project Knowledge Base (Wiki) in docs/ folder -->
+    <None Include="docs\**\*" Pack="true" PackagePath="docs" Condition="Exists('docs')" />
+  </ItemGroup>
+</Project>
+```
+
+- **Standalone Project Configuration (`*.csproj`)**:
+  - For independent libraries or repositories without `Directory.Build.props`, declare packaging metadata explicitly in the project file:
+
+```xml
+<!-- MyLibrary.csproj -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <PackageId>MyOrg.MyLibrary</PackageId>
+    <Version>1.0.0</Version>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>along;ai-agent;llms;$(PackageTags)</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="AGENTS.md" Pack="true" PackagePath="" />
+    <None Include="llms.txt" Pack="true" PackagePath="" />
+    <None Include="docs\**\*" Pack="true" PackagePath="docs" />
+  </ItemGroup>
+</Project>
+```
+
+- **Consumer & Upward Discovery Protocol**:
+  - When consumers install the package via `dotnet add package` or `<PackageReference>`, NuGet unpacks the package into the global cache (`~/.nuget/packages/<package_id>/<version>/`).
+  - Along dependency scanner (`along-dep-scan`) inspects `<PackageReference>` elements, finds the unpacked package in the NuGet cache, indexes `AGENTS.md` and `docs/`, and links them in the consumer's `docs/topic--dependencies.md`.
+
+

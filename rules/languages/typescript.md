@@ -77,3 +77,43 @@ type AsyncResult<T> =
 - **UPPER_SNAKE_CASE**: Global constants.
 - **kebab-case**: Source filenames (e.g. `user-service.ts`, `auth-guard.ts`).
 
+---
+
+## 6. Package Distribution & AI Metadata (LLM-Wiki)
+
+- **Explicit `package.json` `"files"` Whitelist (Standard / Vanilla)**:
+  - Avoid relying on `.npmignore` alone. Always explicitly declare the `"files"` array in `package.json` to guarantee that compiled output (`dist`), AI rules (`AGENTS.md`, `llms.txt`), and the `docs/` Wiki are published in npm packages.
+
+```json
+{
+  "name": "@myorg/core",
+  "version": "1.0.0",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "AGENTS.md",
+    "llms.txt",
+    "docs",
+    "README.md"
+  ],
+  "keywords": ["along", "ai-agent", "llms", "rules"],
+  "ai": {
+    "agents": "AGENTS.md",
+    "llms": "llms.txt",
+    "wiki": "docs"
+  }
+}
+```
+
+- **PNPM Workspaces & Monorepo Publishing (Recommended)**:
+  - Use `pnpm publish --filter <package>` to publish individual workspace packages.
+  - The `workspace:*` protocol automatically translates to exact semantic versions during `pnpm publish`.
+  - Place shared root documentation in `docs/` and package-specific architectural articles in `packages/<pkg>/docs/`.
+
+- **Consumer & Upward Discovery Protocol**:
+  - When consumers install the package (`pnpm add @myorg/core`, `npm i @myorg/core`), package files reside in `node_modules/@myorg/core/`.
+  - Along dependency scanner (`along-dep-scan`) inspects `package.json` dependencies, resolves the package in `node_modules/`, identifies `AGENTS.md` and `docs/` (or manifest `"ai"` metadata), and records links in `docs/topic--dependencies.md`.
+
+

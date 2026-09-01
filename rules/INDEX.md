@@ -14,11 +14,11 @@ Rule packs provide strict, pragmatic engineering standards for both programming 
 
 | Language | Rule File | Primary Focus & Standards |
 | :--- | :--- | :--- |
-| **C# / .NET** | [`languages/csharp.md`](file://rules/languages/csharp.md) | Central Package Management (`Directory.Packages.props`), `Directory.Build.props`, Modern .NET 8+, Nullable reference types, Async/Await correctness, Memory efficiency (`Span<T>`, records). |
-| **TypeScript** | [`languages/typescript.md`](file://rules/languages/typescript.md) | PNPM Workspaces (`workspace:*`, Catalogs), Strict type safety, Zero `any`, Explicit function return types, Discriminated unions, Immutable structures. |
-| **JavaScript** | [`languages/javascript.md`](file://rules/languages/javascript.md) | Modern ES2022+, ESM modules, Async/Await error handling, Defensive object manipulation. |
-| **Python** | [`languages/python.md`](file://rules/languages/python.md) | UV Workspaces (`[tool.uv.workspace]`), Modern Python 3.11+, PEP 8, Type annotations (`mypy`/`pyright`), Dataclasses/Pydantic, Ruff linting. |
-| **Rust** | [`languages/rust.md`](file://rules/languages/rust.md) | Cargo Workspace dependency inheritance (`[workspace.dependencies]`), Memory safety, Zero panic in production (`unwrap`/`expect` ban), `thiserror`/`anyhow`. |
+| **C# / .NET** | [`languages/csharp.md`](file://rules/languages/csharp.md) | Central Package Management (`Directory.Packages.props`), `Directory.Build.props`, Modern .NET 8+, Nullable reference types, Async/Await correctness, NuGet packaging for AI instructions (`AGENTS.md`, `llms.txt`, `docs/`). |
+| **TypeScript** | [`languages/typescript.md`](file://rules/languages/typescript.md) | PNPM Workspaces (`workspace:*`, Catalogs), Strict type safety, Zero `any`, Explicit return types, `package.json` `"files"` and AI metadata distribution. |
+| **JavaScript** | [`languages/javascript.md`](file://rules/languages/javascript.md) | Modern ES2022+, ESM modules, Async/Await error handling, Defensive object manipulation, Safe `.npmignore` and AI documentation packaging. |
+| **Python** | [`languages/python.md`](file://rules/languages/python.md) | UV Workspaces (`[tool.uv.workspace]`), Modern Python 3.11+, PEP 8/621, Type annotations (`mypy`/`pyright`), `pyproject.toml` package-data bundling (`AGENTS.md`, `llms.txt`, `docs/`). |
+| **Rust** | [`languages/rust.md`](file://rules/languages/rust.md) | Cargo Workspace dependency inheritance (`[workspace.dependencies]`), Memory safety, Zero panic in production (`unwrap`/`expect` ban), `include` whitelist for crate AI documentation. |
 
 ---
 

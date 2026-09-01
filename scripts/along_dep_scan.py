@@ -92,6 +92,14 @@ def normalize_posix(path_str: str) -> str:
     return path_str.replace("\\", "/")
 
 
+def safe_relpath(path: str, start: str) -> str:
+    """Safely calculate relative path, handling cross-drive paths on Windows gracefully."""
+    try:
+        return os.path.relpath(path, start)
+    except (ValueError, Exception):
+        return path
+
+
 def find_ai_files_in_dir(dir_path: str, repo_root: str) -> List[Dict[str, str]]:
     """Scan directory for AI instruction files without case duplication."""
     found = []
@@ -110,7 +118,7 @@ def find_ai_files_in_dir(dir_path: str, repo_root: str) -> List[Dict[str, str]]:
                 r_canon = os.path.realpath(full)
                 if r_canon not in seen_real:
                     seen_real.add(r_canon)
-                    rel = normalize_posix(os.path.relpath(full, repo_root))
+                    rel = normalize_posix(safe_relpath(full, repo_root))
                     found.append({"filename": entry, "path": rel})
     return found
 
@@ -599,7 +607,7 @@ def scan_nuget_project_deps(project: ProjectScope, repo_root: str) -> List[Dict[
 
         docs_dir = os.path.join(found_pkg_dir, "docs")
         if os.path.isdir(docs_dir):
-            rel_docs = normalize_posix(os.path.relpath(docs_dir, repo_root))
+            rel_docs = normalize_posix(safe_relpath(docs_dir, repo_root))
             found_files.append({"filename": "docs/", "path": rel_docs})
 
         if found_files:

@@ -66,3 +66,64 @@ class Coordinate:
 - **Custom Exceptions**: Derive domain errors from a custom base exception class (`class DomainError(Exception): pass`).
 - **Exception Chaining**: Use `raise NewException(...) from original_err` to preserve stack traces.
 
+---
+
+## 6. Packaging & Distributing AI Documentation (LLM-Wiki)
+
+- **Standard PEP 621 `pyproject.toml` & Package Data**:
+  - When publishing Python packages to PyPI or internal registries, configure the build backend to bundle `AGENTS.md`, `llms.txt`, and the `docs/` folder into wheels (`.whl`) and source distributions (`.tar.gz`).
+
+```toml
+# pyproject.toml (Hatchling / Standard PEP 621)
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "myorg-core"
+version = "1.0.0"
+readme = "README.md"
+keywords = ["along", "ai-agent", "llms", "rules"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"AGENTS.md" = "myorg_core/AGENTS.md"
+"llms.txt" = "myorg_core/llms.txt"
+"docs" = "myorg_core/docs"
+```
+
+- **Setuptools & `MANIFEST.in` (Standard / Vanilla Tooling)**:
+  - When using standard `setuptools`, ensure non-code AI files are included in source distributions and wheels:
+
+```ini
+# MANIFEST.in
+include README.md
+include AGENTS.md
+include llms.txt
+recursive-include docs *.md
+```
+
+```toml
+# pyproject.toml (Setuptools)
+[tool.setuptools.package-data]
+"myorg_core" = ["AGENTS.md", "llms.txt", "docs/**/*.md"]
+```
+
+- **Poetry / Flit (Recommended Alternatives)**:
+  - With Poetry or Flit, declare explicit inclusions in `pyproject.toml`:
+
+```toml
+# pyproject.toml (Poetry)
+[tool.poetry]
+name = "myorg-core"
+include = [
+    { path = "AGENTS.md" },
+    { path = "llms.txt" },
+    { path = "docs" }
+]
+```
+
+- **Consumer & Upward Discovery Protocol**:
+  - When downstream projects install the dependency via `pip install`, `uv add`, or `requirements.txt`, files are installed into `.venv/lib/site-packages/<package>/`.
+  - The Along dependency scanner (`along-dep-scan`) inspects `pyproject.toml` / `requirements.txt`, resolves the installed package directory in the active virtual environment, detects `AGENTS.md` and `docs/`, and registers them into `docs/topic--dependencies.md`.
+
+

@@ -70,3 +70,38 @@ pub enum DatabaseError {
 - **Formatting**: Always format with `cargo fmt`.
 - **Quiet Test Flag**: Run tests in agent loops using `cargo test -q`.
 
+---
+
+## 6. Crate Packaging & Cargo AI Documentation (LLM-Wiki)
+
+- **Cargo Packaging with `include` Whitelist (Standard / Vanilla)**:
+  - When publishing crates to `crates.io` or internal registries via `cargo publish`, explicitly specify the `include` field in `Cargo.toml` to ensure AI instructions and Knowledge Base articles are packaged into the `.crate` archive.
+
+```toml
+# Cargo.toml
+[package]
+name = "myorg-core"
+version = "0.1.0"
+edition = "2021"
+readme = "README.md"
+keywords = ["along", "ai-agent", "llms", "rules"]
+include = [
+    "src/**/*",
+    "Cargo.toml",
+    "README.md",
+    "AGENTS.md",
+    "llms.txt",
+    "docs/**/*",
+]
+
+[package.metadata.ai]
+agents = "AGENTS.md"
+llms = "llms.txt"
+wiki = "docs"
+```
+
+- **Consumer & Upward Discovery Protocol**:
+  - Downstream crates inheriting or declaring the dependency download unpacked crate sources into `~/.cargo/registry/src/` or vendor directory.
+  - The Along dependency scanner (`along-dep-scan`) inspects `Cargo.toml` dependencies, locates crate source directories in Cargo cache/vendor, and registers `AGENTS.md` and `docs/` in `docs/topic--dependencies.md`.
+
+

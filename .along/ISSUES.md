@@ -23,6 +23,7 @@
 - [x] `(feat)` [multi-agent-blackboard-and-architectural-rationale](file://.along/ISSUES/done/feat--multi-agent-blackboard-and-architectural-rationale.md)
 - [x] `(feat)` [llm-wiki-docs-architecture-and-skill-refactor](file://.along/ISSUES/done/feat--llm-wiki-docs-architecture-and-skill-refactor.md)
 - [x] `(feat)` [link-rewriting-and-integrity-gate](file://.along/ISSUES/done/feat--link-rewriting-and-integrity-gate.md)
+- [x] `(feat)` [language-rules-packaging-and-ai-docs](file://.along/ISSUES/done/feat--language-rules-packaging-and-ai-docs.md)
 - [x] `(feat)` [integrate-wiki-llm-mcp](file://.along/ISSUES/done/feat--integrate-wiki-llm-mcp.md)
 - [x] `(feat)` [integrate-code-review-graph-mcp](file://.along/ISSUES/done/feat--integrate-code-review-graph-mcp.md)
 - [x] `(feat)` [installer-junction-fallback-and-dependencies](file://.along/ISSUES/done/feat--installer-junction-fallback-and-dependencies.md)

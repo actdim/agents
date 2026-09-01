@@ -8,7 +8,7 @@ import shutil
 import argparse
 from datetime import datetime
 
-CURRENT_PROTOCOL_VERSION = "2.2.7"
+CURRENT_PROTOCOL_VERSION = "2.2.8"
 
 STANDARD_ARTICLES = [
     ("topic--architecture.md", "System Architecture & Flow", "architecture", ["architecture", "boundaries", "providers", "mcp", "dashboard"]),
